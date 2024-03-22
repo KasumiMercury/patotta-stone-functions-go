@@ -4,18 +4,18 @@ services:
         context: .
         dockerfile: ./proxy/Dockerfile
     environment:
-      FUNCTIONS: "hoge,fuga"
+      FUNCTIONS: "animus"
     volumes:
       - .:/app
     restart: always
     ports:
       - "8080:8080"
-  hoge:
+  animus:
     build:
         context: .
         dockerfile: Dockerfile
     environment:
-      FUNCTION_TARGET: Hoge
+      FUNCTION_TARGET: Animus
     volumes:
       - .:/app
     restart: always

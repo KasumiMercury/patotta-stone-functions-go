@@ -7,9 +7,9 @@ import (
 )
 
 func init() {
-	functions.HTTP("Hoge", hoge)
+	functions.HTTP("Animus", animus)
 }
 
-func hoge(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, World! from Hoge!")
+func animus(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello, World! from Animus!")
 }
