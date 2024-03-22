@@ -57,7 +57,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// debug log
-	fmt.Printf("Fetched %d chats from the static target video", len(stcChats))
+	slog.Info("Fetched chats from the static target video", "count", len(stcChats))
 
 	w.WriteHeader(http.StatusOK)
 	slog.Info("Animus function executed successfully")

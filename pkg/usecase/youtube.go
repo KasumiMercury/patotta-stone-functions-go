@@ -50,7 +50,7 @@ func FetchChatsByVideoInfo(ctx context.Context, svc *youtube.Service, video mode
 			continue
 		}
 		chats = append(chats, model.YTChat{
-			AuthorChannelID: item.AuthorDetails.ChannelId,
+			AuthorChannelID: item.Snippet.AuthorChannelId,
 			Message:         item.Snippet.DisplayMessage,
 			PublishedAtUnix: pa.Unix(),
 			SourceID:        video.SourceID,
