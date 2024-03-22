@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  build:
+    desc: "Build the docker image"
+    cmds:
+      - docker-compose build
+  up:
+    desc: "Start the docker container"
+    cmds:
+      - docker-compose up -d
+  down:
+    desc: "Stop the docker container"
+    cmds:
+      - docker-compose down
+  destroy:
+    desc: "Destroy the docker container"
+    cmds:
+      - docker-compose down --rmi all --volumes --remove-orphans
+  deploy-*-*:
+    desc: "Deploy the function to GOOGLE CLOUD FUNCTIONS"
+    vars:
+      FUNCTION_NAME: '{{index .MATCH 0}}'
+      FUNCTION_TARGET: '{{index .MATCH 1}}'
+    cmds:
+      - gcloud functions deploy {{.FUNCTION_NAME}} \
+        --runtime go121 \
+        --region=asia-northeast1 \
+        --source=. \
+        --entry-point {{.FUNCTION_TARGET}} \
+        --trigger-http

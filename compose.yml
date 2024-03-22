@@ -1,0 +1,21 @@
+services:
+  proxy:
+    build:
+        context: .
+        dockerfile: ./proxy/Dockerfile
+    environment:
+      FUNCTIONS: "hoge,fuga"
+    volumes:
+      - .:/app
+    restart: always
+    ports:
+      - "8080:8080"
+  hoge:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    environment:
+      FUNCTION_TARGET: Hoge
+    volumes:
+      - .:/app
+    restart: always
