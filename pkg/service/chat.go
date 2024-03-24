@@ -80,7 +80,11 @@ func (s *chatService) SaveTargetChats(ctx context.Context, chats []model.YTChat)
 
 	// Save the chats to the database
 	if err := s.supaRepo.InsertChatRecord(ctx, chatRecords); err != nil {
-		slog.Error("Failed to insert chats", "error", err)
+		slog.Error("Failed to insert chats",
+			slog.Group("saveChat", "sourceId", chats[0].SourceID,
+				slog.Group("Supabase", "error", err),
+			),
+		)
 		return err
 	}
 
