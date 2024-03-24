@@ -61,7 +61,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
 
 	// Fetch chats from the static target video
-	_, err = chatUsc.FetchChatsFromStaticTargetVideo(ctx)
+	err = chatUsc.FetchChatsFromStaticTargetVideo(ctx)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the static target video", slog.Group("staticTarget", "error", err))
 		http.Error(w, "Failed to fetch chats from the static target video", http.StatusInternalServerError)

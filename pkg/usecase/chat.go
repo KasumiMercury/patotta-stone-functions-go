@@ -13,7 +13,7 @@ import (
 )
 
 type Chat interface {
-	FetchChatsFromStaticTargetVideo(ctx context.Context) ([]model.YTChat, error)
+	FetchChatsFromStaticTargetVideo(ctx context.Context) error
 }
 
 type chatUsecase struct {
@@ -30,7 +30,7 @@ func NewChatUsecase(targetChannel []string, chatSvc service.Chat, supaRepo repos
 	}
 }
 
-func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) ([]model.YTChat, error) {
+func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error {
 	// load info of static target video from environment variables
 	stcEnv := os.Getenv("STATIC_TARGET")
 	var stc model.VideoInfo
@@ -45,7 +45,7 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) ([]mo
 	stcChats, err := u.chatSvc.FetchChatsByVideoInfo(ctx, stc, 0)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the static target video", slog.Group("staticTarget", "error", err))
-		return nil, err
+		return err
 	}
 
 	// Filter chats by author channel
@@ -55,19 +55,19 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) ([]mo
 	newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, stc.SourceID)
 	if err != nil {
 		slog.Error("Failed to filter chats by the publishedAt", "error", err)
-		return nil, err
+		return err
 	}
 
 	// Save the new chats to the Supabase
 	if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
 		slog.Error("Failed to insert the new chats", "error", err)
-		return nil, err
+		return err
 	}
 
 	// debug log
 	slog.Info("Fetched chats from the static target video", "count", len(newChats))
 
-	return newChats, nil
+	return nil
 }
 
 func filterChatsByAuthorChannel(chats []model.YTChat, targetChannel []string) ([]model.YTChat, []model.YTChat) {
