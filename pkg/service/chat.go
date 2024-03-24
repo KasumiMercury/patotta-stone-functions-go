@@ -7,19 +7,23 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/repository"
 	"log/slog"
+	"time"
 )
 
 type Chat interface {
 	FetchChatsByVideoInfo(ctx context.Context, videoInfo model.VideoInfo, l int64) ([]model.YTChat, error)
+	SaveNewTargetChats(ctx context.Context, chats []model.YTChat) error
 }
 
 type chatService struct {
-	ytRepo repository.YouTube
+	ytRepo   repository.YouTube
+	supaRepo repository.Supabase
 }
 
-func NewChatService(ytRepo repository.YouTube) Chat {
+func NewChatService(ytRepo repository.YouTube, supaRepo repository.Supabase) Chat {
 	return &chatService{
-		ytRepo: ytRepo,
+		ytRepo:   ytRepo,
+		supaRepo: supaRepo,
 	}
 }
 
@@ -62,4 +66,28 @@ func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model
 	}
 
 	return chats, nil
+}
+
+func (s *chatService) SaveNewTargetChats(ctx context.Context, chats []model.YTChat) error {
+	// Convert the chats to the chat records
+	chatRecords := make([]model.ChatRecord, 0, len(chats))
+	for _, chat := range chats {
+		chatRecords = append(chatRecords, model.ChatRecord{
+			Message:     chat.Message,
+			SourceID:    chat.SourceID,
+			PublishedAt: time.Unix(chat.PublishedAtUnix, 0),
+		})
+	}
+
+	// Save the chats to the database
+	if err := s.supaRepo.InsertChatRecord(ctx, chatRecords); err != nil {
+		slog.Error("Failed to insert chats",
+			slog.Group("saveChat", "sourceId", chats[0].SourceID,
+				slog.Group("Supabase", "error", err),
+			),
+		)
+		return err
+	}
+
+	return nil
 }
