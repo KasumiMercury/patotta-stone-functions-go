@@ -65,7 +65,7 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 	}
 
 	// debug log
-	slog.Info("Fetched chats from the static target video", "count", len(newChats))
+	slog.Debug("Fetched chats from the static target video", "count", len(newChats))
 
 	return nil
 }
