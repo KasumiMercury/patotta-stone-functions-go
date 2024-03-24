@@ -36,6 +36,12 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		panic("YOUTUBE_API_KEY must be set")
 	}
 
+	dsn := os.Getenv("DSN")
+	if dsn == "" {
+		slog.Error("DSN is not set")
+		panic("DSN is not set")
+	}
+
 	// Create YouTube service
 	ytRepo, err := infra.NewYouTubeRepository(ctx, ytApiKey)
 	if err != nil {
@@ -43,7 +49,15 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to create YouTube service", http.StatusInternalServerError)
 		return
 	}
-	chatSvc := service.NewChatService(ytRepo)
+	// Create Supabase client
+	supaRepo, err := infra.NewSupabaseRepository(dsn)
+	if err != nil {
+		slog.Error("Failed to create Supabase client", slog.Group("Supabase", "error", err))
+		http.Error(w, "Failed to create Supabase client", http.StatusInternalServerError)
+		return
+	}
+
+	chatSvc := service.NewChatService(ytRepo, supaRepo)
 	chatUsc := usecase.NewChatUsecase(chatSvc, targetChannels)
 
 	// Fetch chats from the static target video

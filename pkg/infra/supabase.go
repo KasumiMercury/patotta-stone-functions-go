@@ -1,7 +1,9 @@
 package infra
 
 import (
+	"context"
 	"database/sql"
+	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/model"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
@@ -24,4 +26,13 @@ func NewSupabaseRepository(dsn string) (*SupabaseRepository, error) {
 	}
 
 	return &SupabaseRepository{db: db}, nil
+}
+
+func (r *SupabaseRepository) InsertChatRecord(ctx context.Context, record []model.ChatRecord) error {
+	_, err := r.db.NewInsert().Model(&record).Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
