@@ -58,7 +58,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	chatSvc := service.NewChatService(ytRepo, supaRepo)
-	chatUsc := usecase.NewChatUsecase(chatSvc, targetChannels)
+	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
 
 	// Fetch chats from the static target video
 	_, err = chatUsc.FetchChatsFromStaticTargetVideo(ctx)

@@ -33,6 +33,29 @@ func NewSupabaseRepository(dsn string) (*SupabaseRepository, error) {
 	return &SupabaseRepository{db: db}, nil
 }
 
+func (r *SupabaseRepository) GetPublishedAtOfLastRecordedChatBySource(ctx context.Context, sourceId string) (int64, error) {
+	records := make([]model.ChatRecord, 0)
+	err := r.db.NewSelect().
+		Model(&records).
+		Where("source_id = ?", sourceId).
+		Order("published_at DESC").
+		Limit(1).
+		Scan(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to get the last recorded chat",
+			slog.Group("Supabase", "error", err),
+		)
+		return 0, err
+	}
+
+	if len(records) == 0 {
+		return 0, nil
+	}
+
+	return records[0].PublishedAt.Unix(), nil
+}
+
 func (r *SupabaseRepository) InsertChatRecord(ctx context.Context, record []model.ChatRecord) error {
 	_, err := r.db.NewInsert().Model(&record).Exec(ctx)
 	if err != nil {

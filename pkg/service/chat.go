@@ -12,6 +12,7 @@ import (
 
 type Chat interface {
 	FetchChatsByVideoInfo(ctx context.Context, videoInfo model.VideoInfo, l int64) ([]model.YTChat, error)
+	SaveNewTargetChats(ctx context.Context, chats []model.YTChat) error
 }
 
 type chatService struct {
@@ -67,7 +68,7 @@ func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model
 	return chats, nil
 }
 
-func (s *chatService) SaveTargetChats(ctx context.Context, chats []model.YTChat) error {
+func (s *chatService) SaveNewTargetChats(ctx context.Context, chats []model.YTChat) error {
 	// Convert the chats to the chat records
 	chatRecords := make([]model.ChatRecord, 0, len(chats))
 	for _, chat := range chats {

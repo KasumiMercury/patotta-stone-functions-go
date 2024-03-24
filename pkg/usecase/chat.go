@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/model"
+	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/repository"
 	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/service"
 	"log/slog"
 	"os"
@@ -16,14 +17,16 @@ type Chat interface {
 }
 
 type chatUsecase struct {
-	chatSvc       service.Chat
 	targetChannel []string
+	chatSvc       service.Chat
+	supaRepo      repository.Supabase
 }
 
-func NewChatUsecase(chatSvc service.Chat, targetChannel []string) Chat {
+func NewChatUsecase(targetChannel []string, chatSvc service.Chat, supaRepo repository.Supabase) Chat {
 	return &chatUsecase{
-		chatSvc:       chatSvc,
 		targetChannel: targetChannel,
+		chatSvc:       chatSvc,
+		supaRepo:      supaRepo,
 	}
 }
 
@@ -48,10 +51,23 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) ([]mo
 	// Filter chats by author channel
 	targetChats, _ := filterChatsByAuthorChannel(stcChats, u.targetChannel)
 
-	// debug log
-	slog.Info("Fetched chats from the static target video", "count", len(targetChats))
+	// Filter chats by the publishedAt
+	newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, stc.SourceID)
+	if err != nil {
+		slog.Error("Failed to filter chats by the publishedAt", "error", err)
+		return nil, err
+	}
 
-	return targetChats, nil
+	// Save the new chats to the Supabase
+	if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
+		slog.Error("Failed to insert the new chats", "error", err)
+		return nil, err
+	}
+
+	// debug log
+	slog.Info("Fetched chats from the static target video", "count", len(newChats))
+
+	return newChats, nil
 }
 
 func filterChatsByAuthorChannel(chats []model.YTChat, targetChannel []string) ([]model.YTChat, []model.YTChat) {
@@ -65,4 +81,27 @@ func filterChatsByAuthorChannel(chats []model.YTChat, targetChannel []string) ([
 	}
 
 	return targetChats, otherChats
+}
+
+func (u *chatUsecase) filterChatsByPublishedAt(ctx context.Context, chats []model.YTChat, sourceId string) ([]model.YTChat, error) {
+	// Fetch the last recorded chat's publishedAt from the Supabase
+	threshold, err := u.supaRepo.GetPublishedAtOfLastRecordedChatBySource(ctx, sourceId)
+	if err != nil {
+		slog.Error("Failed to get the last recorded chat", "error", err)
+		return nil, err
+	}
+
+	// Filter the chats by the threshold
+	// The chats are already sorted by the publishedAt in ascending order (constraint of the YouTube API)
+
+	var filteredChats []model.YTChat
+
+	for i, chat := range chats {
+		if chat.PublishedAtUnix > threshold {
+			filteredChats = chats[i:]
+			break
+		}
+	}
+
+	return filteredChats, nil
 }
