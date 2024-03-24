@@ -1,13 +1,10 @@
 package patotta_stone_functions_go
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/model"
+	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/infra"
+	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/service"
 	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/usecase"
-	"google.golang.org/api/option"
-	"google.golang.org/api/youtube/v3"
 	"log/slog"
 	"net/http"
 	"os"
@@ -31,33 +28,22 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Create YouTube service
-	ytSvc, err := youtube.NewService(ctx, option.WithAPIKey(ytApiKey))
+	ytRepo, err := infra.NewYouTubeRepository(ctx, ytApiKey)
 	if err != nil {
 		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
 		http.Error(w, "Failed to create YouTube service", http.StatusInternalServerError)
 		return
 	}
-
-	// load info of static target video from environment variables
-	stcEnv := os.Getenv("STATIC_TARGET")
-	var stc model.VideoInfo
-	if err := json.Unmarshal([]byte(stcEnv), &stc); err != nil {
-		slog.Error("Failed to unmarshal STATIC_TARGET", "error", err)
-		// If the environment variable is not set correctly, the function will panic.
-		// (To prevent retries by CloudScheduler, the function should panic without returning error responses.)
-		panic(fmt.Sprintf("Failed to unmarshal static target: %v", err))
-	}
+	chatSvc := service.NewChatService(ytRepo)
+	chatUsc := usecase.NewChatUsecase(chatSvc)
 
 	// Fetch chats from the static target video
-	stcChats, err := usecase.FetchChatsByVideoInfo(ctx, ytSvc, stc, 0)
+	_, err = chatUsc.FetchChatsFromStaticTargetVideo(ctx)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the static target video", slog.Group("staticTarget", "error", err))
 		http.Error(w, "Failed to fetch chats from the static target video", http.StatusInternalServerError)
 		return
 	}
-
-	// debug log
-	slog.Info("Fetched chats from the static target video", "count", len(stcChats))
 
 	w.WriteHeader(http.StatusOK)
 	slog.Info("Animus function executed successfully")
