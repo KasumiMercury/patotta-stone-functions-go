@@ -28,12 +28,12 @@ func NewYouTubeRepository(ctx context.Context, apiKey string) (*YouTubeRepositor
 	return &YouTubeRepository{ytSvc: ytSvc}, nil
 }
 
-func (r *YouTubeRepository) FetchChatsByChatID(ctx context.Context, chatID string, l int64) (*youtube.LiveChatMessageListResponse, error) {
+func (r *YouTubeRepository) FetchChatsByChatID(ctx context.Context, chatID string, maxResults int64) (*youtube.LiveChatMessageListResponse, error) {
 	call := r.ytSvc.LiveChatMessages.List(chatID, []string{"snippet"})
 
 	// If the length is set, set the maximum number of messages to be fetched
-	if l > 0 {
-		call.MaxResults(l)
+	if maxResults > 0 {
+		call.MaxResults(maxResults)
 	}
 
 	call = call.Context(ctx)
