@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func init() {
@@ -21,6 +22,14 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	// Because the function is supposed to run on CloudFunctions, it is necessary to read the environment variables here.
 	// If the environment variable is not set, the function will panic.
 	// (To prevent retries by CloudScheduler, the function should panic without returning error responses.)
+	targetChannelIdStr := os.Getenv("TARGET_CHANNEL_ID")
+	if targetChannelIdStr == "" {
+		slog.Error("TARGET_CHANNEL_ID is not set")
+		panic("TARGET_CHANNEL_ID is not set")
+	}
+	// Split targetChannelIdStr by comma
+	targetChannels := strings.Split(targetChannelIdStr, ",")
+
 	ytApiKey := os.Getenv("YOUTUBE_API_KEY")
 	if ytApiKey == "" {
 		slog.Error("YOUTUBE_API_KEY is not set")
@@ -35,7 +44,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	chatSvc := service.NewChatService(ytRepo)
-	chatUsc := usecase.NewChatUsecase(chatSvc)
+	chatUsc := usecase.NewChatUsecase(chatSvc, targetChannels)
 
 	// Fetch chats from the static target video
 	_, err = chatUsc.FetchChatsFromStaticTargetVideo(ctx)

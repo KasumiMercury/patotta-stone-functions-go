@@ -8,6 +8,7 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/service"
 	"log/slog"
 	"os"
+	"slices"
 )
 
 type Chat interface {
@@ -15,12 +16,14 @@ type Chat interface {
 }
 
 type chatUsecase struct {
-	chatSvc service.Chat
+	chatSvc       service.Chat
+	targetChannel []string
 }
 
-func NewChatUsecase(chatSvc service.Chat) Chat {
+func NewChatUsecase(chatSvc service.Chat, targetChannel []string) Chat {
 	return &chatUsecase{
-		chatSvc: chatSvc,
+		chatSvc:       chatSvc,
+		targetChannel: targetChannel,
 	}
 }
 
@@ -42,8 +45,24 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) ([]mo
 		return nil, err
 	}
 
-	// debug log
-	slog.Info("Fetched chats from the static target video", "count", len(stcChats))
+	// Filter chats by author channel
+	targetChats, _ := filterChatsByAuthorChannel(stcChats, u.targetChannel)
 
-	return stcChats, nil
+	// debug log
+	slog.Info("Fetched chats from the static target video", "count", len(targetChats))
+
+	return targetChats, nil
+}
+
+func filterChatsByAuthorChannel(chats []model.YTChat, targetChannel []string) ([]model.YTChat, []model.YTChat) {
+	var targetChats, otherChats []model.YTChat
+	for _, chat := range chats {
+		if slices.Contains(targetChannel, chat.AuthorChannelID) {
+			targetChats = append(targetChats, chat)
+		} else {
+			otherChats = append(otherChats, chat)
+		}
+	}
+
+	return targetChats, otherChats
 }
