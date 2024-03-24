@@ -29,9 +29,4 @@ tasks:
       FUNCTION_NAME: '{{index .MATCH 0}}'
       FUNCTION_TARGET: '{{index .MATCH 1}}'
     cmds:
-      - gcloud functions deploy {{.FUNCTION_NAME}} \
-        --runtime go121 \
-        --region=asia-northeast1 \
-        --source=. \
-        --entry-point {{.FUNCTION_TARGET}} \
-        --trigger-http
+      - gcloud functions deploy {{.FUNCTION_NAME}} --no-gen2 --runtime go121 --region=asia-northeast1 --source=. --entry-point {{.FUNCTION_TARGET}} --trigger-http
