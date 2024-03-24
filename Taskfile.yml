@@ -1,6 +1,12 @@
 version: '3'
 
 tasks:
+  run-*:
+    desc: "Run the function"
+    vars:
+      FUNCTION_TARGET: '{{index .MATCH 0}}'
+    cmds:
+      - FUNCTION_TARGET={{.FUNCTION_TARGET}} go run cmd/main.go
   build:
     desc: "Build the docker image"
     cmds:
