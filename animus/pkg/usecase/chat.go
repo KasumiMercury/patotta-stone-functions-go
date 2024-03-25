@@ -72,7 +72,7 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 
 func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) error {
 	// Get the upcoming target video info from the Supabase
-	upc, err := u.supaRepo.GetVideoRecordByStatus(ctx, []string{"upcoming"})
+	upc, err := u.supaRepo.GetVideoInfoByStatus(ctx, []string{"upcoming"})
 	if err != nil {
 		slog.Error("Failed to get the upcoming target video",
 			slog.Group("upcomingTarget", "error", err),
