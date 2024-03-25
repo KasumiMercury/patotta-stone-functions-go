@@ -19,5 +19,5 @@ services:
     environment:
       FUNCTION_TARGET: Animus
     volumes:
-      - .:/app
+      - ./animus:/app
     restart: always

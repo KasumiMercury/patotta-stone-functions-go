@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/model"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
 )
 
 type Supabase interface {

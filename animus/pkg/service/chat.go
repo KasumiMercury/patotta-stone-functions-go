@@ -4,30 +4,30 @@ import (
 	"context"
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
-	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/model"
-	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/repository"
+	model2 "github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
+	repository2 "github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/repository"
 	"log/slog"
 	"time"
 )
 
 type Chat interface {
-	FetchChatsByVideoInfo(ctx context.Context, videoInfo model.VideoInfo, l int64) ([]model.YTChat, error)
-	SaveNewTargetChats(ctx context.Context, chats []model.YTChat) error
+	FetchChatsByVideoInfo(ctx context.Context, videoInfo model2.VideoInfo, l int64) ([]model2.YTChat, error)
+	SaveNewTargetChats(ctx context.Context, chats []model2.YTChat) error
 }
 
 type chatService struct {
-	ytRepo   repository.YouTube
-	supaRepo repository.Supabase
+	ytRepo   repository2.YouTube
+	supaRepo repository2.Supabase
 }
 
-func NewChatService(ytRepo repository.YouTube, supaRepo repository.Supabase) Chat {
+func NewChatService(ytRepo repository2.YouTube, supaRepo repository2.Supabase) Chat {
 	return &chatService{
 		ytRepo:   ytRepo,
 		supaRepo: supaRepo,
 	}
 }
 
-func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model.VideoInfo, l int64) ([]model.YTChat, error) {
+func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model2.VideoInfo, l int64) ([]model2.YTChat, error) {
 	// Fetch chats from the static target video
 	resp, err := s.ytRepo.FetchChatsByChatID(ctx, videoInfo.ChatID, l)
 	if err != nil {
@@ -46,7 +46,7 @@ func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model
 	}
 
 	// Create a slice to store the chats
-	chats := make([]model.YTChat, 0, len(resp.Items))
+	chats := make([]model2.YTChat, 0, len(resp.Items))
 	for _, item := range items {
 		pa, err := synchro.ParseISO[tz.AsiaTokyo](item.Snippet.PublishedAt)
 		if err != nil {
@@ -57,7 +57,7 @@ func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model
 			)
 			continue
 		}
-		chats = append(chats, model.YTChat{
+		chats = append(chats, model2.YTChat{
 			AuthorChannelID: item.Snippet.AuthorChannelId,
 			Message:         item.Snippet.DisplayMessage,
 			PublishedAtUnix: pa.Unix(),
@@ -68,11 +68,11 @@ func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model
 	return chats, nil
 }
 
-func (s *chatService) SaveNewTargetChats(ctx context.Context, chats []model.YTChat) error {
+func (s *chatService) SaveNewTargetChats(ctx context.Context, chats []model2.YTChat) error {
 	// Convert the chats to the chat records
-	chatRecords := make([]model.ChatRecord, 0, len(chats))
+	chatRecords := make([]model2.ChatRecord, 0, len(chats))
 	for _, chat := range chats {
-		chatRecords = append(chatRecords, model.ChatRecord{
+		chatRecords = append(chatRecords, model2.ChatRecord{
 			Message:     chat.Message,
 			SourceID:    chat.SourceID,
 			PublishedAt: time.Unix(chat.PublishedAtUnix, 0),
