@@ -1,10 +1,10 @@
-package patotta_stone_functions_go
+package animus
 
 import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/infra"
-	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/service"
-	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/usecase"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/infra"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/service"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/usecase"
 	"log/slog"
 	"net/http"
 	"os"
@@ -36,7 +36,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		panic("YOUTUBE_API_KEY must be set")
 	}
 
-	dsn := os.Getenv("DSN")
+	dsn := os.Getenv("SUPABASE_DSN")
 	if dsn == "" {
 		slog.Error("DSN is not set")
 		panic("DSN is not set")

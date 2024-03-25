@@ -3,7 +3,7 @@ package infra
 import (
 	"context"
 	"database/sql"
-	"github.com/KasumiMercury/patotta-stone-functions-go/pkg/model"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
