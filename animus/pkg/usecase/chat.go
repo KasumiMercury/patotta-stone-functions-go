@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	model2 "github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/repository"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/service"
 	"log/slog"
@@ -33,7 +33,7 @@ func NewChatUsecase(targetChannel []string, chatSvc service.Chat, supaRepo repos
 func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error {
 	// load info of static target video from environment variables
 	stcEnv := os.Getenv("STATIC_TARGET")
-	var stc model2.VideoInfo
+	var stc model.VideoInfo
 	if err := json.Unmarshal([]byte(stcEnv), &stc); err != nil {
 		slog.Error("Failed to unmarshal STATIC_TARGET", "error", err)
 		// If the environment variable is not set correctly, the function will panic.
@@ -87,7 +87,7 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) err
 
 	// Fetch chats from the upcoming target video
 	for _, video := range upc {
-		info := model2.VideoInfo{
+		info := model.VideoInfo{
 			SourceID: video.SourceID,
 			ChatID:   video.ChatID,
 		}
@@ -122,8 +122,8 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) err
 	return nil
 }
 
-func filterChatsByAuthorChannel(chats []model2.YTChat, targetChannel []string) ([]model2.YTChat, []model2.YTChat) {
-	var targetChats, otherChats []model2.YTChat
+func filterChatsByAuthorChannel(chats []model.YTChat, targetChannel []string) ([]model.YTChat, []model.YTChat) {
+	var targetChats, otherChats []model.YTChat
 	for _, chat := range chats {
 		if slices.Contains(targetChannel, chat.AuthorChannelID) {
 			targetChats = append(targetChats, chat)
@@ -135,7 +135,7 @@ func filterChatsByAuthorChannel(chats []model2.YTChat, targetChannel []string) (
 	return targetChats, otherChats
 }
 
-func (u *chatUsecase) filterChatsByPublishedAt(ctx context.Context, chats []model2.YTChat, sourceId string) ([]model2.YTChat, error) {
+func (u *chatUsecase) filterChatsByPublishedAt(ctx context.Context, chats []model.YTChat, sourceId string) ([]model.YTChat, error) {
 	// Fetch the last recorded chat's publishedAt from the Supabase
 	threshold, err := u.supaRepo.GetPublishedAtOfLastRecordedChatBySource(ctx, sourceId)
 	if err != nil {
@@ -146,7 +146,7 @@ func (u *chatUsecase) filterChatsByPublishedAt(ctx context.Context, chats []mode
 	// Filter the chats by the threshold
 	// The chats are already sorted by the publishedAt in ascending order (constraint of the YouTube API)
 
-	var filteredChats []model2.YTChat
+	var filteredChats []model.YTChat
 
 	for i, chat := range chats {
 		if chat.PublishedAtUnix > threshold {
