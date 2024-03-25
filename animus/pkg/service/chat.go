@@ -53,7 +53,7 @@ func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model
 			slog.Error(
 				"Failed to parse the publishedAt",
 				slog.Group("fetchChat", "chatId", videoInfo.ChatID, "sourceId", videoInfo.SourceID,
-					slog.Group("formatting", "error", err, "target", item.Snippet.PublishedAt)),
+					slog.Group("formatChat", "error", err, "target", item.Snippet.PublishedAt)),
 			)
 			continue
 		}
