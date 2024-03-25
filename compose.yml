@@ -6,7 +6,7 @@ services:
     environment:
       FUNCTIONS: "animus"
     volumes:
-      - .:/app
+      - ./proxy:/app
     restart: always
     ports:
       - "8080:8080"
