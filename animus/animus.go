@@ -3,6 +3,7 @@ package animus
 import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/infra"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/lib"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/service"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/usecase"
 	"log/slog"
@@ -17,6 +18,10 @@ func init() {
 
 func animus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+
+	// Custom log
+	handler := lib.NewCustomLogger()
+	slog.SetDefault(handler)
 
 	// Cache common environment variables
 	// Because the function is supposed to run on CloudFunctions, it is necessary to read the environment variables here.
