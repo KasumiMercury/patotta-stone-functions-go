@@ -4,6 +4,7 @@ import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/infra"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/lib"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/service"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/usecase"
 	"log/slog"
@@ -65,6 +66,25 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	chatSvc := service.NewChatService(ytRepo, supaRepo)
 	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
 
+	videoUsc := usecase.NewVideoUsecase(supaRepo)
+
+	// Get variable video info from Supabase
+	targetStatus := []string{"upcoming"}
+	varVideos, err := videoUsc.GetVideoInfosByStatusFromSupabase(ctx, targetStatus)
+	if err != nil {
+		slog.Error("Failed to get variable video info", slog.Group("error", err))
+		http.Error(w, "Failed to get video info by status", http.StatusInternalServerError)
+		return
+	}
+
+	// Find the upcoming target video
+	var upcVideos []model.VideoInfo
+	if _, ok := varVideos["upcoming"]; ok {
+		upcVideos = varVideos["upcoming"]
+	} else {
+		slog.Info("No upcoming target video")
+	}
+
 	// Fetch chats from the static target video
 	err = chatUsc.FetchChatsFromStaticTargetVideo(ctx)
 	if err != nil {
@@ -74,7 +94,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch chats from the upcoming target video
-	err = chatUsc.FetchChatsFromUpcomingTargetVideo(ctx)
+	err = chatUsc.FetchChatsFromUpcomingTargetVideo(ctx, upcVideos)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the upcoming target video", slog.Group("upcomingTarget", "error", err))
 		http.Error(w, "Failed to fetch chats from the upcoming target video", http.StatusInternalServerError)
