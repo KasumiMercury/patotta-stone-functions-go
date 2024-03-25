@@ -36,7 +36,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		panic("YOUTUBE_API_KEY must be set")
 	}
 
-	dsn := os.Getenv("DSN")
+	dsn := os.Getenv("SUPABASE_DSN")
 	if dsn == "" {
 		slog.Error("DSN is not set")
 		panic("DSN is not set")
