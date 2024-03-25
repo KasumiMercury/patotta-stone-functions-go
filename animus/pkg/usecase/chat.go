@@ -14,7 +14,7 @@ import (
 
 type Chat interface {
 	FetchChatsFromStaticTargetVideo(ctx context.Context) error
-	FetchChatsFromUpcomingTargetVideo(ctx context.Context) error
+	FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc []model.VideoInfo) error
 }
 
 type chatUsecase struct {
@@ -87,21 +87,7 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 	return nil
 }
 
-func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) error {
-	// Get the upcoming target video info from the Supabase
-	upc, err := u.supaRepo.GetVideoInfoByStatus(ctx, []string{"upcoming"})
-	if err != nil {
-		slog.Error("Failed to get the upcoming target video",
-			slog.Group("upcomingTarget", "error", err),
-		)
-		return err
-	}
-
-	if len(upc) == 0 {
-		slog.Info("No upcoming target video")
-		return nil
-	}
-
+func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc []model.VideoInfo) error {
 	// Fetch chats from the upcoming target video
 	for _, video := range upc {
 		info := model.VideoInfo{

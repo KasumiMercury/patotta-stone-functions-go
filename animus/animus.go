@@ -93,7 +93,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch chats from the upcoming target video
-	err = chatUsc.FetchChatsFromUpcomingTargetVideo(ctx)
+	err = chatUsc.FetchChatsFromUpcomingTargetVideo(ctx, upcVideos)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the upcoming target video", slog.Group("upcomingTarget", "error", err))
 		http.Error(w, "Failed to fetch chats from the upcoming target video", http.StatusInternalServerError)
