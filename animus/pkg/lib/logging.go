@@ -1,7 +1,6 @@
 package lib
 
 import (
-	"context"
 	"log/slog"
 	"os"
 )
@@ -10,7 +9,7 @@ type CustomHandler struct {
 	slog.Handler
 }
 
-func NewCustomLogger(ctx context.Context) *slog.Logger {
+func NewCustomLogger() *slog.Logger {
 	svcName := os.Getenv("SERVICE_NAME")
 	if svcName == "" {
 		if os.Getenv("LOCAL_ONLY") != "true" {

@@ -20,7 +20,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	// Custom log
-	handler := lib.NewCustomLogger(ctx)
+	handler := lib.NewCustomLogger()
 	slog.SetDefault(handler)
 
 	// Cache common environment variables
