@@ -33,7 +33,7 @@ func NewSupabaseRepository(dsn string) (*SupabaseRepository, error) {
 	return &SupabaseRepository{db: db}, nil
 }
 
-func (r *SupabaseRepository) GetVideoRecordByStatus(ctx context.Context, status []string) ([]model.VideoRecord, error) {
+func (r *SupabaseRepository) GetVideoInfoByStatus(ctx context.Context, status []string) ([]model.VideoRecord, error) {
 	records := make([]model.VideoRecord, 0)
 	err := r.db.NewSelect().Model(&records).Where("status IN (?)", bun.In(status)).Column("status", "source_id", "chat_id").Scan(ctx)
 	if err != nil {
