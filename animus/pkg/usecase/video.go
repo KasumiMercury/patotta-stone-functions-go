@@ -28,6 +28,7 @@ func (u *videoUsecase) GetVideoInfosByStatusFromSupabase(ctx context.Context, st
 			"status", status,
 			slog.Group("error", err),
 		)
+		return nil, err
 	}
 
 	if len(rec) == 0 {
