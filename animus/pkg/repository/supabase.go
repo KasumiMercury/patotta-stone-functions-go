@@ -6,7 +6,7 @@ import (
 )
 
 type Supabase interface {
-	GetVideoRecordByStatus(ctx context.Context, status []string) ([]model.VideoRecord, error)
+	GetVideoInfoByStatus(ctx context.Context, status []string) ([]model.VideoRecord, error)
 	InsertChatRecord(ctx context.Context, record []model.ChatRecord) error
 	GetPublishedAtOfLastRecordedChatBySource(ctx context.Context, sourceId string) (int64, error)
 }
