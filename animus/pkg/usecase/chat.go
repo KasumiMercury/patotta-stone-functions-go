@@ -54,13 +54,19 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 	// Filter chats by the publishedAt
 	newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, stc.SourceID)
 	if err != nil {
-		slog.Error("Failed to filter chats by the publishedAt", "error", err)
+		slog.Error("Failed to filter chats by the publishedAt",
+			slog.Group("staticTarget", "error", err),
+		)
 		return err
 	}
 
 	// Save the new chats to the Supabase
 	if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
-		slog.Error("Failed to insert the new chats", "error", err)
+		slog.Error("Failed to insert the new chats",
+			slog.Group("staticTarget",
+				slog.Group("saveChat", "sourceId", newChats[0].SourceID, "error", err),
+			),
+		)
 		return err
 	}
 
@@ -105,13 +111,19 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) err
 		// Filter chats by the publishedAt
 		newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, video.SourceID)
 		if err != nil {
-			slog.Error("Failed to filter chats by the publishedAt", "error", err)
+			slog.Error("Failed to filter chats by the publishedAt",
+				slog.Group("upcomingTarget", "error", err),
+			)
 			return err
 		}
 
 		// Save the new chats to the Supabase
 		if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
-			slog.Error("Failed to insert the new chats", "error", err)
+			slog.Error("Failed to insert the new chats",
+				slog.Group("upcomingTarget",
+					slog.Group("saveChat", "sourceId", newChats[0].SourceID, "error", err),
+				),
+			)
 			return err
 		}
 
@@ -139,7 +151,9 @@ func (u *chatUsecase) filterChatsByPublishedAt(ctx context.Context, chats []mode
 	// Fetch the last recorded chat's publishedAt from the Supabase
 	threshold, err := u.supaRepo.GetPublishedAtOfLastRecordedChatBySource(ctx, sourceId)
 	if err != nil {
-		slog.Error("Failed to get the last recorded chat", "error", err)
+		slog.Error("Failed to get the last recorded chat",
+			slog.Group("filterChat", "chats", chats, "sourceId", sourceId),
+		)
 		return nil, err
 	}
 

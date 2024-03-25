@@ -39,6 +39,7 @@ func (r *SupabaseRepository) GetVideoInfoByStatus(ctx context.Context, status []
 	if err != nil {
 		slog.Error(
 			"Failed to get video records by status",
+			"status", status,
 			slog.Group("Supabase", "error", err),
 		)
 		return nil, err
@@ -58,6 +59,7 @@ func (r *SupabaseRepository) GetPublishedAtOfLastRecordedChatBySource(ctx contex
 	if err != nil {
 		slog.Error(
 			"Failed to get the last recorded chat",
+			"sourceId", sourceId,
 			slog.Group("Supabase", "error", err),
 		)
 		return 0, err
