@@ -60,6 +60,11 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 		return err
 	}
 
+	if len(newChats) == 0 {
+		slog.Info("No new chats from the static target video")
+		return nil
+	}
+
 	// Save the new chats to the Supabase
 	if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
 		slog.Error("Failed to insert the new chats",
@@ -115,6 +120,11 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) err
 				slog.Group("upcomingTarget", "error", err),
 			)
 			return err
+		}
+
+		if len(newChats) == 0 {
+			slog.Info("No new chats from the upcoming target video")
+			continue
 		}
 
 		// Save the new chats to the Supabase
