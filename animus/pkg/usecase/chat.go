@@ -119,6 +119,13 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) err
 		// Filter chats by author channel
 		targetChats, _ := filterChatsByAuthorChannel(upcChats, u.targetChannel)
 
+		if len(targetChats) == 0 {
+			slog.Info("No new chats from the upcoming target video",
+				slog.Group("upcomingTarget", "sourceId", video.SourceID),
+			)
+			continue
+		}
+
 		// Filter chats by the publishedAt
 		newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, video.SourceID)
 		if err != nil {
@@ -129,7 +136,9 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) err
 		}
 
 		if len(newChats) == 0 {
-			slog.Info("No new chats from the upcoming target video")
+			slog.Info("No new chats from the upcoming target video",
+				slog.Group("upcomingTarget", "sourceId", video.SourceID),
+			)
 			continue
 		}
 
