@@ -52,6 +52,11 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 	// Filter chats by author channel
 	targetChats, _ := filterChatsByAuthorChannel(stcChats, u.targetChannel)
 
+	if len(targetChats) == 0 {
+		slog.Info("No chats from the static target video")
+		return nil
+	}
+
 	// Filter chats by the publishedAt
 	newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, stc.SourceID)
 	if err != nil {
