@@ -23,10 +23,11 @@ tasks:
     desc: "Destroy the docker container"
     cmds:
       - docker-compose down --rmi all --volumes --remove-orphans
-  deploy-*-*:
+  deploy-*-*-*:
     desc: "Deploy the function to GOOGLE CLOUD FUNCTIONS"
     vars:
       FUNCTION_NAME: '{{index .MATCH 0}}'
-      FUNCTION_TARGET: '{{index .MATCH 1}}'
+      FUNCTION_DIR: '{{index .MATCH 1}}'
+      FUNCTION_TARGET: '{{index .MATCH 2}}'
     cmds:
-      - gcloud functions deploy {{.FUNCTION_NAME}} --no-gen2 --runtime go121 --region=asia-northeast1 --source=. --entry-point {{.FUNCTION_TARGET}} --trigger-http
+      - gcloud functions deploy {{.FUNCTION_NAME}} --no-gen2 --runtime go121 --region=asia-northeast1 --source=./{{.FUNCTION_DIR}} --entry-point {{.FUNCTION_TARGET}} --trigger-http
