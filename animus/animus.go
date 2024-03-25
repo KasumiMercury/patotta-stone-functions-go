@@ -74,6 +74,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("Failed to get variable video info", slog.Group("error", err))
 		http.Error(w, "Failed to get video info by status", http.StatusInternalServerError)
+		return
 	}
 
 	// Find the upcoming target video
