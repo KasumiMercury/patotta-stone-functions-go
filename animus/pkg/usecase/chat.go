@@ -14,6 +14,7 @@ import (
 
 type Chat interface {
 	FetchChatsFromStaticTargetVideo(ctx context.Context) error
+	FetchChatsFromUpcomingTargetVideo(ctx context.Context) error
 }
 
 type chatUsecase struct {
