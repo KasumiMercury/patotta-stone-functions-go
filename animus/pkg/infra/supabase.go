@@ -33,6 +33,20 @@ func NewSupabaseRepository(dsn string) (*SupabaseRepository, error) {
 	return &SupabaseRepository{db: db}, nil
 }
 
+func (r *SupabaseRepository) GetVideoInfoByStatus(ctx context.Context, status []string) ([]model.VideoRecord, error) {
+	records := make([]model.VideoRecord, 0)
+	err := r.db.NewSelect().Model(&records).Where("status IN (?)", bun.In(status)).Column("status", "source_id", "chat_id").Scan(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to get video records by status",
+			slog.Group("Supabase", "error", err),
+		)
+		return nil, err
+	}
+
+	return records, nil
+}
+
 func (r *SupabaseRepository) GetPublishedAtOfLastRecordedChatBySource(ctx context.Context, sourceId string) (int64, error) {
 	records := make([]model.ChatRecord, 0)
 	err := r.db.NewSelect().

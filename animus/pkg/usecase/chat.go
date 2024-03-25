@@ -70,6 +70,58 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 	return nil
 }
 
+func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context) error {
+	// Get the upcoming target video info from the Supabase
+	upc, err := u.supaRepo.GetVideoRecordByStatus(ctx, []string{"upcoming"})
+	if err != nil {
+		slog.Error("Failed to get the upcoming target video",
+			slog.Group("upcomingTarget", "error", err),
+		)
+		return err
+	}
+
+	if len(upc) == 0 {
+		slog.Info("No upcoming target video")
+		return nil
+	}
+
+	// Fetch chats from the upcoming target video
+	for _, video := range upc {
+		info := model2.VideoInfo{
+			SourceID: video.SourceID,
+			ChatID:   video.ChatID,
+		}
+		upcChats, err := u.chatSvc.FetchChatsByVideoInfo(ctx, info, 0)
+		if err != nil {
+			slog.Error("Failed to fetch chats from the upcoming target video",
+				slog.Group("upcomingTarget", "error", err),
+			)
+			return err
+		}
+
+		// Filter chats by author channel
+		targetChats, _ := filterChatsByAuthorChannel(upcChats, u.targetChannel)
+
+		// Filter chats by the publishedAt
+		newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, video.SourceID)
+		if err != nil {
+			slog.Error("Failed to filter chats by the publishedAt", "error", err)
+			return err
+		}
+
+		// Save the new chats to the Supabase
+		if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
+			slog.Error("Failed to insert the new chats", "error", err)
+			return err
+		}
+
+		// debug log
+		slog.Debug("Fetched chats from the upcoming target video", "count", len(newChats))
+	}
+
+	return nil
+}
+
 func filterChatsByAuthorChannel(chats []model2.YTChat, targetChannel []string) ([]model2.YTChat, []model2.YTChat) {
 	var targetChats, otherChats []model2.YTChat
 	for _, chat := range chats {
