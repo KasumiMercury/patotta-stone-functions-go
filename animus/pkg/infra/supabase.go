@@ -8,6 +8,7 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"log/slog"
+	"time"
 )
 
 type SupabaseRepository struct {
@@ -80,6 +81,22 @@ func (r *SupabaseRepository) InsertChatRecord(ctx context.Context, record []mode
 			slog.Group("saveChat", "record", record,
 				slog.Group("Supabase", "error", err),
 			),
+		)
+		return err
+	}
+
+	return nil
+}
+
+func (r *SupabaseRepository) InsertFetchedHistory(ctx context.Context, sourceId string) error {
+	_, err := r.db.NewInsert().Model(&model.History{
+		SourceID:  sourceId,
+		CreatedAt: time.Now(),
+	}).Exec(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to insert fetched history",
+			slog.Group("Supabase", "error", err),
 		)
 		return err
 	}

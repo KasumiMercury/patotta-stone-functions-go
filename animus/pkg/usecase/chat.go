@@ -98,6 +98,14 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 		return err
 	}
 
+	// Save the fetched history to the Supabase
+	if err := u.supaRepo.InsertFetchedHistory(ctx, video.SourceID); err != nil {
+		slog.Error("Failed to insert fetched history",
+			slog.Group("upcomingTarget", "sourceId", video.SourceID, "error", err),
+		)
+		return err
+	}
+
 	// Filter chats by author channel
 	targetChats, _ := filterChatsByAuthorChannel(upcChats, u.targetChannel)
 
