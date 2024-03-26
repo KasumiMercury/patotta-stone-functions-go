@@ -69,7 +69,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	videoUsc := usecase.NewVideoUsecase(supaRepo)
 
 	// Get variable video info from Supabase
-	targetStatus := []string{"upcoming"}
+	targetStatus := []string{"upcoming", "live"}
 	varVideos, err := videoUsc.GetVideoInfosByStatusFromSupabase(ctx, targetStatus)
 	if err != nil {
 		slog.Error("Failed to get variable video info", slog.Group("error", err))
