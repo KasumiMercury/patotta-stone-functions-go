@@ -77,6 +77,14 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check the existence of the live status video
+	// If there is live status video, skip the function
+	if _, ok := varVideos["live"]; ok {
+		slog.Info("There is a live status video")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	// Find the upcoming target video
 	var upcVideos []model.VideoInfo
 	if _, ok := varVideos["upcoming"]; ok {
