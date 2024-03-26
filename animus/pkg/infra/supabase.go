@@ -103,3 +103,24 @@ func (r *SupabaseRepository) InsertFetchedHistory(ctx context.Context, sourceId 
 
 	return nil
 }
+
+func (r *SupabaseRepository) GetFetchedHistory(ctx context.Context, sourceIds []string) ([]model.History, error) {
+	histories := make([]model.History, 0)
+	// get the last fetched history of each sourceId using Rank
+	err := r.db.NewSelect().
+		Model(&histories).
+		Where("source_id IN (?)", sourceIds).
+		ColumnExpr("source_id, created_at, RANK() OVER (PARTITION BY source_id ORDER BY created_at DESC) as rank").
+		Where("rank = 1").
+		Order("created_at ASC").
+		Scan(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to get fetched history",
+			slog.Group("Supabase", "error", err),
+		)
+		return nil, err
+	}
+
+	return histories, nil
+}
