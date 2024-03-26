@@ -69,11 +69,19 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	videoUsc := usecase.NewVideoUsecase(supaRepo)
 
 	// Get variable video info from Supabase
-	targetStatus := []string{"upcoming"}
+	targetStatus := []string{"upcoming", "live"}
 	varVideos, err := videoUsc.GetVideoInfosByStatusFromSupabase(ctx, targetStatus)
 	if err != nil {
 		slog.Error("Failed to get variable video info", slog.Group("error", err))
 		http.Error(w, "Failed to get video info by status", http.StatusInternalServerError)
+		return
+	}
+
+	// Check the existence of the live status video
+	// If there is live status video, skip the function
+	if _, ok := varVideos["live"]; ok {
+		slog.Info("There is a live status video")
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
