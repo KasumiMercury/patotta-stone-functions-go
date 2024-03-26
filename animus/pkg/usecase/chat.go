@@ -89,57 +89,49 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 
 func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc []model.VideoInfo) error {
 	// Fetch chats from the upcoming target video
-	for _, video := range upc {
-		info := model.VideoInfo{
-			SourceID: video.SourceID,
-			ChatID:   video.ChatID,
-		}
-		upcChats, err := u.chatSvc.FetchChatsByVideoInfo(ctx, info, 0)
-		if err != nil {
-			slog.Error("Failed to fetch chats from the upcoming target video",
-				slog.Group("upcomingTarget", "error", err),
-			)
-			return err
-		}
+	video := upc[0]
+	upcChats, err := u.chatSvc.FetchChatsByVideoInfo(ctx, video, 0)
+	if err != nil {
+		slog.Error("Failed to fetch chats from the upcoming target video",
+			slog.Group("upcomingTarget", "error", err),
+		)
+		return err
+	}
 
-		// Filter chats by author channel
-		targetChats, _ := filterChatsByAuthorChannel(upcChats, u.targetChannel)
+	// Filter chats by author channel
+	targetChats, _ := filterChatsByAuthorChannel(upcChats, u.targetChannel)
 
-		if len(targetChats) == 0 {
-			slog.Info("No new chats from the upcoming target video",
-				slog.Group("upcomingTarget", "sourceId", video.SourceID),
-			)
-			continue
-		}
+	if len(targetChats) == 0 {
+		slog.Info("No new chats from the upcoming target video",
+			slog.Group("upcomingTarget", "sourceId", video.SourceID),
+		)
+		return nil
+	}
 
-		// Filter chats by the publishedAt
-		newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, video.SourceID)
-		if err != nil {
-			slog.Error("Failed to filter chats by the publishedAt",
-				slog.Group("upcomingTarget", "error", err),
-			)
-			return err
-		}
+	// Filter chats by the publishedAt
+	newChats, err := u.filterChatsByPublishedAt(ctx, targetChats, video.SourceID)
+	if err != nil {
+		slog.Error("Failed to filter chats by the publishedAt",
+			slog.Group("upcomingTarget", "error", err),
+		)
+		return err
+	}
 
-		if len(newChats) == 0 {
-			slog.Info("No new chats from the upcoming target video",
-				slog.Group("upcomingTarget", "sourceId", video.SourceID),
-			)
-			continue
-		}
+	if len(newChats) == 0 {
+		slog.Info("No new chats from the upcoming target video",
+			slog.Group("upcomingTarget", "sourceId", video.SourceID),
+		)
+		return nil
+	}
 
-		// Save the new chats to the Supabase
-		if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
-			slog.Error("Failed to insert the new chats",
-				slog.Group("upcomingTarget",
-					slog.Group("saveChat", "sourceId", newChats[0].SourceID, "error", err),
-				),
-			)
-			return err
-		}
-
-		// debug log
-		slog.Debug("Fetched chats from the upcoming target video", "count", len(newChats))
+	// Save the new chats to the Supabase
+	if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
+		slog.Error("Failed to insert the new chats",
+			slog.Group("upcomingTarget",
+				slog.Group("saveChat", "sourceId", newChats[0].SourceID, "error", err),
+			),
+		)
+		return err
 	}
 
 	return nil
