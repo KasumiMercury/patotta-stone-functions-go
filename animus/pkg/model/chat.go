@@ -18,5 +18,5 @@ type ChatRecord struct {
 	Message     string    `bun:",pk,type:varchar(255)"`
 	IsNegative  bool      `bun:",type:tinyint(1)"`
 	SourceID    string    `bun:",type:varchar(255)"`
-	PublishedAt time.Time `bun:",type:timestamp"`
+	PublishedAt time.Time `bun:",type:timestamptz"`
 }
