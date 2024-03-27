@@ -94,7 +94,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch chats from the static target video
-	err = chatUsc.FetchChatsFromStaticTargetVideo(ctx)
+	stcChats, err := chatUsc.FetchChatsFromStaticTargetVideo(ctx)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the static target video", slog.Group("staticTarget", "error", err))
 		http.Error(w, "Failed to fetch chats from the static target video", http.StatusInternalServerError)
@@ -102,10 +102,19 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch chats from the upcoming target video
-	err = chatUsc.FetchChatsFromUpcomingTargetVideo(ctx, upcVideos)
+	upcChats, err := chatUsc.FetchChatsFromUpcomingTargetVideo(ctx, upcVideos)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the upcoming target video", slog.Group("upcomingTarget", "error", err))
 		http.Error(w, "Failed to fetch chats from the upcoming target video", http.StatusInternalServerError)
+		return
+	}
+
+	// Save the new target chats
+	if err := chatSvc.SaveNewTargetChats(ctx, append(stcChats, upcChats...)); err != nil {
+		slog.Error("Failed to save the new target chats",
+			slog.Group("saveChat", "error", err),
+		)
+		http.Error(w, "Failed to save the new target chats", http.StatusInternalServerError)
 		return
 	}
 
