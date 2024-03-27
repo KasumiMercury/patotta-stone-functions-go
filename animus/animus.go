@@ -32,6 +32,10 @@ var supaClient *bun.DB
 
 var nlaClient *language.Client
 
+// Usecase for the function
+var chatUsc usecase.Chat
+var videoUsc usecase.Video
+
 func init() {
 	// err is pre-declared to avoid shadowing client.
 	var err error
@@ -73,17 +77,6 @@ func init() {
 		log.Fatalf("Failed to create NaturalLanguageAPI client: %v", err)
 	}
 
-	// Register the function to handle HTTP requests
-	functions.HTTP("Animus", animus)
-}
-
-func animus(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	// Cache common environment variables
-	// Because the function is supposed to run on CloudFunctions, it is necessary to read the environment variables here.
-	// If the environment variable is not set, the function will panic.
-	// (To prevent retries by CloudScheduler, the function should panic without returning error responses.)
 	targetChannelIdStr := os.Getenv("TARGET_CHANNEL_ID")
 	if targetChannelIdStr == "" {
 		slog.Error("TARGET_CHANNEL_ID is not set")
@@ -92,14 +85,21 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	// Split targetChannelIdStr by comma
 	targetChannels := strings.Split(targetChannelIdStr, ",")
 
+	// dependency injection
 	ytRepo := infra.NewYouTubeRepository(ytSvc)
 	supaRepo := infra.NewSupabaseRepository(supaClient)
 	sntRepo := infra.NewSentimentRepository(nlaClient)
-
 	chatSvc := service.NewChatService(ytRepo, supaRepo, sntRepo, stampPat)
-	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
 
-	videoUsc := usecase.NewVideoUsecase(supaRepo)
+	chatUsc = usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
+	videoUsc = usecase.NewVideoUsecase(supaRepo)
+
+	// Register the function to handle HTTP requests
+	functions.HTTP("Animus", animus)
+}
+
+func animus(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 
 	// Get variable video info from Supabase
 	targetStatus := []string{"upcoming", "live"}
