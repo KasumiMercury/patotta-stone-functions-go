@@ -21,16 +21,16 @@ func init() {
 	// The pattern is `:stamp:`
 	stampPat = regexp.MustCompile(`:[^:]+:`)
 
+	// Custom log
+	handler := lib.NewCustomLogger()
+	slog.SetDefault(handler)
+
 	// Register the function to handle HTTP requests
 	functions.HTTP("Animus", animus)
 }
 
 func animus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
-	// Custom log
-	handler := lib.NewCustomLogger()
-	slog.SetDefault(handler)
 
 	// Cache common environment variables
 	// Because the function is supposed to run on CloudFunctions, it is necessary to read the environment variables here.
