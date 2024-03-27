@@ -17,7 +17,11 @@ import (
 var stampPat *regexp.Regexp
 
 func init() {
+	// Define the pattern for the stamp
+	// The pattern is `:stamp:`
 	stampPat = regexp.MustCompile(`:[^:]+:`)
+
+	// Register the function to handle HTTP requests
 	functions.HTTP("Animus", animus)
 }
 
