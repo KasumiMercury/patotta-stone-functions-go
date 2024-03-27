@@ -10,10 +10,14 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 )
 
+var stampPat *regexp.Regexp
+
 func init() {
+	stampPat = regexp.MustCompile(`:[^:]+:`)
 	functions.HTTP("Animus", animus)
 }
 
@@ -65,7 +69,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	// Create NaturalLanguageAPI client
 	sntRepo, err := infra.NewSentimentRepository(ctx)
 
-	chatSvc := service.NewChatService(ytRepo, supaRepo, sntRepo)
+	chatSvc := service.NewChatService(ytRepo, supaRepo, sntRepo, stampPat)
 	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
 
 	videoUsc := usecase.NewVideoUsecase(supaRepo)

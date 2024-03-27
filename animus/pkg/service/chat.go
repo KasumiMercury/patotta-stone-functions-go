@@ -4,9 +4,12 @@ import (
 	"context"
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
+	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/lib"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/repository"
+	"golang.org/x/text/unicode/norm"
 	"log/slog"
+	"regexp"
 	"time"
 )
 
@@ -19,13 +22,15 @@ type chatService struct {
 	ytRepo   repository.YouTube
 	supaRepo repository.Supabase
 	sntRepo  repository.Sentiment
+	stampPat *regexp.Regexp
 }
 
-func NewChatService(ytRepo repository.YouTube, supaRepo repository.Supabase, sntRepo repository.Sentiment) Chat {
+func NewChatService(ytRepo repository.YouTube, supaRepo repository.Supabase, sntRepo repository.Sentiment, stampPat *regexp.Regexp) Chat {
 	return &chatService{
 		ytRepo:   ytRepo,
 		supaRepo: supaRepo,
 		sntRepo:  sntRepo,
+		stampPat: stampPat,
 	}
 }
 
@@ -103,7 +108,16 @@ func (s *chatService) SaveNewTargetChats(ctx context.Context, chats []model.YTCh
 }
 
 func (s *chatService) analyzeNegativityOfChatMessage(ctx context.Context, msg string) (bool, error) {
-	score, magnitude, err := s.sntRepo.AnalyzeSentiment(ctx, msg)
+	// Remove stamps from the chat message
+	// Stamps are not necessary for sentiment analysis
+	rsMsg := s.stampPat.ReplaceAllString(msg, "")
+	// Normalize the message
+	nMsg := norm.NFKC.String(rsMsg)
+	// Remove emojis from the message
+	// Because the emojis are not necessary for the sentiment analysis and occasionally cause an error
+	reMsg := lib.RemoveEmoji(nMsg)
+
+	score, magnitude, err := s.sntRepo.AnalyzeSentiment(ctx, reMsg)
 	if err != nil {
 		slog.Error("Failed to analyze sentiment",
 			slog.Group("analyzeSentiment", "error", err),
