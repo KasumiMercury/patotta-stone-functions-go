@@ -41,6 +41,7 @@ var videoUsc usecase.Video
 func init() {
 	// err is pre-declared to avoid shadowing client.
 	var err error
+	ctx := context.Background()
 
 	// Define the pattern for the stamp
 	// The pattern is `:stamp:`
@@ -55,7 +56,7 @@ func init() {
 		slog.Error("YOUTUBE_API_KEY is not set")
 		log.Fatalf("YOUTUBE_API_KEY is not set")
 	}
-	ytSvc, err = infra.NewYouTubeService(context.Background(), ytApiKey)
+	ytSvc, err = infra.NewYouTubeService(ctx, ytApiKey)
 	if err != nil {
 		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
 		log.Fatalf("Failed to create YouTube service: %v", err)
@@ -73,7 +74,7 @@ func init() {
 	}
 
 	// Create connection to NaturalLanguageAPI
-	nlaClient, err = infra.NewAnalysisClient(context.Background())
+	nlaClient, err = infra.NewAnalysisClient(ctx)
 	if err != nil {
 		slog.Error("Failed to create NaturalLanguageAPI client", slog.Group("NaturalLanguageAPI", "error", err))
 		log.Fatalf("Failed to create NaturalLanguageAPI client: %v", err)
