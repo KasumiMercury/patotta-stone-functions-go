@@ -14,7 +14,7 @@ import (
 )
 
 type Chat interface {
-	FetchChatsByVideoInfo(ctx context.Context, videoInfo model.VideoInfo, l int64) ([]model.YTChat, error)
+	FetchChatsByVideoInfo(ctx context.Context, videoInfo model.VideoInfo, l int64) ([]model.YTChat, bool, error)
 	SaveNewTargetChats(ctx context.Context, chats []model.YTChat) error
 }
 
@@ -34,9 +34,9 @@ func NewChatService(ytRepo repository.YouTube, supaRepo repository.Supabase, snt
 	}
 }
 
-func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model.VideoInfo, l int64) ([]model.YTChat, error) {
+func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model.VideoInfo, l int64) ([]model.YTChat, bool, error) {
 	// Fetch chats from the static target video
-	resp, err := s.ytRepo.FetchChatsByChatID(ctx, videoInfo.ChatID, l)
+	resp, archived, err := s.ytRepo.FetchChatsByChatID(ctx, videoInfo.ChatID, l)
 	if err != nil {
 		slog.Error(
 			"Failed to fetch chats",
@@ -44,12 +44,18 @@ func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model
 				slog.Group("YouTubeAPI", "error", err),
 			),
 		)
-		return nil, err
+		return nil, false, err
+	}
+	if archived {
+		slog.Info("The chat is archived",
+			slog.Group("fetchChat", "chatId", videoInfo.ChatID, "sourceId", videoInfo.SourceID),
+		)
+		return nil, true, nil
 	}
 
 	items := resp.Items
 	if items == nil || len(items) == 0 {
-		return nil, nil
+		return nil, false, nil
 	}
 
 	// Create a slice to store the chats
@@ -72,7 +78,7 @@ func (s *chatService) FetchChatsByVideoInfo(ctx context.Context, videoInfo model
 		})
 	}
 
-	return chats, nil
+	return chats, false, nil
 }
 
 func (s *chatService) SaveNewTargetChats(ctx context.Context, chats []model.YTChat) error {

@@ -19,7 +19,7 @@ func NewYouTubeRepository(svc *youtube.Service) *YouTubeRepository {
 	return &YouTubeRepository{ytSvc: svc}
 }
 
-func (r *YouTubeRepository) FetchChatsByChatID(ctx context.Context, chatID string, maxResults int64) (*youtube.LiveChatMessageListResponse, error) {
+func (r *YouTubeRepository) FetchChatsByChatID(ctx context.Context, chatID string, maxResults int64) (*youtube.LiveChatMessageListResponse, bool, error) {
 	call := r.ytSvc.LiveChatMessages.List(chatID, []string{"snippet"})
 
 	// If the length is set, set the maximum number of messages to be fetched
@@ -32,11 +32,16 @@ func (r *YouTubeRepository) FetchChatsByChatID(ctx context.Context, chatID strin
 	// Fetch the chats from the YouTube API
 	resp, err := call.Do()
 	if err != nil {
+		// If video is archived and an error occurs, recover the error and notify archiving
+		if err.Error() == "googleapi: Error 403: The live chat is no longer live., liveChatEnded" {
+			return nil, true, nil
+		}
+		// Otherwise, log the error and return the error as common error
 		slog.Error(
 			"Failed to run LiveChatMessages.List",
 			slog.Group("fetchChat", "chatId", chatID, slog.Group("YouTubeAPI", "error", err)),
 		)
-		return nil, err
+		return nil, false, err
 	}
-	return resp, nil
+	return resp, false, nil
 }

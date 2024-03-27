@@ -44,7 +44,7 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) ([]mo
 	}
 
 	// Fetch chats from the static target video
-	stcChats, err := u.chatSvc.FetchChatsByVideoInfo(ctx, stc, 0)
+	stcChats, _, err := u.chatSvc.FetchChatsByVideoInfo(ctx, stc, 0)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the static target video", slog.Group("staticTarget", "error", err))
 		return nil, err
@@ -97,7 +97,7 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 		video = top
 	}
 
-	upcChats, err := u.chatSvc.FetchChatsByVideoInfo(ctx, video, 0)
+	upcChats, _, err := u.chatSvc.FetchChatsByVideoInfo(ctx, video, 0)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the upcoming target video",
 			slog.Group("upcomingTarget", "error", err),

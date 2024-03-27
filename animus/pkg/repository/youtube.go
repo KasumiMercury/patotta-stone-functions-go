@@ -6,5 +6,5 @@ import (
 )
 
 type YouTube interface {
-	FetchChatsByChatID(ctx context.Context, chatID string, maxResults int64) (*youtube.LiveChatMessageListResponse, error)
+	FetchChatsByChatID(ctx context.Context, chatID string, maxResults int64) (*youtube.LiveChatMessageListResponse, bool, error)
 }
