@@ -10,10 +10,18 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 )
 
+var stampPat *regexp.Regexp
+
 func init() {
+	// Define the pattern for the stamp
+	// The pattern is `:stamp:`
+	stampPat = regexp.MustCompile(`:[^:]+:`)
+
+	// Register the function to handle HTTP requests
 	functions.HTTP("Animus", animus)
 }
 
@@ -62,8 +70,10 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to create Supabase client", http.StatusInternalServerError)
 		return
 	}
+	// Create NaturalLanguageAPI client
+	sntRepo, err := infra.NewSentimentRepository(ctx)
 
-	chatSvc := service.NewChatService(ytRepo, supaRepo)
+	chatSvc := service.NewChatService(ytRepo, supaRepo, sntRepo, stampPat)
 	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
 
 	videoUsc := usecase.NewVideoUsecase(supaRepo)
@@ -94,7 +104,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch chats from the static target video
-	err = chatUsc.FetchChatsFromStaticTargetVideo(ctx)
+	stcChats, err := chatUsc.FetchChatsFromStaticTargetVideo(ctx)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the static target video", slog.Group("staticTarget", "error", err))
 		http.Error(w, "Failed to fetch chats from the static target video", http.StatusInternalServerError)
@@ -102,10 +112,26 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch chats from the upcoming target video
-	err = chatUsc.FetchChatsFromUpcomingTargetVideo(ctx, upcVideos)
+	upcChats, err := chatUsc.FetchChatsFromUpcomingTargetVideo(ctx, upcVideos)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the upcoming target video", slog.Group("upcomingTarget", "error", err))
 		http.Error(w, "Failed to fetch chats from the upcoming target video", http.StatusInternalServerError)
+		return
+	}
+
+	newChats := append(stcChats, upcChats...)
+	if len(newChats) == 0 {
+		slog.Info("No new chats")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// Save the new target chats
+	if err := chatUsc.SaveNewChats(ctx, newChats); err != nil {
+		slog.Error("Failed to save new target chats",
+			slog.Group("saveNewChats", "error", err),
+		)
+		http.Error(w, "Failed to save new target chats", http.StatusInternalServerError)
 		return
 	}
 

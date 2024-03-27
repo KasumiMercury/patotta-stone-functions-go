@@ -13,8 +13,9 @@ import (
 )
 
 type Chat interface {
-	FetchChatsFromStaticTargetVideo(ctx context.Context) error
-	FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc []model.VideoInfo) error
+	FetchChatsFromStaticTargetVideo(ctx context.Context) ([]model.YTChat, error)
+	FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc []model.VideoInfo) ([]model.YTChat, error)
+	SaveNewChats(ctx context.Context, chats []model.YTChat) error
 }
 
 type chatUsecase struct {
@@ -31,7 +32,7 @@ func NewChatUsecase(targetChannel []string, chatSvc service.Chat, supaRepo repos
 	}
 }
 
-func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error {
+func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) ([]model.YTChat, error) {
 	// load info of static target video from environment variables
 	stcEnv := os.Getenv("STATIC_TARGET")
 	var stc model.VideoInfo
@@ -46,7 +47,7 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 	stcChats, err := u.chatSvc.FetchChatsByVideoInfo(ctx, stc, 0)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the static target video", slog.Group("staticTarget", "error", err))
-		return err
+		return nil, err
 	}
 
 	// Filter chats by author channel
@@ -54,7 +55,7 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 
 	if len(targetChats) == 0 {
 		slog.Info("No chats from the static target video")
-		return nil
+		return nil, nil
 	}
 
 	// Filter chats by the publishedAt
@@ -63,31 +64,16 @@ func (u *chatUsecase) FetchChatsFromStaticTargetVideo(ctx context.Context) error
 		slog.Error("Failed to filter chats by the publishedAt",
 			slog.Group("staticTarget", "error", err),
 		)
-		return err
-	}
-
-	if len(newChats) == 0 {
-		slog.Info("No new chats from the static target video")
-		return nil
-	}
-
-	// Save the new chats to the Supabase
-	if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
-		slog.Error("Failed to insert the new chats",
-			slog.Group("staticTarget",
-				slog.Group("saveChat", "sourceId", newChats[0].SourceID, "error", err),
-			),
-		)
-		return err
+		return nil, err
 	}
 
 	// debug log
 	slog.Debug("Fetched chats from the static target video", "count", len(newChats))
 
-	return nil
+	return newChats, nil
 }
 
-func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc []model.VideoInfo) error {
+func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc []model.VideoInfo) ([]model.YTChat, error) {
 	// Fetch chats from the upcoming target video
 	var video model.VideoInfo
 
@@ -96,7 +82,7 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 	switch len(upc) {
 	case 0:
 		slog.Info("No upcoming target video")
-		return nil
+		return nil, nil
 	case 1:
 		video = upc[0]
 	default:
@@ -106,7 +92,7 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 			slog.Error("Failed to calculate priority",
 				slog.Group("upcomingTarget", "error", err),
 			)
-			return err
+			return nil, err
 		}
 		video = top
 	}
@@ -116,7 +102,7 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 		slog.Error("Failed to fetch chats from the upcoming target video",
 			slog.Group("upcomingTarget", "error", err),
 		)
-		return err
+		return nil, err
 	}
 
 	// Save the fetched history to the Supabase
@@ -124,7 +110,7 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 		slog.Error("Failed to insert fetched history",
 			slog.Group("upcomingTarget", "sourceId", video.SourceID, "error", err),
 		)
-		return err
+		return nil, err
 	}
 
 	// Filter chats by author channel
@@ -134,7 +120,7 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 		slog.Info("No new chats from the upcoming target video",
 			slog.Group("upcomingTarget", "sourceId", video.SourceID),
 		)
-		return nil
+		return nil, nil
 	}
 
 	// Filter chats by the publishedAt
@@ -143,27 +129,10 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 		slog.Error("Failed to filter chats by the publishedAt",
 			slog.Group("upcomingTarget", "error", err),
 		)
-		return err
+		return nil, err
 	}
 
-	if len(newChats) == 0 {
-		slog.Info("No new chats from the upcoming target video",
-			slog.Group("upcomingTarget", "sourceId", video.SourceID),
-		)
-		return nil
-	}
-
-	// Save the new chats to the Supabase
-	if err := u.chatSvc.SaveNewTargetChats(ctx, newChats); err != nil {
-		slog.Error("Failed to insert the new chats",
-			slog.Group("upcomingTarget",
-				slog.Group("saveChat", "sourceId", newChats[0].SourceID, "error", err),
-			),
-		)
-		return err
-	}
-
-	return nil
+	return newChats, nil
 }
 
 func filterChatsByAuthorChannel(chats []model.YTChat, targetChannel []string) ([]model.YTChat, []model.YTChat) {
@@ -257,4 +226,16 @@ func (u *chatUsecase) calculatePriority(ctx context.Context, videos []model.Vide
 		),
 	)
 	return model.VideoInfo{}, fmt.Errorf("failed to calculate priority")
+}
+
+func (u *chatUsecase) SaveNewChats(ctx context.Context, chats []model.YTChat) error {
+	// Save the new target chats
+	if err := u.chatSvc.SaveNewTargetChats(ctx, chats); err != nil {
+		slog.Error("Failed to save the new target chats",
+			slog.Group("saveChat", "error", err),
+		)
+		return err
+	}
+
+	return nil
 }
