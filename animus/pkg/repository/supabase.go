@@ -11,4 +11,5 @@ type Supabase interface {
 	GetPublishedAtOfLastRecordedChatBySource(ctx context.Context, sourceId string) (int64, error)
 	InsertFetchedHistory(ctx context.Context, sourceId string) error
 	GetFetchedHistory(ctx context.Context, sourceIds []string) ([]model.History, error)
+	UpdateStatusBySourceID(ctx context.Context, sourceId string, status string) error
 }

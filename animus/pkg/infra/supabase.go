@@ -117,3 +117,29 @@ func (r *SupabaseRepository) GetFetchedHistory(ctx context.Context, sourceIds []
 
 	return histories, nil
 }
+
+func (r *SupabaseRepository) UpdateStatusBySourceID(ctx context.Context, sourceId string, status string) error {
+	video := model.VideoRecord{
+		SourceID:  sourceId,
+		Status:    status,
+		UpdatedAt: time.Now(),
+	}
+
+	_, err := r.db.NewUpdate().
+		Model(&video).
+		Column("status", "updated_at").
+		Where("source_id = ?", sourceId).
+		Exec(ctx)
+
+	if err != nil {
+		slog.Error(
+			"Failed to update status",
+			"sourceId", sourceId,
+			"status", status,
+			slog.Group("Supabase", "error", err),
+		)
+		return err
+	}
+
+	return nil
+}
