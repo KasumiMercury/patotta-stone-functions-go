@@ -23,6 +23,8 @@ var stampPat *regexp.Regexp
 
 // Global variables
 // Initialize once per function instance
+var targetStatus = []string{"live", "upcoming"}
+
 var ytApiKey = os.Getenv("YOUTUBE_API_KEY")
 var ytSvc *youtube.Service
 
@@ -102,7 +104,6 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	// Get variable video info from Supabase
-	targetStatus := []string{"upcoming", "live"}
 	varVideos, err := videoUsc.GetVideoInfosByStatusFromSupabase(ctx, targetStatus)
 	if err != nil {
 		slog.Error("Failed to get variable video info", slog.Group("error", err))
