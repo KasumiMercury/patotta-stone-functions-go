@@ -1,6 +1,7 @@
 package animus
 
 import (
+	language "cloud.google.com/go/language/apiv2"
 	"context"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/infra"
@@ -27,6 +28,8 @@ var ytSvc *youtube.Service
 // DSN is the connection string for Supabase
 var dsn = os.Getenv("DSN")
 var supaClient *bun.DB
+
+var nlaClient *language.Client
 
 func init() {
 	// err is pre-declared to avoid shadowing client.
@@ -59,6 +62,12 @@ func init() {
 		slog.Error("Failed to create Supabase client", slog.Group("Supabase", "error", err))
 	}
 
+	// Create connection to NaturalLanguageAPI
+	nlaClient, err = infra.NewAnalysisClient(context.Background())
+	if err != nil {
+		slog.Error("Failed to create NaturalLanguageAPI client", slog.Group("NaturalLanguageAPI", "error", err))
+	}
+
 	// Register the function to handle HTTP requests
 	functions.HTTP("Animus", animus)
 }
@@ -80,9 +89,7 @@ func animus(w http.ResponseWriter, r *http.Request) {
 
 	ytRepo := infra.NewYouTubeRepository(ytSvc)
 	supaRepo := infra.NewSupabaseRepository(supaClient)
-
-	// Create NaturalLanguageAPI client
-	sntRepo, err := infra.NewSentimentRepository(ctx)
+	sntRepo := infra.NewSentimentRepository(nlaClient)
 
 	chatSvc := service.NewChatService(ytRepo, supaRepo, sntRepo, stampPat)
 	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
