@@ -82,7 +82,7 @@ func init() {
 	targetChannelIdStr := os.Getenv("TARGET_CHANNEL_ID")
 	if targetChannelIdStr == "" {
 		slog.Error("TARGET_CHANNEL_ID is not set")
-		panic("TARGET_CHANNEL_ID is not set")
+		log.Fatalf("TARGET_CHANNEL_ID is not set")
 	}
 	// Split targetChannelIdStr by comma
 	targetChannels := strings.Split(targetChannelIdStr, ",")
