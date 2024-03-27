@@ -109,12 +109,19 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	newChats := append(stcChats, upcChats...)
+	if len(newChats) == 0 {
+		slog.Info("No new chats")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	// Save the new target chats
-	if err := chatSvc.SaveNewTargetChats(ctx, append(stcChats, upcChats...)); err != nil {
-		slog.Error("Failed to save the new target chats",
-			slog.Group("saveChat", "error", err),
+	if err := chatUsc.SaveNewChats(ctx, newChats); err != nil {
+		slog.Error("Failed to save new target chats",
+			slog.Group("saveNewChats", "error", err),
 		)
-		http.Error(w, "Failed to save the new target chats", http.StatusInternalServerError)
+		http.Error(w, "Failed to save new target chats", http.StatusInternalServerError)
 		return
 	}
 

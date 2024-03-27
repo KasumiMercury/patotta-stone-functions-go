@@ -15,6 +15,7 @@ import (
 type Chat interface {
 	FetchChatsFromStaticTargetVideo(ctx context.Context) ([]model.YTChat, error)
 	FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc []model.VideoInfo) ([]model.YTChat, error)
+	SaveNewChats(ctx context.Context, chats []model.YTChat) error
 }
 
 type chatUsecase struct {
@@ -225,4 +226,16 @@ func (u *chatUsecase) calculatePriority(ctx context.Context, videos []model.Vide
 		),
 	)
 	return model.VideoInfo{}, fmt.Errorf("failed to calculate priority")
+}
+
+func (u *chatUsecase) SaveNewChats(ctx context.Context, chats []model.YTChat) error {
+	// Save the new target chats
+	if err := u.chatSvc.SaveNewTargetChats(ctx, chats); err != nil {
+		slog.Error("Failed to save the new target chats",
+			slog.Group("saveChat", "error", err),
+		)
+		return err
+	}
+
+	return nil
 }
