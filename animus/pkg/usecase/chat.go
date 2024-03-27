@@ -97,7 +97,7 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 		video = top
 	}
 
-	upcChats, _, err := u.chatSvc.FetchChatsByVideoInfo(ctx, video, 0)
+	upcChats, archived, err := u.chatSvc.FetchChatsByVideoInfo(ctx, video, 0)
 	if err != nil {
 		slog.Error("Failed to fetch chats from the upcoming target video",
 			slog.Group("upcomingTarget", "error", err),
@@ -111,6 +111,11 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 			slog.Group("upcomingTarget", "sourceId", video.SourceID, "error", err),
 		)
 		return nil, err
+	}
+
+	// If the chat is archived, update the status of the video to archived and return
+	if archived {
+		// TODO: Implement the function to update the status of the video to archived
 	}
 
 	// Filter chats by author channel
