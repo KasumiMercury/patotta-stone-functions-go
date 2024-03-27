@@ -2,6 +2,7 @@ package infra
 
 import (
 	language "cloud.google.com/go/language/apiv2"
+	"cloud.google.com/go/language/apiv2/languagepb"
 	"context"
 	"log/slog"
 )
@@ -28,4 +29,25 @@ func NewSentimentRepository(ctx context.Context) (*SentimentRepository, error) {
 		return nil, err
 	}
 	return &SentimentRepository{client: client}, nil
+}
+
+func (r *SentimentRepository) AnalyzeSentiment(ctx context.Context, text string) (float32, float32, error) {
+	sentiment, err := r.client.AnalyzeSentiment(ctx, &languagepb.AnalyzeSentimentRequest{
+		Document: &languagepb.Document{
+			Source: &languagepb.Document_Content{
+				Content: text,
+			},
+			Type: languagepb.Document_PLAIN_TEXT,
+		},
+	})
+	if err != nil {
+		slog.Error(
+			"Failed to analyze sentiment",
+			slog.Group("analyzeSentiment", "text", text,
+				slog.Group("NaturalLanguageAPI", "error", err),
+			),
+		)
+		return 0, 0, err
+	}
+	return sentiment.DocumentSentiment.Score, sentiment.DocumentSentiment.Magnitude, nil
 }

@@ -62,8 +62,10 @@ func animus(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to create Supabase client", http.StatusInternalServerError)
 		return
 	}
+	// Create NaturalLanguageAPI client
+	sntRepo, err := infra.NewSentimentRepository(ctx)
 
-	chatSvc := service.NewChatService(ytRepo, supaRepo)
+	chatSvc := service.NewChatService(ytRepo, supaRepo, sntRepo)
 	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)
 
 	videoUsc := usecase.NewVideoUsecase(supaRepo)
