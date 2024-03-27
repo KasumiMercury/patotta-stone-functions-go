@@ -126,6 +126,8 @@ func (s *chatService) analyzeNegativityOfChatMessage(ctx context.Context, msg st
 	}
 
 	// Calculate the negativity of the chat message
+	// Threshold is proportional to magnitude
+	// The higher the magnitude, the more likely it is to contain negative elements, so the higher the threshold is set.
 	negativity := score < 0.5*magnitude
 
 	return negativity, nil
