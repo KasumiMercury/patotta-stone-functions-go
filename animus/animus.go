@@ -1,12 +1,17 @@
 package animus
 
 import (
+	language "cloud.google.com/go/language/apiv2"
+	"context"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/infra"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/lib"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/service"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/usecase"
+	"github.com/uptrace/bun"
+	"google.golang.org/api/youtube/v3"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -16,10 +21,57 @@ import (
 
 var stampPat *regexp.Regexp
 
+// Global variables
+// Initialize once per function instance
+var ytApiKey = os.Getenv("YOUTUBE_API_KEY")
+var ytSvc *youtube.Service
+
+// DSN is the connection string for Supabase
+var dsn = os.Getenv("DSN")
+var supaClient *bun.DB
+
+var nlaClient *language.Client
+
 func init() {
+	// err is pre-declared to avoid shadowing client.
+	var err error
+
 	// Define the pattern for the stamp
 	// The pattern is `:stamp:`
 	stampPat = regexp.MustCompile(`:[^:]+:`)
+
+	// Custom log
+	handler := lib.NewCustomLogger()
+	slog.SetDefault(handler)
+
+	// Create YouTube Data API service
+	if ytApiKey == "" {
+		slog.Error("YOUTUBE_API_KEY is not set")
+		log.Fatalf("YOUTUBE_API_KEY is not set")
+	}
+	ytSvc, err = infra.NewYouTubeService(context.Background(), ytApiKey)
+	if err != nil {
+		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
+		log.Fatalf("Failed to create YouTube service: %v", err)
+	}
+
+	// Create connection to Supabase
+	if dsn == "" {
+		slog.Error("DSN is not set")
+		log.Fatalf("DSN is not set")
+	}
+	supaClient, err = infra.NewSupabaseClient(dsn)
+	if err != nil {
+		slog.Error("Failed to create Supabase client", slog.Group("Supabase", "error", err))
+		log.Fatalf("Failed to create Supabase client: %v", err)
+	}
+
+	// Create connection to NaturalLanguageAPI
+	nlaClient, err = infra.NewAnalysisClient(context.Background())
+	if err != nil {
+		slog.Error("Failed to create NaturalLanguageAPI client", slog.Group("NaturalLanguageAPI", "error", err))
+		log.Fatalf("Failed to create NaturalLanguageAPI client: %v", err)
+	}
 
 	// Register the function to handle HTTP requests
 	functions.HTTP("Animus", animus)
@@ -27,10 +79,6 @@ func init() {
 
 func animus(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
-	// Custom log
-	handler := lib.NewCustomLogger()
-	slog.SetDefault(handler)
 
 	// Cache common environment variables
 	// Because the function is supposed to run on CloudFunctions, it is necessary to read the environment variables here.
@@ -44,34 +92,9 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	// Split targetChannelIdStr by comma
 	targetChannels := strings.Split(targetChannelIdStr, ",")
 
-	ytApiKey := os.Getenv("YOUTUBE_API_KEY")
-	if ytApiKey == "" {
-		slog.Error("YOUTUBE_API_KEY is not set")
-		panic("YOUTUBE_API_KEY must be set")
-	}
-
-	dsn := os.Getenv("SUPABASE_DSN")
-	if dsn == "" {
-		slog.Error("DSN is not set")
-		panic("DSN is not set")
-	}
-
-	// Create YouTube service
-	ytRepo, err := infra.NewYouTubeRepository(ctx, ytApiKey)
-	if err != nil {
-		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
-		http.Error(w, "Failed to create YouTube service", http.StatusInternalServerError)
-		return
-	}
-	// Create Supabase client
-	supaRepo, err := infra.NewSupabaseRepository(dsn)
-	if err != nil {
-		slog.Error("Failed to create Supabase client", slog.Group("Supabase", "error", err))
-		http.Error(w, "Failed to create Supabase client", http.StatusInternalServerError)
-		return
-	}
-	// Create NaturalLanguageAPI client
-	sntRepo, err := infra.NewSentimentRepository(ctx)
+	ytRepo := infra.NewYouTubeRepository(ytSvc)
+	supaRepo := infra.NewSupabaseRepository(supaClient)
+	sntRepo := infra.NewSentimentRepository(nlaClient)
 
 	chatSvc := service.NewChatService(ytRepo, supaRepo, sntRepo, stampPat)
 	chatUsc := usecase.NewChatUsecase(targetChannels, chatSvc, supaRepo)

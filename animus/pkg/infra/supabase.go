@@ -21,17 +21,10 @@ func NewSupabaseClient(dsn string) (*bun.DB, error) {
 	return db, nil
 }
 
-func NewSupabaseRepository(dsn string) (*SupabaseRepository, error) {
-	db, err := NewSupabaseClient(dsn)
-	if err != nil {
-		slog.Error(
-			"Failed to create a new Supabase client",
-			slog.Group("Supabase", "error", err),
-		)
-		return nil, err
+func NewSupabaseRepository(db *bun.DB) *SupabaseRepository {
+	return &SupabaseRepository{
+		db: db,
 	}
-
-	return &SupabaseRepository{db: db}, nil
 }
 
 func (r *SupabaseRepository) GetVideoInfoByStatus(ctx context.Context, status []string) ([]model.VideoRecord, error) {

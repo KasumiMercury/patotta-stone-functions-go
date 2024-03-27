@@ -19,16 +19,8 @@ func NewAnalysisClient(ctx context.Context) (*language.Client, error) {
 	return client, nil
 }
 
-func NewSentimentRepository(ctx context.Context) (*SentimentRepository, error) {
-	client, err := NewAnalysisClient(ctx)
-	if err != nil {
-		slog.Error(
-			"Failed to create a new language client",
-			slog.Group("NaturalLanguageAPI", "error", err),
-		)
-		return nil, err
-	}
-	return &SentimentRepository{client: client}, nil
+func NewSentimentRepository(client *language.Client) *SentimentRepository {
+	return &SentimentRepository{client: client}
 }
 
 func (r *SentimentRepository) AnalyzeSentiment(ctx context.Context, text string) (float32, float32, error) {
