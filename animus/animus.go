@@ -8,6 +8,7 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/service"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/usecase"
+	"github.com/uptrace/bun"
 	"google.golang.org/api/youtube/v3"
 	"log/slog"
 	"net/http"
@@ -22,6 +23,10 @@ var stampPat *regexp.Regexp
 // Initialize once per function instance
 var ytApiKey = os.Getenv("YOUTUBE_API_KEY")
 var ytSvc *youtube.Service
+
+// DSN is the connection string for Supabase
+var dsn = os.Getenv("DSN")
+var supaClient *bun.DB
 
 func init() {
 	// err is pre-declared to avoid shadowing client.
@@ -44,6 +49,16 @@ func init() {
 		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
 	}
 
+	// Create connection to Supabase
+	if dsn == "" {
+		slog.Error("DSN is not set")
+		panic("DSN is not set")
+	}
+	supaClient, err = infra.NewSupabaseClient(dsn)
+	if err != nil {
+		slog.Error("Failed to create Supabase client", slog.Group("Supabase", "error", err))
+	}
+
 	// Register the function to handle HTTP requests
 	functions.HTTP("Animus", animus)
 }
@@ -63,20 +78,9 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	// Split targetChannelIdStr by comma
 	targetChannels := strings.Split(targetChannelIdStr, ",")
 
-	dsn := os.Getenv("SUPABASE_DSN")
-	if dsn == "" {
-		slog.Error("DSN is not set")
-		panic("DSN is not set")
-	}
-
 	ytRepo := infra.NewYouTubeRepository(ytSvc)
-	// Create Supabase client
-	supaRepo, err := infra.NewSupabaseRepository(dsn)
-	if err != nil {
-		slog.Error("Failed to create Supabase client", slog.Group("Supabase", "error", err))
-		http.Error(w, "Failed to create Supabase client", http.StatusInternalServerError)
-		return
-	}
+	supaRepo := infra.NewSupabaseRepository(supaClient)
+
 	// Create NaturalLanguageAPI client
 	sntRepo, err := infra.NewSentimentRepository(ctx)
 
