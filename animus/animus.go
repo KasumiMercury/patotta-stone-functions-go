@@ -11,6 +11,7 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/usecase"
 	"github.com/uptrace/bun"
 	"google.golang.org/api/youtube/v3"
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -46,26 +47,30 @@ func init() {
 	// Create YouTube Data API service
 	if ytApiKey == "" {
 		slog.Error("YOUTUBE_API_KEY is not set")
+		log.Fatalf("YOUTUBE_API_KEY is not set")
 	}
 	ytSvc, err = infra.NewYouTubeService(context.Background(), ytApiKey)
 	if err != nil {
 		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
+		log.Fatalf("Failed to create YouTube service: %v", err)
 	}
 
 	// Create connection to Supabase
 	if dsn == "" {
 		slog.Error("DSN is not set")
-		panic("DSN is not set")
+		log.Fatalf("DSN is not set")
 	}
 	supaClient, err = infra.NewSupabaseClient(dsn)
 	if err != nil {
 		slog.Error("Failed to create Supabase client", slog.Group("Supabase", "error", err))
+		log.Fatalf("Failed to create Supabase client: %v", err)
 	}
 
 	// Create connection to NaturalLanguageAPI
 	nlaClient, err = infra.NewAnalysisClient(context.Background())
 	if err != nil {
 		slog.Error("Failed to create NaturalLanguageAPI client", slog.Group("NaturalLanguageAPI", "error", err))
+		log.Fatalf("Failed to create NaturalLanguageAPI client: %v", err)
 	}
 
 	// Register the function to handle HTTP requests
