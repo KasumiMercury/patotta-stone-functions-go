@@ -115,7 +115,14 @@ func (u *chatUsecase) FetchChatsFromUpcomingTargetVideo(ctx context.Context, upc
 
 	// If the chat is archived, update the status of the video to archived and return
 	if archived {
-		// TODO: Implement the function to update the status of the video to archived
+		if err := u.supaRepo.UpdateStatusBySourceID(ctx, video.SourceID, "archived"); err != nil {
+			slog.Error("Failed to update the status of the video to archived",
+				slog.Group("upcomingTarget", "sourceId", video.SourceID, "error", err),
+			)
+			return nil, err
+		}
+
+		return nil, nil
 	}
 
 	// Filter chats by author channel
