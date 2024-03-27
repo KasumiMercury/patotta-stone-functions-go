@@ -1,12 +1,14 @@
 package animus
 
 import (
+	"context"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/infra"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/lib"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/service"
 	"github.com/KasumiMercury/patotta-stone-functions-go/animus/pkg/usecase"
+	"google.golang.org/api/youtube/v3"
 	"log/slog"
 	"net/http"
 	"os"
@@ -16,7 +18,15 @@ import (
 
 var stampPat *regexp.Regexp
 
+// Global variables
+// Initialize once per function instance
+var ytApiKey = os.Getenv("YOUTUBE_API_KEY")
+var ytSvc *youtube.Service
+
 func init() {
+	// err is pre-declared to avoid shadowing client.
+	var err error
+
 	// Define the pattern for the stamp
 	// The pattern is `:stamp:`
 	stampPat = regexp.MustCompile(`:[^:]+:`)
@@ -24,6 +34,15 @@ func init() {
 	// Custom log
 	handler := lib.NewCustomLogger()
 	slog.SetDefault(handler)
+
+	// Create YouTube Data API service
+	if ytApiKey == "" {
+		slog.Error("YOUTUBE_API_KEY is not set")
+	}
+	ytSvc, err = infra.NewYouTubeService(context.Background(), ytApiKey)
+	if err != nil {
+		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
+	}
 
 	// Register the function to handle HTTP requests
 	functions.HTTP("Animus", animus)
@@ -44,25 +63,13 @@ func animus(w http.ResponseWriter, r *http.Request) {
 	// Split targetChannelIdStr by comma
 	targetChannels := strings.Split(targetChannelIdStr, ",")
 
-	ytApiKey := os.Getenv("YOUTUBE_API_KEY")
-	if ytApiKey == "" {
-		slog.Error("YOUTUBE_API_KEY is not set")
-		panic("YOUTUBE_API_KEY must be set")
-	}
-
 	dsn := os.Getenv("SUPABASE_DSN")
 	if dsn == "" {
 		slog.Error("DSN is not set")
 		panic("DSN is not set")
 	}
 
-	// Create YouTube service
-	ytRepo, err := infra.NewYouTubeRepository(ctx, ytApiKey)
-	if err != nil {
-		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
-		http.Error(w, "Failed to create YouTube service", http.StatusInternalServerError)
-		return
-	}
+	ytRepo := infra.NewYouTubeRepository(ytSvc)
 	// Create Supabase client
 	supaRepo, err := infra.NewSupabaseRepository(dsn)
 	if err != nil {

@@ -15,17 +15,8 @@ func NewYouTubeService(ctx context.Context, apiKey string) (*youtube.Service, er
 	return youtube.NewService(ctx, option.WithAPIKey(apiKey))
 }
 
-func NewYouTubeRepository(ctx context.Context, apiKey string) (*YouTubeRepository, error) {
-	ytSvc, err := NewYouTubeService(ctx, apiKey)
-	if err != nil {
-		slog.Error(
-			"Failed to create a new YouTube service",
-			slog.Group("YouTubeAPI", "error", err),
-		)
-		return nil, err
-	}
-
-	return &YouTubeRepository{ytSvc: ytSvc}, nil
+func NewYouTubeRepository(svc *youtube.Service) *YouTubeRepository {
+	return &YouTubeRepository{ytSvc: svc}
 }
 
 func (r *YouTubeRepository) FetchChatsByChatID(ctx context.Context, chatID string, maxResults int64) (*youtube.LiveChatMessageListResponse, error) {
