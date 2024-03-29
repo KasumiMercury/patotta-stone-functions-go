@@ -104,17 +104,17 @@ func opus(w http.ResponseWriter, r *http.Request) {
 				UpdatedAtUnix: p.UpdatedAtUnix,
 			})
 		}
-		//err = videoUsc.SaveNewVideo(ctx, n)
-		//
-		//if err != nil {
-		//	slog.Error("Failed to save new videos",
-		//		slog.Group("rssWatch",
-		//			slog.Group("saveNewVideo", "error", err),
-		//		),
-		//	)
-		//	http.Error(w, "Failed to save new videos", http.StatusInternalServerError)
-		//	return
-		//}
+		err = videoUsc.SaveNewVideo(ctx, n)
+
+		if err != nil {
+			slog.Error("Failed to save new videos",
+				slog.Group("rssWatch",
+					slog.Group("saveNewVideo", "error", err),
+				),
+			)
+			http.Error(w, "Failed to save new videos", http.StatusInternalServerError)
+			return
+		}
 		slog.Debug(
 			"Saved new videos",
 			slog.Group("rssWatch", "newVideos", n),
