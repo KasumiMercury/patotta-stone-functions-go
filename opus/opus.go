@@ -3,6 +3,7 @@ package opus
 import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/infra"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/usecase"
 	"github.com/uptrace/bun"
 	"log"
@@ -87,6 +88,29 @@ func opus(w http.ResponseWriter, r *http.Request) {
 
 	// Compare RSS items and video records
 	pcs := rssUsc.CompareRssItemsAndVideoRecords(ctx, rss, recMap)
+
+	// Save new videos
+	if len(pcs.NewItems) > 0 {
+		n := make([]model.VideoInfo, 0, len(pcs.NewItems))
+		for _, p := range pcs.NewItems {
+			n = append(n, model.VideoInfo{
+				SourceID:      p.SourceID,
+				Title:         p.Title,
+				UpdatedAtUnix: p.UpdatedAtUnix,
+			})
+		}
+		err = videoUsc.SaveNewVideo(ctx, n)
+
+		if err != nil {
+			slog.Error("Failed to save new videos",
+				slog.Group("rssWatch",
+					slog.Group("saveNewVideo", "error", err),
+				),
+			)
+			http.Error(w, "Failed to save new videos", http.StatusInternalServerError)
+			return
+		}
+	}
 
 	w.WriteHeader(http.StatusOK)
 	slog.Info("Fetched updated RSS items")

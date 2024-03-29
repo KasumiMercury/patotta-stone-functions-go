@@ -66,3 +66,16 @@ func (r *SupabaseRepository) GetRecordsBySourceIDs(ctx context.Context, sourceID
 
 	return records, nil
 }
+
+func (r *SupabaseRepository) InsertVideoRecords(ctx context.Context, records []model.VideoRecord) error {
+	_, err := r.db.NewInsert().Model(&records).Exec(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to insert video records",
+			slog.Group("Supabase", "error", err),
+		)
+		return err
+	}
+
+	return nil
+}
