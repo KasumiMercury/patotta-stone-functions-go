@@ -48,3 +48,21 @@ func (r *SupabaseRepository) GetLastUpdatedUnixOfVideo(ctx context.Context) (int
 	updatedAt := records[0].UpdatedAt
 	return updatedAt.Unix(), nil
 }
+
+func (r *SupabaseRepository) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string) ([]model.VideoRecord, error) {
+	records := make([]model.VideoRecord, 0)
+	err := r.db.NewSelect().
+		Model(&records).
+		Where("source_id IN (?)", bun.In(sourceIDs)).
+		Scan(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to get video records by source IDs",
+			"sourceIDs", sourceIDs,
+			slog.Group("Supabase", "error", err),
+		)
+		return nil, err
+	}
+
+	return records, nil
+}
