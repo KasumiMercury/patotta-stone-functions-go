@@ -54,11 +54,14 @@ func opus(w http.ResponseWriter, r *http.Request) {
 
 	rssRepo := infra.NewRssRepository()
 	rssUsecase := usecase.NewRssUsecase(rssRepo, supaRepo)
-	if err := rssUsecase.FetchUpdatedRssItemsEachOfChannels(ctx, targetChannels); err != nil {
+
+	rss, err := rssUsecase.FetchUpdatedRssItemsEachOfChannels(ctx, targetChannels)
+	if err != nil {
 		slog.Error("Failed to fetch updated RSS items", slog.Group("rssWatch", "error", err))
 		http.Error(w, "Failed to fetch updated RSS items", http.StatusInternalServerError)
 		return
 	}
+	slog.Debug("Fetched updated RSS items", slog.Group("rssWatch", "rss", rss))
 
 	w.WriteHeader(http.StatusOK)
 	slog.Info("Fetched updated RSS items")
