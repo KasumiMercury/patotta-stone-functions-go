@@ -85,6 +85,9 @@ func opus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Compare RSS items and video records
+	pcs := rssUsc.CompareRssItemsAndVideoRecords(ctx, rss, recMap)
+
 	w.WriteHeader(http.StatusOK)
 	slog.Info("Fetched updated RSS items")
 }

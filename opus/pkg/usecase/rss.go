@@ -9,6 +9,7 @@ import (
 
 type Rss interface {
 	FetchUpdatedRssItemsEachOfChannels(ctx context.Context, target []string) ([]model.Rss, error)
+	CompareRssItemsAndVideoRecords(ctx context.Context, rss []model.Rss, videos map[string]model.VideoRecord) model.RssProcess
 }
 
 type rssUsecase struct {
@@ -44,4 +45,30 @@ func (u *rssUsecase) FetchUpdatedRssItemsEachOfChannels(ctx context.Context, tar
 	}
 
 	return items, nil
+}
+
+func (u *rssUsecase) CompareRssItemsAndVideoRecords(ctx context.Context, rss []model.Rss, videos map[string]model.VideoRecord) model.RssProcess {
+	var result model.RssProcess
+
+	for _, r := range rss {
+		if v, ok := videos[r.SourceID]; ok {
+			item := model.UpdatedItem{
+				Record:  v,
+				RssItem: r,
+			}
+
+			if r.Title != v.Title {
+				result.TitleUpdated = append(result.TitleUpdated, item)
+			}
+			// Split for future expansion of comparison items
+			if r.Title == v.Title {
+				result.StatusUpdated = append(result.StatusUpdated, item)
+			}
+
+		} else {
+			result.NewItems = append(result.NewItems, r)
+		}
+	}
+
+	return result
 }
