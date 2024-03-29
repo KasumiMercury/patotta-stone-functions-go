@@ -13,7 +13,7 @@ func NewRssRepository() *RssRepository {
 	return &RssRepository{}
 }
 
-func (r *RssRepository) FetchRss(ctx context.Context, url string) ([]model.Rss, error) {
+func (r *RssRepository) FetchUpdatedRssItems(ctx context.Context, url string, threshold int64) ([]model.Rss, error) {
 	feed, err := gofeed.NewParser().ParseURLWithContext(url, ctx)
 	if err != nil {
 		slog.Error(
@@ -27,13 +27,17 @@ func (r *RssRepository) FetchRss(ctx context.Context, url string) ([]model.Rss, 
 
 	items := make([]model.Rss, 0, len(feed.Items))
 	for _, i := range feed.Items {
+		updated := i.UpdatedParsed.Unix()
+		if updated <= threshold {
+			continue
+		}
 		items = append(items, model.Rss{
 			ChannelID:       i.Extensions["yt"]["channelId"][0].Value,
 			SourceID:        i.Extensions["yt"]["videoId"][0].Value,
 			Title:           i.Title,
 			Description:     extractDescriptionFromRssItem(i),
 			PublishedAtUnix: i.PublishedParsed.Unix(),
-			UpdatedAtUnix:   i.UpdatedParsed.Unix(),
+			UpdatedAtUnix:   updated,
 		})
 	}
 
