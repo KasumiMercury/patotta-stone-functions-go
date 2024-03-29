@@ -4,7 +4,7 @@ services:
         context: .
         dockerfile: ./proxy/Dockerfile
     environment:
-      FUNCTIONS: "animus"
+      FUNCTIONS: "animus,opus"
     volumes:
       - ./proxy:/app
     restart: always
@@ -20,4 +20,15 @@ services:
       FUNCTION_TARGET: Animus
     volumes:
       - ./animus:/app
+    restart: always
+  opus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+        FUNCTION_TARGET: Opus
+    volumes:
+        - ./opus:/app
     restart: always
