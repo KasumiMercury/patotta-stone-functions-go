@@ -3,6 +3,7 @@ package opus
 import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/infra"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/lib"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/usecase"
 	"github.com/uptrace/bun"
@@ -20,6 +21,10 @@ var supaClient *bun.DB
 func init() {
 	// err is pre-declared to avoid shadowing client.
 	var err error
+
+	// Custom log
+	handler := lib.NewCustomLogger()
+	slog.SetDefault(handler)
 
 	// Create connection to Supabase
 	if dsn == "" {
