@@ -27,7 +27,7 @@ var ytApiKey = os.Getenv("YOUTUBE_API_KEY")
 var ytSvc *youtube.Service
 
 // DSN is the connection string for Supabase
-var dsn = os.Getenv("DSN")
+var dsn = os.Getenv("SUPABASE_DSN")
 var supaClient *bun.DB
 
 var nlaClient *language.Client
