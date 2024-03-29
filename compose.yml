@@ -18,8 +18,10 @@ services:
       - .env
     environment:
       FUNCTION_TARGET: Animus
+      GOOGLE_APPLICATION_CREDENTIALS: /key.json
     volumes:
       - ./animus:/app
+      - $HOME/.config/gcloud/application_default_credentials.json:/key.json:ro
     restart: always
   opus:
     build:
