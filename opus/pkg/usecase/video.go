@@ -7,6 +7,7 @@ import (
 )
 
 type Video interface {
+	GetVideoRecordMap(ctx context.Context, sourceIDs []string) (map[string]model.VideoRecord, error)
 }
 
 type videoUsecase struct {

@@ -53,15 +53,37 @@ func opus(w http.ResponseWriter, r *http.Request) {
 	supaRepo := infra.NewSupabaseRepository(supaClient)
 
 	rssRepo := infra.NewRssRepository()
-	rssUsecase := usecase.NewRssUsecase(rssRepo, supaRepo)
+	rssUsc := usecase.NewRssUsecase(rssRepo, supaRepo)
 
-	rss, err := rssUsecase.FetchUpdatedRssItemsEachOfChannels(ctx, targetChannels)
+	videoUsc := usecase.NewVideoUsecase(supaRepo)
+
+	rss, err := rssUsc.FetchUpdatedRssItemsEachOfChannels(ctx, targetChannels)
 	if err != nil {
 		slog.Error("Failed to fetch updated RSS items", slog.Group("rssWatch", "error", err))
 		http.Error(w, "Failed to fetch updated RSS items", http.StatusInternalServerError)
 		return
 	}
 	slog.Debug("Fetched updated RSS items", slog.Group("rssWatch", "rss", rss))
+
+	if len(rss) == 0 {
+		slog.Info("No updated RSS items")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// Store sourceIDs of videos that have been updated in an array
+	sIds := make([]string, 0, len(rss))
+	for _, r := range rss {
+		sIds = append(sIds, r.SourceID)
+	}
+
+	// Get existing video records
+	recMap, err := videoUsc.GetVideoRecordMap(ctx, sIds)
+	if err != nil {
+		slog.Error("Failed to get video records", slog.Group("rssWatch", "error", err))
+		http.Error(w, "Failed to get video records", http.StatusInternalServerError)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	slog.Info("Fetched updated RSS items")
