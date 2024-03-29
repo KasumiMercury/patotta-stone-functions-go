@@ -36,7 +36,8 @@ func (u *rssUsecase) FetchUpdatedRssItemsEachOfChannels(ctx context.Context, tar
 
 	items := make([]model.Rss, 0)
 	for _, t := range target {
-		updated, err := u.rssRepo.FetchUpdatedRssItems(ctx, t, threshold)
+		url := "https://www.youtube.com/feeds/videos.xml?channel_id=" + t
+		updated, err := u.rssRepo.FetchUpdatedRssItems(ctx, url, threshold)
 		if err != nil {
 			return nil, err
 		}
