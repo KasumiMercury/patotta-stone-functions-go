@@ -6,13 +6,17 @@ import (
 )
 
 type VideoInfo struct {
+	SourceID      string
+	Title         string
+	UpdatedAtUnix int64
+}
+
+type VideoDetail struct {
 	SourceID        string
-	Title           string
-	Status          string
 	ChatID          string
+	Status          string
 	ScheduledAtUnix int64
 	PublishedAtUnix int64
-	UpdatedAtUnix   int64
 }
 
 type VideoRecord struct {

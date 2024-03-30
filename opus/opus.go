@@ -1,18 +1,25 @@
 package opus
 
 import (
+	"context"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/infra"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/lib"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/usecase"
 	"github.com/uptrace/bun"
+	"google.golang.org/api/youtube/v3"
 	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"strings"
 )
+
+// Global variables
+// Initialize once per function instance
+var ytApiKey = os.Getenv("YOUTUBE_API_KEY")
+var ytSvc *youtube.Service
 
 // DSN is the connection string for Supabase
 var dsn = os.Getenv("SUPABASE_DSN")
@@ -25,6 +32,17 @@ func init() {
 	// Custom log
 	handler := lib.NewCustomLogger()
 	slog.SetDefault(handler)
+
+	// Create YouTube Data API service
+	if ytApiKey == "" {
+		slog.Error("YOUTUBE_API_KEY is not set")
+		log.Fatalf("YOUTUBE_API_KEY is not set")
+	}
+	ytSvc, err = infra.NewYouTubeService(context.Background(), ytApiKey)
+	if err != nil {
+		slog.Error("Failed to create YouTube service", slog.Group("YouTubeAPI", "error", err))
+		log.Fatalf("Failed to create YouTube service: %v", err)
+	}
 
 	// Create connection to Supabase
 	if dsn == "" {
@@ -57,10 +75,11 @@ func opus(w http.ResponseWriter, r *http.Request) {
 	targetChannels := strings.Split(targetChannelIdStr, ",")
 
 	supaRepo := infra.NewSupabaseRepository(supaClient)
-
+	ytRepo := infra.NewYouTubeRepository(ytSvc)
 	rssRepo := infra.NewRssRepository()
-	rssUsc := usecase.NewRssUsecase(rssRepo, supaRepo)
 
+	rssUsc := usecase.NewRssUsecase(rssRepo, supaRepo)
+	apiSvc := usecase.NewApiUsecase(ytRepo)
 	videoUsc := usecase.NewVideoUsecase(supaRepo)
 
 	rss, err := rssUsc.FetchUpdatedRssItemsEachOfChannels(ctx, targetChannels)
@@ -97,14 +116,18 @@ func opus(w http.ResponseWriter, r *http.Request) {
 	// Save new videos
 	if len(pcs.NewItems) > 0 {
 		n := make([]model.VideoInfo, 0, len(pcs.NewItems))
+		nsIds := make([]string, 0, len(pcs.NewItems))
 		for _, p := range pcs.NewItems {
+			nsIds = append(nsIds, p.SourceID)
 			n = append(n, model.VideoInfo{
 				SourceID:      p.SourceID,
 				Title:         p.Title,
 				UpdatedAtUnix: p.UpdatedAtUnix,
 			})
 		}
-		err = videoUsc.SaveNewVideo(ctx, n)
+		// Fetch details of new videos
+		vdMap, err := apiSvc.VideoDetailsMap(ctx, nsIds)
+		err = videoUsc.SaveNewVideo(ctx, n, vdMap)
 
 		if err != nil {
 			slog.Error("Failed to save new videos",
