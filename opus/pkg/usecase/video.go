@@ -9,7 +9,7 @@ import (
 
 type Video interface {
 	GetVideoRecordMap(ctx context.Context, sourceIDs []string) (map[string]model.VideoRecord, error)
-	SaveNewVideo(ctx context.Context, videos []model.VideoInfo) error
+	SaveNewVideo(ctx context.Context, infos []model.VideoInfo, details map[string]model.VideoDetail) error
 }
 
 type videoUsecase struct {
@@ -36,16 +36,15 @@ func (u *videoUsecase) GetVideoRecordMap(ctx context.Context, sourceIDs []string
 	return recordMap, nil
 }
 
-func (u *videoUsecase) SaveNewVideo(ctx context.Context, infos []model.VideoInfo) error {
-	// TODO: implement
+func (u *videoUsecase) SaveNewVideo(ctx context.Context, infos []model.VideoInfo, details map[string]model.VideoDetail) error {
 	rec := make([]model.VideoRecord, 0, len(infos))
 	for _, i := range infos {
 		rec = append(rec, model.VideoRecord{
 			SourceID:    i.SourceID,
 			Title:       i.Title,
-			Status:      i.Status,
-			ChatID:      i.ChatID,
-			ScheduledAt: time.Unix(i.ScheduledAtUnix, 0),
+			Status:      details[i.SourceID].Status,
+			ChatID:      details[i.SourceID].ChatID,
+			ScheduledAt: time.Unix(details[i.SourceID].ScheduledAtUnix, 0),
 			UpdatedAt:   time.Unix(i.UpdatedAtUnix, 0),
 		})
 	}

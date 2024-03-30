@@ -17,3 +17,15 @@ func NewYouTubeService(ctx context.Context, apiKey string) (*youtube.Service, er
 func NewYouTubeRepository(svc *youtube.Service) *YouTubeRepository {
 	return &YouTubeRepository{ytSvc: svc}
 }
+
+func (r YouTubeRepository) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]*youtube.Video, error) {
+	call := r.ytSvc.Videos.List([]string{"snippet", "contentDetails", "liveStreamingDetails"}).Id(videoIDs...)
+	call = call.Context(ctx)
+
+	resp, err := call.Do()
+	if err != nil {
+		return nil, err
+	}
+
+	return resp.Items, nil
+}
