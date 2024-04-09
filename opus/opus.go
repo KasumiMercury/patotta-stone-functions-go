@@ -144,6 +144,17 @@ func opus(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	w.WriteHeader(http.StatusOK)
 	slog.Info("Fetched updated RSS items")
+
+	// extract parameter from request
+	q := r.URL.Query()
+	// extract upcoming param
+	uw := q.Get("upcoming")
+	// if uw is not empty, check update scheduler of upcoming videos
+	if uw != "" {
+		// TODO: implement
+		slog.Info("Check update scheduler of upcoming videos")
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
