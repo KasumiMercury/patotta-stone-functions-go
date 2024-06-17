@@ -177,7 +177,28 @@ func opus(w http.ResponseWriter, r *http.Request) {
 			uIds = append(uIds, u.SourceID)
 		}
 		// fetch scheduled time of upcoming videos
-		// TODO: implement
+		vSaMap, err := apiSvc.VideoScheduledAtUnixMap(ctx, uIds)
+		if err != nil {
+			slog.Error("Failed to fetch scheduled time of upcoming videos",
+				slog.Group("check upcoming schedule", "error", err),
+			)
+			http.Error(w, "Failed to fetch scheduled time of upcoming videos", http.StatusInternalServerError)
+			return
+		}
+
+		// compare scheduled time
+		// if scheduled time is different, update scheduled time
+		// if scheduled time is same, do nothing
+		// if scheduled time is not found, update status to archived
+		for _, u := range uv {
+			if sa, ok := vSaMap[u.SourceID]; ok {
+				if u.ScheduledAt.Unix() != sa {
+					// TODO: update scheduled time
+				}
+			} else {
+				// TODO: update status to archived
+			}
+		}
 	}
 
 	w.WriteHeader(http.StatusOK)
