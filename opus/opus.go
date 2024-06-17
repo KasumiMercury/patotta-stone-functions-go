@@ -154,11 +154,12 @@ func opus(w http.ResponseWriter, r *http.Request) {
 	if uw != "" {
 		slog.Info("Check update scheduler of upcoming videos")
 		// extract upcoming status video
-		uv := make([]model.VideoRecord, 0, len(recMap))
+		uv := make([]model.VideoSchedule, 0, len(recMap))
 		for _, record := range recMap {
 			if record.Status == "upcoming" {
-				uv = append(uv, model.VideoRecord{
+				uv = append(uv, model.VideoSchedule{
 					SourceID:    record.SourceID,
+					Status:      record.Status,
 					ScheduledAt: record.ScheduledAt,
 				})
 			}

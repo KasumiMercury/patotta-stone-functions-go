@@ -29,3 +29,9 @@ type VideoRecord struct {
 	ScheduledAt time.Time `bun:",type:timestamptz"`
 	UpdatedAt   time.Time `bun:",type:timestamptz"`
 }
+
+type VideoSchedule struct {
+	SourceID    string
+	Status      string
+	ScheduledAt time.Time
+}
