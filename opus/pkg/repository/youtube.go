@@ -7,4 +7,5 @@ import (
 
 type YouTube interface {
 	FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]*youtube.Video, error)
+	FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]*youtube.Video, error)
 }
