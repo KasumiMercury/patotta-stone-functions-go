@@ -152,8 +152,26 @@ func opus(w http.ResponseWriter, r *http.Request) {
 	uw := q.Get("upcoming")
 	// if uw is not empty, check update scheduler of upcoming videos
 	if uw != "" {
-		// TODO: implement
 		slog.Info("Check update scheduler of upcoming videos")
+		// extract upcoming status video
+		uv := make([]model.VideoRecord, 0, len(recMap))
+		for _, record := range recMap {
+			if record.Status == "upcoming" {
+				uv = append(uv, model.VideoRecord{
+					SourceID:    record.SourceID,
+					ScheduledAt: record.ScheduledAt,
+				})
+			}
+		}
+		// if there is no upcoming status video, return
+		if len(uv) == 0 {
+			slog.Info("No upcoming status video")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// fetch YouTube api and compare scheduled time
+		// TODO: implement
 	}
 
 	w.WriteHeader(http.StatusOK)
