@@ -172,6 +172,11 @@ func opus(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// fetch YouTube api and compare scheduled time
+		uIds := make([]string, 0, len(uv))
+		for _, u := range uv {
+			uIds = append(uIds, u.SourceID)
+		}
+		// fetch scheduled time of upcoming videos
 		// TODO: implement
 	}
 
