@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 // Global variables
@@ -26,7 +27,7 @@ var dsn = os.Getenv("SUPABASE_DSN")
 var supaClient *bun.DB
 
 func init() {
-	// err is pre-declared to avoid shadowing client.
+	// err is pre-declared to avoid a shadowing client.
 	var err error
 
 	// Custom log
@@ -193,7 +194,14 @@ func opus(w http.ResponseWriter, r *http.Request) {
 		for _, u := range uv {
 			if sa, ok := vSaMap[u.SourceID]; ok {
 				if u.ScheduledAt.Unix() != sa {
-					// TODO: update scheduled time
+					err := videoUsc.UpdateScheduledAt(ctx, u.SourceID, time.Unix(sa, 0))
+					if err != nil {
+						slog.Error("Failed to update scheduled time",
+							slog.Group("check upcoming schedule", "error", err),
+						)
+						http.Error(w, "Failed to update scheduled time", http.StatusInternalServerError)
+						return
+					}
 				}
 			} else {
 				// TODO: update status to archived

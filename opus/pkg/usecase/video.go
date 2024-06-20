@@ -10,6 +10,7 @@ import (
 type Video interface {
 	GetVideoRecordMap(ctx context.Context, sourceIDs []string) (map[string]model.VideoRecord, error)
 	SaveNewVideo(ctx context.Context, infos []model.VideoInfo, details map[string]model.VideoDetail) error
+	UpdateScheduledAt(ctx context.Context, sourceID string, scheduledAt time.Time) error
 }
 
 type videoUsecase struct {
@@ -54,4 +55,8 @@ func (u *videoUsecase) SaveNewVideo(ctx context.Context, infos []model.VideoInfo
 	}
 
 	return nil
+}
+
+func (u *videoUsecase) UpdateScheduledAt(ctx context.Context, sourceID string, scheduledAt time.Time) error {
+	return u.supaRepo.UpdateScheduledAtBySourceID(ctx, sourceID, scheduledAt)
 }
