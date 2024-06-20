@@ -204,7 +204,14 @@ func opus(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 			} else {
-				// TODO: update status to archived
+				err := videoUsc.UpdateStatus(ctx, u.SourceID, "archived")
+				if err != nil {
+					slog.Error("Failed to update status",
+						slog.Group("check upcoming schedule", "error", err),
+					)
+					http.Error(w, "Failed to update status", http.StatusInternalServerError)
+					return
+				}
 			}
 		}
 	}

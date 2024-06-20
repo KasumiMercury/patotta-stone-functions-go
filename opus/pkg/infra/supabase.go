@@ -98,3 +98,21 @@ func (r *SupabaseRepository) UpdateScheduledAtBySourceID(ctx context.Context, so
 
 	return nil
 }
+
+func (r *SupabaseRepository) UpdateStatusBySourceID(ctx context.Context, sourceID string, status string) error {
+	_, err := r.db.NewUpdate().
+		Model(&model.VideoRecord{Status: status}).
+		Where("source_id = ?", sourceID).
+		Exec(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to update status",
+			"sourceID", sourceID,
+			"status", status,
+			slog.Group("Supabase", "error", err),
+		)
+		return err
+	}
+
+	return nil
+}

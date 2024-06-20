@@ -11,6 +11,7 @@ type Video interface {
 	GetVideoRecordMap(ctx context.Context, sourceIDs []string) (map[string]model.VideoRecord, error)
 	SaveNewVideo(ctx context.Context, infos []model.VideoInfo, details map[string]model.VideoDetail) error
 	UpdateScheduledAt(ctx context.Context, sourceID string, scheduledAt time.Time) error
+	UpdateStatus(ctx context.Context, sourceID, status string) error
 }
 
 type videoUsecase struct {
@@ -59,4 +60,8 @@ func (u *videoUsecase) SaveNewVideo(ctx context.Context, infos []model.VideoInfo
 
 func (u *videoUsecase) UpdateScheduledAt(ctx context.Context, sourceID string, scheduledAt time.Time) error {
 	return u.supaRepo.UpdateScheduledAtBySourceID(ctx, sourceID, scheduledAt)
+}
+
+func (u *videoUsecase) UpdateStatus(ctx context.Context, sourceID, status string) error {
+	return u.supaRepo.UpdateStatusBySourceID(ctx, sourceID, status)
 }
