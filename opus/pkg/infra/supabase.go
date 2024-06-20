@@ -8,6 +8,7 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"log/slog"
+	"time"
 )
 
 type SupabaseRepository struct {
@@ -72,6 +73,42 @@ func (r *SupabaseRepository) InsertVideoRecords(ctx context.Context, records []m
 	if err != nil {
 		slog.Error(
 			"Failed to insert video records",
+			slog.Group("Supabase", "error", err),
+		)
+		return err
+	}
+
+	return nil
+}
+
+func (r *SupabaseRepository) UpdateScheduledAtBySourceID(ctx context.Context, sourceID string, scheduledAt time.Time) error {
+	_, err := r.db.NewUpdate().
+		Model(&model.VideoRecord{ScheduledAt: scheduledAt}).
+		Where("source_id = ?", sourceID).
+		Exec(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to update scheduledAt",
+			"sourceID", sourceID,
+			"scheduledAt", scheduledAt,
+			slog.Group("Supabase", "error", err),
+		)
+		return err
+	}
+
+	return nil
+}
+
+func (r *SupabaseRepository) UpdateStatusBySourceID(ctx context.Context, sourceID string, status string) error {
+	_, err := r.db.NewUpdate().
+		Model(&model.VideoRecord{Status: status}).
+		Where("source_id = ?", sourceID).
+		Exec(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to update status",
+			"sourceID", sourceID,
+			"status", status,
 			slog.Group("Supabase", "error", err),
 		)
 		return err

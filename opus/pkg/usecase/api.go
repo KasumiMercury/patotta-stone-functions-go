@@ -11,6 +11,7 @@ import (
 
 type Api interface {
 	VideoDetailsMap(ctx context.Context, sourceIDs []string) (map[string]model.VideoDetail, error)
+	VideoScheduledAtUnixMap(ctx context.Context, sourceIDs []string) (map[string]int64, error)
 }
 
 type apiUsecase struct {
@@ -110,4 +111,35 @@ func (u *apiUsecase) VideoDetailsMap(ctx context.Context, sourceIDs []string) (m
 	}
 
 	return dtlMap, nil
+}
+
+func (u *apiUsecase) VideoScheduledAtUnixMap(ctx context.Context, sourceIDs []string) (map[string]int64, error) {
+	// fetch scheduled time of upcoming videos
+	items, err := u.ytRepo.FetchScheduledAtByVideoIDs(ctx, sourceIDs)
+	if err != nil {
+		slog.Error(
+			"failed to fetch scheduled time",
+			"sourceIDs", sourceIDs,
+			slog.Group("YouTubeAPI", "error", err),
+		)
+		return nil, err
+	}
+
+	// format scheduled time to map
+	saMap := make(map[string]int64, len(items))
+	for _, i := range items {
+		sa, err := synchro.ParseISO[tz.AsiaTokyo](i.LiveStreamingDetails.ScheduledStartTime)
+		if err != nil {
+			slog.Error(
+				"failed to parse scheduledStartTime",
+				"sourceID", i.Id,
+				"scheduledStartTime", i.LiveStreamingDetails.ScheduledStartTime,
+				slog.Group("formatScheduledTime", "error", err),
+			)
+			continue
+		}
+		saMap[i.Id] = sa.Unix()
+	}
+
+	return saMap, nil
 }

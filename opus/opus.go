@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 // Global variables
@@ -26,7 +27,7 @@ var dsn = os.Getenv("SUPABASE_DSN")
 var supaClient *bun.DB
 
 func init() {
-	// err is pre-declared to avoid shadowing client.
+	// err is pre-declared to avoid a shadowing client.
 	var err error
 
 	// Custom log
@@ -144,6 +145,76 @@ func opus(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	w.WriteHeader(http.StatusOK)
 	slog.Info("Fetched updated RSS items")
+
+	// extract parameter from request
+	q := r.URL.Query()
+	// extract upcoming param
+	uw := q.Get("upcoming")
+	// if uw is not empty, check update scheduler of upcoming videos
+	if uw != "" {
+		slog.Info("Check update scheduler of upcoming videos")
+		// extract upcoming status video
+		uv := make([]model.VideoSchedule, 0, len(recMap))
+		for _, record := range recMap {
+			if record.Status == "upcoming" {
+				uv = append(uv, model.VideoSchedule{
+					SourceID:    record.SourceID,
+					Status:      record.Status,
+					ScheduledAt: record.ScheduledAt,
+				})
+			}
+		}
+		// if there is no upcoming status video, return
+		if len(uv) == 0 {
+			slog.Info("No upcoming status video")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// fetch YouTube api and compare scheduled time
+		uIds := make([]string, 0, len(uv))
+		for _, u := range uv {
+			uIds = append(uIds, u.SourceID)
+		}
+		// fetch scheduled time of upcoming videos
+		vSaMap, err := apiSvc.VideoScheduledAtUnixMap(ctx, uIds)
+		if err != nil {
+			slog.Error("Failed to fetch scheduled time of upcoming videos",
+				slog.Group("check upcoming schedule", "error", err),
+			)
+			http.Error(w, "Failed to fetch scheduled time of upcoming videos", http.StatusInternalServerError)
+			return
+		}
+
+		// compare scheduled time
+		// if scheduled time is different, update scheduled time
+		// if scheduled time is same, do nothing
+		// if scheduled time is not found, update status to archived
+		for _, u := range uv {
+			if sa, ok := vSaMap[u.SourceID]; ok {
+				if u.ScheduledAt.Unix() != sa {
+					err := videoUsc.UpdateScheduledAt(ctx, u.SourceID, time.Unix(sa, 0))
+					if err != nil {
+						slog.Error("Failed to update scheduled time",
+							slog.Group("check upcoming schedule", "error", err),
+						)
+						http.Error(w, "Failed to update scheduled time", http.StatusInternalServerError)
+						return
+					}
+				}
+			} else {
+				err := videoUsc.UpdateStatus(ctx, u.SourceID, "archived")
+				if err != nil {
+					slog.Error("Failed to update status",
+						slog.Group("check upcoming schedule", "error", err),
+					)
+					http.Error(w, "Failed to update status", http.StatusInternalServerError)
+					return
+				}
+			}
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
