@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/input/cloudfunction"
 	"log"
 	"net/http"
@@ -12,6 +13,13 @@ import (
 )
 
 var handler *cloudfunction.CloudFunctionHandler
+
+func init() {
+	handler = cloudfunction.NewCloudFunctionHandler()
+
+	// Register the function to handle HTTP requests
+	functions.HTTP("Opus", EntryPoint)
+}
 
 func main() {
 	// By default, listen on all interfaces. If testing locally, run with
