@@ -1,14 +1,30 @@
 package main
 
 import (
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/input/cloudfunction"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/lib"
 	"log"
+	"log/slog"
+	"net/http"
 	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
-	_ "github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 	// Blank-import the function package so the init() runs
 	_ "github.com/KasumiMercury/patotta-stone-functions-go/opus"
 )
+
+var handler *cloudfunction.CloudFunctionHandler
+
+func init() {
+	handler = cloudfunction.NewCloudFunctionHandler()
+
+	logger := lib.NewCustomLogger()
+	slog.SetDefault(logger)
+
+	// Register the function to handle HTTP requests
+	functions.HTTP("Opus", EntryPoint)
+}
 
 func main() {
 	// By default, listen on all interfaces. If testing locally, run with
@@ -21,4 +37,8 @@ func main() {
 	if err := funcframework.StartHostPort(hostname, "8080"); err != nil {
 		log.Fatalf("funcframework.StartHostPort: %v\n", err)
 	}
+}
+
+func EntryPoint(w http.ResponseWriter, r *http.Request) {
+	handler.Handle(w, r)
 }
