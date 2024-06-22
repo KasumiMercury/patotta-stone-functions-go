@@ -3,7 +3,9 @@ package main
 import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/input/cloudfunction"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/lib"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 
@@ -16,6 +18,9 @@ var handler *cloudfunction.CloudFunctionHandler
 
 func init() {
 	handler = cloudfunction.NewCloudFunctionHandler()
+
+	logger := lib.NewCustomLogger()
+	slog.SetDefault(logger)
 
 	// Register the function to handle HTTP requests
 	functions.HTTP("Opus", EntryPoint)
