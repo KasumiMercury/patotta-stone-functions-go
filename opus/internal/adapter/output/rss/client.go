@@ -12,7 +12,7 @@ func NewRssClient() *Client {
 	return &Client{}
 }
 
-func (c *Client) GetRssItems(ctx context.Context, url string, limitUnix int64) ([]rss.Item, error) {
+func (c *Client) FetchRssItems(ctx context.Context, url string, limitUnix int64) ([]rss.Item, error) {
 	feed, err := gofeed.NewParser().ParseURLWithContext(url, ctx)
 	if err != nil {
 		return nil, err
