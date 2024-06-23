@@ -6,5 +6,5 @@ import (
 )
 
 type RSSRepository interface {
-	GetRssItems(ctx context.Context, url string) ([]rss.Item, error)
+	GetRssItems(ctx context.Context, url string, limitUnix int64) ([]rss.Item, error)
 }

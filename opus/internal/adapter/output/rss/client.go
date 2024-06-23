@@ -12,7 +12,7 @@ func NewRssClient() *Client {
 	return &Client{}
 }
 
-func (c *Client) GetRssItems(ctx context.Context, url string) ([]rss.Item, error) {
+func (c *Client) GetRssItems(ctx context.Context, url string, limitUnix int64) ([]rss.Item, error) {
 	feed, err := gofeed.NewParser().ParseURLWithContext(url, ctx)
 	if err != nil {
 		return nil, err
@@ -20,13 +20,19 @@ func (c *Client) GetRssItems(ctx context.Context, url string) ([]rss.Item, error
 
 	items := make([]rss.Item, 0, len(feed.Items))
 	for _, i := range feed.Items {
+		// if updated is less than or equal to limitUnix, skip
+		ut := i.UpdatedParsed.Unix()
+		if ut <= limitUnix {
+			continue
+		}
+
 		item := rss.NewRssItem(
 			i.Extensions["yt"]["channelId"][0].Value,
 			i.Extensions["yt"]["videoId"][0].Value,
 			i.Title,
 			extractDescriptionFromRssItem(i),
 			i.PublishedParsed.Unix(),
-			i.UpdatedParsed.Unix(),
+			ut,
 		)
 		items = append(items, *item)
 	}
