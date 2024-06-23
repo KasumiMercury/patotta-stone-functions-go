@@ -8,7 +8,7 @@ import (
 
 type Client struct{}
 
-func NewClient() *Client {
+func NewRssClient() *Client {
 	return &Client{}
 }
 
