@@ -21,8 +21,8 @@ func NewRealtimeClient(dsn string) (*Realtime, error) {
 	return &Realtime{db: db}, nil
 }
 
-func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string) ([]realtime.Record, error) {
-	records := make([]realtime.Record, 0)
+func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string) ([]*realtime.Record, error) {
+	records := make([]*realtime.Record, 0)
 	err := r.db.NewSelect().
 		Model(&records).
 		Where("source_id IN (?)", bun.In(sourceIDs)).
@@ -39,7 +39,7 @@ func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string
 	return records, nil
 }
 
-func (r *Realtime) InsertRecords(ctx context.Context, records []realtime.Record) error {
+func (r *Realtime) InsertRecords(ctx context.Context, records []*realtime.Record) error {
 	if _, err := r.db.NewInsert().Model(&records).Exec(ctx); err != nil {
 		slog.Error(
 			"Failed to insert records into realtime",
