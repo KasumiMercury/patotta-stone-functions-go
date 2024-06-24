@@ -108,6 +108,36 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 	return vds, nil
 }
 
+func (c *Client) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]*api.LiveScheduleInfo, error) {
+	call := c.ytSvc.Videos.List([]string{"liveStreamingDetails"}).Id(videoIDs...)
+	call = call.Context(ctx)
+
+	resp, err := call.Do()
+	if err != nil {
+		return nil, err
+	}
+
+	lsis := make([]*api.LiveScheduleInfo, 0, len(resp.Items))
+
+	for _, i := range resp.Items {
+		lsi := api.NewLiveScheduleInfo(i.Id)
+
+		if i.Snippet == nil {
+			return nil, fmt.Errorf("snippet is not found")
+		}
+
+		// scheduledStartTime
+		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		if err != nil {
+			return nil, err
+		}
+
+		lsi.SetScheduledAtUnix(sa)
+		lsis = append(lsis, lsi)
+	}
+
+	return lsis, nil
+}
 func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
 	if details == nil {
 		return ""
