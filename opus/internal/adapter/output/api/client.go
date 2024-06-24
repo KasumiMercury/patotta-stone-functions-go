@@ -59,7 +59,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 		switch i.Snippet.LiveBroadcastContent {
 		case "live":
 			vd.SetStatus("live")
-			vd.SetChatID(i.LiveStreamingDetails.ActiveLiveChatId)
+			vd.SetChatID(extractChatID(i.LiveStreamingDetails))
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
 				return nil, err
@@ -69,7 +69,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 			}
 		case "upcoming":
 			vd.SetStatus("upcoming")
-			vd.SetChatID(i.LiveStreamingDetails.ActiveLiveChatId)
+			vd.SetChatID(extractChatID(i.LiveStreamingDetails))
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
 				return nil, err
@@ -97,6 +97,14 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 		vds = append(vds, vd)
 	}
 	return vds, nil
+}
+
+func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
+	if details == nil {
+		return ""
+	}
+
+	return details.ActiveLiveChatId
 }
 
 func extractScheduledAtUnix(details *youtube.VideoLiveStreamingDetails) (int64, error) {

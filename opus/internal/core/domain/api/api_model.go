@@ -44,7 +44,7 @@ func (vd *VideoDetail) SetScheduledAtUnix(scheduledAtUnix int64) error {
 func (vd *VideoDetail) GetSourceID() string {
 	return vd.sourceID
 }
-func (vd *VideoDetail) GetChatID() *string {
+func (vd *VideoDetail) GetNillableChatID() *string {
 	if vd.chatID == "" {
 		return nil
 	}
