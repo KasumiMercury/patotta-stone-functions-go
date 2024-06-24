@@ -94,3 +94,22 @@ func (r *Realtime) UpdateScheduledAtBySourceID(ctx context.Context, sourceID str
 
 	return nil
 }
+
+func (r *Realtime) UpdateStatusBySourceID(ctx context.Context, sourceID string, status string) error {
+	_, err := r.db.NewUpdate().
+		Model(&realtime.Record{}).
+		Set("status = ?", status).
+		Where("source_id = ?", sourceID).
+		Exec(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to update status by source ID",
+			"sourceID", sourceID,
+			"status", status,
+			slog.Group("Realtime", "error", err),
+		)
+		return err
+	}
+
+	return nil
+}

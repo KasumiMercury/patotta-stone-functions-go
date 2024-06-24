@@ -11,4 +11,5 @@ type RealtimeRepository interface {
 	InsertRecords(ctx context.Context, records []*realtime.Record) error
 	GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error)
 	UpdateScheduledAtBySourceID(ctx context.Context, sourceID string, scheduledAt time.Time) error
+	UpdateStatusBySourceID(ctx context.Context, sourceID string, status string) error
 }
