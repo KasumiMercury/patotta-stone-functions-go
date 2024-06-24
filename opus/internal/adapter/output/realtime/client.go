@@ -8,6 +8,7 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"log/slog"
+	"time"
 )
 
 type Realtime struct {
@@ -73,4 +74,23 @@ func (r *Realtime) GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error)
 
 	updatedAt := records[0].UpdatedAt
 	return updatedAt.Unix(), nil
+}
+
+func (r *Realtime) UpdateScheduledAtBySourceID(ctx context.Context, sourceID string, scheduledAt time.Time) error {
+	_, err := r.db.NewUpdate().
+		Model(&realtime.Record{}).
+		Set("scheduled_at = ?", scheduledAt).
+		Where("source_id = ?", sourceID).
+		Exec(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to update scheduled_at by source ID",
+			"sourceID", sourceID,
+			"scheduledAt", scheduledAt,
+			slog.Group("Realtime", "error", err),
+		)
+		return err
+	}
+
+	return nil
 }
