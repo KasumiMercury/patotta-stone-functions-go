@@ -17,6 +17,7 @@ type VideoDetail struct {
 func NewVideoDetail(sourceID string) *VideoDetail {
 	return &VideoDetail{
 		sourceID: sourceID,
+		status:   Undefined,
 	}
 }
 
