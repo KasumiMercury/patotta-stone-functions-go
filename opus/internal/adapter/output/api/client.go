@@ -46,10 +46,9 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 		pa, err := synchro.ParseISO[tz.AsiaTokyo](i.Snippet.PublishedAt)
 		if err != nil {
 			slog.Error(
-				"failed to parse publishedAt",
-				"sourceID", i.Id,
+				"failed to parse 'publishedAt' for video ID; "+i.Id,
 				"publishedAt", i.Snippet.PublishedAt,
-				slog.Group("formatVideoDetails", "error", err),
+				slog.Group("fetchVideoDetailsByVideoIDs", "error", err),
 			)
 			return nil, err
 		}
