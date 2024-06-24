@@ -77,29 +77,21 @@ func (vd *VideoDetail) GetNillablePublishedAt() *time.Time {
 
 type LiveScheduleInfo struct {
 	sourceID        string
-	status          Status
 	scheduledAtUnix int64
 }
 
 func NewLiveScheduleInfo(sourceID string) *LiveScheduleInfo {
 	return &LiveScheduleInfo{
 		sourceID: sourceID,
-		status:   Undefined,
 	}
 }
 
-func (lsi *LiveScheduleInfo) SetStatus(status Status) {
-	lsi.status = status
-}
 func (lsi *LiveScheduleInfo) SetScheduledAtUnix(scheduledAtUnix int64) {
 	lsi.scheduledAtUnix = scheduledAtUnix
 }
 
 func (lsi *LiveScheduleInfo) GetSourceID() string {
 	return lsi.sourceID
-}
-func (lsi *LiveScheduleInfo) GetStatus() string {
-	return lsi.status.String()
 }
 func (lsi *LiveScheduleInfo) GetScheduledAtUnix() int64 {
 	return lsi.scheduledAtUnix
