@@ -58,7 +58,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 		// liveBroadcastContent
 		switch i.Snippet.LiveBroadcastContent {
 		case "live":
-			vd.SetStatus("live")
+			vd.SetStatus(api.Live)
 			vd.SetChatID(extractChatID(i.LiveStreamingDetails))
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
@@ -68,7 +68,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 				return nil, err
 			}
 		case "upcoming":
-			vd.SetStatus("upcoming")
+			vd.SetStatus(api.Upcoming)
 			vd.SetChatID(extractChatID(i.LiveStreamingDetails))
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
@@ -78,7 +78,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 				return nil, err
 			}
 		case "none":
-			vd.SetStatus("archived")
+			vd.SetStatus(api.Archived)
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
 				return nil, err
@@ -87,7 +87,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 				return nil, err
 			}
 		case "completed":
-			vd.SetStatus("archived")
+			vd.SetStatus(api.Archived)
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
 				return nil, err

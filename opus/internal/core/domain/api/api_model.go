@@ -9,7 +9,7 @@ import (
 type VideoDetail struct {
 	sourceID        string
 	chatID          string
-	status          string
+	status          Status
 	publishedAtUnix int64
 	scheduledAtUnix int64
 }
@@ -23,7 +23,7 @@ func NewVideoDetail(sourceID string) *VideoDetail {
 func (vd *VideoDetail) SetChatID(chatID string) {
 	vd.chatID = chatID
 }
-func (vd *VideoDetail) SetStatus(status string) {
+func (vd *VideoDetail) SetStatus(status Status) {
 	vd.status = status
 }
 func (vd *VideoDetail) SetPublishedAtUnix(publishedAtUnix int64) {
@@ -51,7 +51,7 @@ func (vd *VideoDetail) GetNillableChatID() *string {
 	return &vd.chatID
 }
 func (vd *VideoDetail) GetStatus() string {
-	return vd.status
+	return vd.status.String()
 }
 func (vd *VideoDetail) GetScheduledAtUnix() int64 {
 	return vd.scheduledAtUnix
