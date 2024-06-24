@@ -7,4 +7,5 @@ import (
 
 type ApiRepository interface {
 	FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]*api.VideoDetail, error)
+	FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]*api.LiveScheduleInfo, error)
 }

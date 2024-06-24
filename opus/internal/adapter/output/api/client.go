@@ -138,6 +138,7 @@ func (c *Client) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []stri
 
 	return lsis, nil
 }
+
 func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
 	if details == nil {
 		return ""
