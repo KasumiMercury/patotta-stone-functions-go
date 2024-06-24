@@ -86,6 +86,15 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 			if err := vd.SetScheduledAtUnix(sa); err != nil {
 				return nil, err
 			}
+		case "completed":
+			vd.SetStatus("archived")
+			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+			if err != nil {
+				return nil, err
+			}
+			if err := vd.SetScheduledAtUnix(sa); err != nil {
+				return nil, err
+			}
 		default:
 			slog.Error(
 				"unexpected liveBroadcastContent",
