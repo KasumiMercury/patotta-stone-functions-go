@@ -8,4 +8,5 @@ import (
 type RealtimeRepository interface {
 	GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string) ([]*realtime.Record, error)
 	InsertRecords(ctx context.Context, records []*realtime.Record) error
+	GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error)
 }

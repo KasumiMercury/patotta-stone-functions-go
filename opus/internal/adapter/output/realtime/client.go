@@ -51,3 +51,26 @@ func (r *Realtime) InsertRecords(ctx context.Context, records []*realtime.Record
 
 	return nil
 }
+
+func (r *Realtime) GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error) {
+	records := make([]realtime.Record, 0)
+	err := r.db.NewSelect().
+		Model(&records).
+		Order("updated_at DESC").
+		Limit(1).
+		Scan(ctx)
+	if err != nil {
+		slog.Error(
+			"Failed to get the last updated video",
+			slog.Group("Realtime", "error", err),
+		)
+		return 0, err
+	}
+
+	if len(records) == 0 {
+		return 0, nil
+	}
+
+	updatedAt := records[0].UpdatedAt
+	return updatedAt.Unix(), nil
+}
