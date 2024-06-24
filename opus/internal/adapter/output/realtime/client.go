@@ -7,6 +7,7 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"log/slog"
 )
 
 type Realtime struct {
@@ -31,4 +32,17 @@ func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string
 	}
 
 	return records, nil
+}
+
+func (r *Realtime) InsertRecords(ctx context.Context, records []realtime.Record) error {
+	if _, err := r.db.NewInsert().Model(&records).Exec(ctx); err != nil {
+		slog.Error(
+			"Failed to insert records into realtime",
+			"records", records,
+			slog.Group("Realtime", "error", err),
+		)
+		return err
+	}
+
+	return nil
 }
