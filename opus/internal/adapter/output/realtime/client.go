@@ -28,6 +28,11 @@ func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string
 		Where("source_id IN (?)", bun.In(sourceIDs)).
 		Scan(ctx)
 	if err != nil {
+		slog.Error(
+			"Failed to get records by source IDs",
+			"sourceIDs", sourceIDs,
+			slog.Group("Realtime", "error", err),
+		)
 		return nil, err
 	}
 
