@@ -36,7 +36,7 @@ func (vd *VideoDetail) SetScheduledAtUnix(scheduledAtUnix int64) error {
 			"publishedAtUnix is not set",
 			"sourceID", vd.sourceID,
 		)
-		return fmt.Errorf("publishedAtUnix is not set")
+		return fmt.Errorf("publishedAtUnix is not set for sourceID: %s", vd.sourceID)
 	}
 	vd.scheduledAtUnix = scheduledAtUnix
 	return nil
