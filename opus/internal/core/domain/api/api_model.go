@@ -42,32 +42,32 @@ func (vd *VideoDetail) SetScheduledAtUnix(scheduledAtUnix int64) error {
 	return nil
 }
 
-func (vd *VideoDetail) GetSourceID() string {
+func (vd *VideoDetail) SourceID() string {
 	return vd.sourceID
 }
-func (vd *VideoDetail) GetNillableChatID() *string {
+func (vd *VideoDetail) NillableChatID() *string {
 	if vd.chatID == "" {
 		return nil
 	}
 	return &vd.chatID
 }
-func (vd *VideoDetail) GetStatus() string {
+func (vd *VideoDetail) Status() string {
 	return vd.status.String()
 }
-func (vd *VideoDetail) GetScheduledAtUnix() int64 {
+func (vd *VideoDetail) ScheduledAtUnix() int64 {
 	return vd.scheduledAtUnix
 }
-func (vd *VideoDetail) GetNillableScheduledAt() *time.Time {
+func (vd *VideoDetail) NillableScheduledAt() *time.Time {
 	if vd.scheduledAtUnix == 0 {
 		return nil
 	}
 	t := time.Unix(vd.scheduledAtUnix, 0)
 	return &t
 }
-func (vd *VideoDetail) GetPublishedAtUnix() int64 {
+func (vd *VideoDetail) PublishedAtUnix() int64 {
 	return vd.publishedAtUnix
 }
-func (vd *VideoDetail) GetNillablePublishedAt() *time.Time {
+func (vd *VideoDetail) NillablePublishedAt() *time.Time {
 	if vd.publishedAtUnix == 0 {
 		return nil
 	}
@@ -90,13 +90,13 @@ func (lsi *LiveScheduleInfo) SetScheduledAtUnix(scheduledAtUnix int64) {
 	lsi.scheduledAtUnix = scheduledAtUnix
 }
 
-func (lsi *LiveScheduleInfo) GetSourceID() string {
+func (lsi *LiveScheduleInfo) SourceID() string {
 	return lsi.sourceID
 }
-func (lsi *LiveScheduleInfo) GetScheduledAtUnix() int64 {
+func (lsi *LiveScheduleInfo) ScheduledAtUnix() int64 {
 	return lsi.scheduledAtUnix
 }
-func (lsi *LiveScheduleInfo) GetNillableScheduledAt() *time.Time {
+func (lsi *LiveScheduleInfo) NillableScheduledAt() *time.Time {
 	if lsi.scheduledAtUnix == 0 {
 		return nil
 	}
