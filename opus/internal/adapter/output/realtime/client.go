@@ -3,7 +3,6 @@ package realtime
 import (
 	"context"
 	"database/sql"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/realtime"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
@@ -22,8 +21,8 @@ func NewRealtimeClient(dsn string) (*Realtime, error) {
 	return &Realtime{db: db}, nil
 }
 
-func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string) ([]*realtime.Record, error) {
-	records := make([]*realtime.Record, 0)
+func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string) ([]*Record, error) {
+	records := make([]*Record, 0)
 	err := r.db.NewSelect().
 		Model(&records).
 		Where("source_id IN (?)", bun.In(sourceIDs)).
@@ -40,7 +39,7 @@ func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string
 	return records, nil
 }
 
-func (r *Realtime) InsertRecords(ctx context.Context, records []*realtime.Record) error {
+func (r *Realtime) InsertRecords(ctx context.Context, records []*Record) error {
 	if _, err := r.db.NewInsert().Model(&records).Exec(ctx); err != nil {
 		slog.Error(
 			"Failed to insert records into realtime",
@@ -54,7 +53,7 @@ func (r *Realtime) InsertRecords(ctx context.Context, records []*realtime.Record
 }
 
 func (r *Realtime) GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error) {
-	records := make([]realtime.Record, 0)
+	records := make([]Record, 0)
 	err := r.db.NewSelect().
 		Model(&records).
 		Order("updated_at DESC").
@@ -78,7 +77,7 @@ func (r *Realtime) GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error)
 
 func (r *Realtime) UpdateScheduledAtBySourceID(ctx context.Context, sourceID string, scheduledAt time.Time) error {
 	_, err := r.db.NewUpdate().
-		Model(&realtime.Record{}).
+		Model(&Record{}).
 		Set("scheduled_at = ?", scheduledAt).
 		Where("source_id = ?", sourceID).
 		Exec(ctx)
@@ -97,7 +96,7 @@ func (r *Realtime) UpdateScheduledAtBySourceID(ctx context.Context, sourceID str
 
 func (r *Realtime) UpdateStatusBySourceID(ctx context.Context, sourceID string, status string) error {
 	_, err := r.db.NewUpdate().
-		Model(&realtime.Record{}).
+		Model(&Record{}).
 		Set("status = ?", status).
 		Where("source_id = ?", sourceID).
 		Exec(ctx)

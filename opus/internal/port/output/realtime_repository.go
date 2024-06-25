@@ -2,7 +2,7 @@ package output
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/realtime"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/realtime"
 	"time"
 )
 
