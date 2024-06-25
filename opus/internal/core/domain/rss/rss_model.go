@@ -22,32 +22,32 @@ func NewRssItem(channelID, sourceID, title, description string, publishedAtUnix,
 	}
 }
 
-func (r *Item) GetChannelID() string {
+func (r *Item) ChannelID() string {
 	return r.channelID
 }
-func (r *Item) GetSourceID() string {
+func (r *Item) SourceID() string {
 	return r.sourceID
 }
-func (r *Item) GetTitle() string {
+func (r *Item) Title() string {
 	return r.title
 }
-func (r *Item) GetDescription() string {
+func (r *Item) Description() string {
 	return r.description
 }
-func (r *Item) GetPublishedAtUnix() int64 {
+func (r *Item) PublishedAtUnix() int64 {
 	return r.publishedAtUnix
 }
-func (r *Item) GetPublishedAt() *time.Time {
+func (r *Item) PublishedAt() *time.Time {
 	if r.publishedAtUnix == 0 {
 		return nil
 	}
 	t := time.Unix(r.publishedAtUnix, 0)
 	return &t
 }
-func (r *Item) GetUpdatedAtUnix() int64 {
+func (r *Item) UpdatedAtUnix() int64 {
 	return r.updatedAtUnix
 }
-func (r *Item) GetUpdatedAt() *time.Time {
+func (r *Item) UpdatedAt() *time.Time {
 	if r.updatedAtUnix == 0 {
 		return nil
 	}
