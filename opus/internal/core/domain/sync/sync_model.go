@@ -6,11 +6,11 @@ import (
 
 type VideoSyncItem struct {
 	sourceID string
-	content  *content
+	content  *Content
 	detail   *Detail
 }
 
-func NewItem(sourceID string, content *content, detail *Detail) *VideoSyncItem {
+func NewItem(sourceID string, content *Content, detail *Detail) *VideoSyncItem {
 	return &VideoSyncItem{
 		sourceID: sourceID,
 		content:  content,
@@ -18,15 +18,15 @@ func NewItem(sourceID string, content *content, detail *Detail) *VideoSyncItem {
 	}
 }
 
-type content struct {
+type Content struct {
 	sourceID      string
 	title         string
 	description   string
 	updatedAtUnix int64
 }
 
-func NewContent(sourceID string, title string, description string, updatedAtUnix int64) *content {
-	return &content{
+func NewContent(sourceID string, title string, description string, updatedAtUnix int64) *Content {
+	return &Content{
 		sourceID:      sourceID,
 		title:         title,
 		description:   description,
