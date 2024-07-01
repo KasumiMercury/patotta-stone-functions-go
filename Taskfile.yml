@@ -31,3 +31,11 @@ tasks:
       FUNCTION_TARGET: '{{index .MATCH 2}}'
     cmds:
       - gcloud functions deploy {{.FUNCTION_NAME}} --no-gen2 --runtime go121 --region=asia-northeast1 --source=./{{.FUNCTION_DIR}} --entry-point {{.FUNCTION_TARGET}} --trigger-http
+  generate-opus:
+    desc: "go generate for opus"
+    dir: "opus"
+    cmds:
+      - go install go.uber.org/mock/mockgen@latest
+      - go install golang.org/x/tools/cmd/stringer@latest
+      - export PATH=$PATH:$(go env GOPATH)/bin
+      - go generate ./...
