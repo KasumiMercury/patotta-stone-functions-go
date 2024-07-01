@@ -24,7 +24,7 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 		return err
 	}
 
-	duri := "https://www.youtube.com/feeds/videos.xml?channel_id=UCQ0UDLQCjY0rmuxCDE38FGg"
+	duri := "https://www.youtube.com/feeds/videos.xml?channel_id=UCeLzT-7b2PBcunJplmWtoDg"
 
 	// Get updated videos from RSS
 	rss, err := r.rssRepo.FetchRssItems(ctx, duri, lutu)
