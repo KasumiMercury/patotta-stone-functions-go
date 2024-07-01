@@ -3,17 +3,20 @@ package rss
 import (
 	"context"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/mmcdole/gofeed"
 )
 
-type Client struct{}
+type Client struct {
+	parser output.ParserRepository
+}
 
-func NewRssClient() *Client {
-	return &Client{}
+func NewRssClient(p output.ParserRepository) *Client {
+	return &Client{parser: p}
 }
 
 func (c *Client) FetchRssItems(ctx context.Context, url string, limitUnix int64) ([]rss.Item, error) {
-	feed, err := gofeed.NewParser().ParseURLWithContext(url, ctx)
+	feed, err := c.parser.ParseURLWithContext(url, ctx)
 	if err != nil {
 		return nil, err
 	}

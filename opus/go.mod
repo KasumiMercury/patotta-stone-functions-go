@@ -11,6 +11,7 @@ require (
 	github.com/uptrace/bun v1.1.17
 	github.com/uptrace/bun/dialect/pgdialect v1.1.17
 	github.com/uptrace/bun/driver/pgdriver v1.1.17
+	go.uber.org/mock v0.4.0
 	google.golang.org/api v0.128.0
 )
 
