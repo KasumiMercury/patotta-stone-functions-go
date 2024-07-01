@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/infra"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/lib"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/logging"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/model"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/usecase"
 	"github.com/uptrace/bun"
@@ -31,7 +31,7 @@ func init() {
 	var err error
 
 	// Custom log
-	handler := lib.NewCustomLogger()
+	handler := logging.NewCustomLogger()
 	slog.SetDefault(handler)
 
 	// Create YouTube Data API service

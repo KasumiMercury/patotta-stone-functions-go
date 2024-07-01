@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/input/cloudfunction"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/lib"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/logging"
 	"log"
 	"log/slog"
 	"net/http"
@@ -19,7 +19,7 @@ var handler *cloudfunction.CloudFunctionHandler
 func init() {
 	handler = cloudfunction.NewCloudFunctionHandler()
 
-	logger := lib.NewCustomLogger()
+	logger := logging.NewCustomLogger()
 	slog.SetDefault(logger)
 
 	// Register the function to handle HTTP requests

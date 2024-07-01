@@ -1,4 +1,4 @@
-package lib
+package logging
 
 import (
 	"log/slog"
