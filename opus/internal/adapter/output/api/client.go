@@ -6,6 +6,7 @@ import (
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 	"log/slog"
@@ -57,7 +58,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 		// liveBroadcastContent
 		switch i.Snippet.LiveBroadcastContent {
 		case "live":
-			vd.SetStatus(api.Live)
+			vd.SetStatus(status.Live)
 			vd.SetChatID(extractChatID(i.LiveStreamingDetails))
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
@@ -67,7 +68,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 				return nil, err
 			}
 		case "upcoming":
-			vd.SetStatus(api.Upcoming)
+			vd.SetStatus(status.Upcoming)
 			vd.SetChatID(extractChatID(i.LiveStreamingDetails))
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
@@ -77,7 +78,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 				return nil, err
 			}
 		case "none":
-			vd.SetStatus(api.Archived)
+			vd.SetStatus(status.Archived)
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
 				return nil, err
@@ -86,7 +87,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 				return nil, err
 			}
 		case "completed":
-			vd.SetStatus(api.Archived)
+			vd.SetStatus(status.Archived)
 			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
 			if err != nil {
 				return nil, err

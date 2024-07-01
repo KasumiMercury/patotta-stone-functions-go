@@ -1,7 +1,7 @@
 package sync
 
 import (
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 )
 
 type VideoSyncItem struct {
@@ -37,12 +37,12 @@ func NewContent(sourceID string, title string, description string, updatedAtUnix
 type Detail struct {
 	sourceID        string
 	chatID          string
-	status          api.Status
+	status          status.Status
 	publishedAtUnix int64
 	scheduledAtUnix int64
 }
 
-func NewDetail(sourceID string, chatID string, status api.Status, publishedAtUnix int64, scheduledAtUnix int64) *Detail {
+func NewDetail(sourceID string, chatID string, status status.Status, publishedAtUnix int64, scheduledAtUnix int64) *Detail {
 	return &Detail{
 		sourceID:        sourceID,
 		chatID:          chatID,

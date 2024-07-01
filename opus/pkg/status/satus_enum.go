@@ -1,4 +1,4 @@
-package api
+package status
 
 //go:generate stringer -type Status
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	status2 "github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 	"log/slog"
 	"time"
 )
@@ -9,7 +10,7 @@ import (
 type VideoDetail struct {
 	sourceID        string
 	chatID          string
-	status          Status
+	status          status2.Status
 	publishedAtUnix int64
 	scheduledAtUnix int64
 }
@@ -17,14 +18,14 @@ type VideoDetail struct {
 func NewVideoDetail(sourceID string) *VideoDetail {
 	return &VideoDetail{
 		sourceID: sourceID,
-		status:   Undefined,
+		status:   status2.Undefined,
 	}
 }
 
 func (vd *VideoDetail) SetChatID(chatID string) {
 	vd.chatID = chatID
 }
-func (vd *VideoDetail) SetStatus(status Status) {
+func (vd *VideoDetail) SetStatus(status status2.Status) {
 	vd.status = status
 }
 func (vd *VideoDetail) SetPublishedAtUnix(publishedAtUnix int64) {
