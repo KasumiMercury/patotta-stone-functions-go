@@ -85,8 +85,8 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 	newItems := make([]*video.Video, 0, len(rssItemList)/2)
 	updatedItems := make([]*video.Video, 0, len(rssItemList))
 
-	for _, v := range vdList {
-		ri, ok := rssMap[v.SourceID()]
+	for _, vd := range vdList {
+		ri, ok := rssMap[vd.SourceID()]
 		if !ok {
 			continue
 		}
@@ -96,15 +96,15 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 			SetChannelID(ri.ChannelID()).
 			SetSourceID(ri.SourceID()).
 			SetTitle(ri.Title()).
-			SetStatus(v.Status()).
-			SetChatID(v.ChatID()).
-			SetPublishedAtUnix(v.PublishedAtUnix()).
-			SetScheduledAtUnix(v.ScheduledAtUnix()).
+			SetStatus(vd.Status()).
+			SetChatID(vd.ChatID()).
+			SetPublishedAtUnix(vd.PublishedAtUnix()).
+			SetScheduledAtUnix(vd.ScheduledAtUnix()).
 			SetUpdatedAtUnix(ri.UpdatedAtUnix()).
 			Build()
 
 		// If the source ID is not in the video records, it is a new item
-		if _, ok := vrMap[v.SourceID()]; !ok {
+		if _, ok := vrMap[vd.SourceID()]; !ok {
 			newItems = append(newItems, vr)
 			continue
 		} else {
