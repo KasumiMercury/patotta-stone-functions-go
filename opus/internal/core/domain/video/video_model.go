@@ -14,17 +14,91 @@ type Video struct {
 	updatedAtUnix   int64
 }
 
-func NewVideo(channelID, sourceID, title, description string, chatID string, status string, publishedAtUnix, scheduledAtUnix, updatedAtUnix int64) *Video {
+type Builder interface {
+	SetChannelID(string) Builder
+	SetSourceID(string) Builder
+	SetTitle(string) Builder
+	SetDescription(string) Builder
+	SetChatID(string) Builder
+	SetStatus(string) Builder
+	SetPublishedAtUnix(int64) Builder
+	SetScheduledAtUnix(int64) Builder
+	SetUpdatedAtUnix(int64) Builder
+	Build() *Video
+}
+
+type builder struct {
+	channelID       string
+	sourceID        string
+	title           string
+	description     string
+	chatID          string
+	status          string
+	publishedAtUnix int64
+	scheduledAtUnix int64
+	updatedAtUnix   int64
+}
+
+func NewVideoBuilder() Builder {
+	return &builder{}
+}
+
+func (vb *builder) SetChannelID(channelID string) Builder {
+	vb.channelID = channelID
+	return vb
+}
+
+func (vb *builder) SetSourceID(sourceID string) Builder {
+	vb.channelID = sourceID
+	return vb
+}
+
+func (vb *builder) SetTitle(title string) Builder {
+	vb.title = title
+	return vb
+}
+
+func (vb *builder) SetDescription(description string) Builder {
+	vb.description = description
+	return vb
+}
+
+func (vb *builder) SetChatID(chatID string) Builder {
+	vb.chatID = chatID
+	return vb
+}
+
+func (vb *builder) SetStatus(status string) Builder {
+	vb.status = status
+	return vb
+}
+
+func (vb *builder) SetPublishedAtUnix(publishedAtUnix int64) Builder {
+	vb.publishedAtUnix = publishedAtUnix
+	return vb
+}
+
+func (vb *builder) SetScheduledAtUnix(scheduledAtUnix int64) Builder {
+	vb.scheduledAtUnix = scheduledAtUnix
+	return vb
+}
+
+func (vb *builder) SetUpdatedAtUnix(updatedAtUnix int64) Builder {
+	vb.updatedAtUnix = updatedAtUnix
+	return vb
+}
+
+func (vb *builder) Build() *Video {
 	return &Video{
-		channelID:       channelID,
-		sourceID:        sourceID,
-		title:           title,
-		description:     description,
-		chatID:          chatID,
-		status:          status,
-		publishedAtUnix: publishedAtUnix,
-		scheduledAtUnix: scheduledAtUnix,
-		updatedAtUnix:   updatedAtUnix,
+		channelID:       vb.channelID,
+		sourceID:        vb.sourceID,
+		title:           vb.title,
+		description:     vb.description,
+		chatID:          vb.chatID,
+		status:          vb.status,
+		publishedAtUnix: vb.publishedAtUnix,
+		scheduledAtUnix: vb.scheduledAtUnix,
+		updatedAtUnix:   vb.updatedAtUnix,
 	}
 }
 
