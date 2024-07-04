@@ -90,7 +90,15 @@ func (vb *builder) SetUpdatedAtUnix(updatedAtUnix int64) Builder {
 
 func (vb *builder) Build() *Video {
 	return &Video{
-		channelID: vb.channelID,
+		channelID:       vb.channelID,
+		sourceID:        vb.sourceID,
+		title:           vb.title,
+		description:     vb.description,
+		chatID:          vb.chatID,
+		status:          vb.status,
+		publishedAtUnix: vb.publishedAtUnix,
+		scheduledAtUnix: vb.scheduledAtUnix,
+		updatedAtUnix:   vb.updatedAtUnix,
 	}
 }
 
