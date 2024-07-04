@@ -15,9 +15,11 @@ type RssService struct {
 	apiRepo output.ApiRepository
 }
 
-func NewRssService(rtd *output.RealtimeRepository) *RssService {
+func NewRssService(rtd *output.RealtimeRepository, rss *output.RSSRepository, api *output.ApiRepository) *RssService {
 	return &RssService{
 		rtdRepo: *rtd,
+		rssRepo: *rss,
+		apiRepo: *api,
 	}
 }
 
