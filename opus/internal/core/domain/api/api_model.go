@@ -46,6 +46,9 @@ func (vd *VideoDetail) SetScheduledAtUnix(scheduledAtUnix int64) error {
 func (vd *VideoDetail) SourceID() string {
 	return vd.sourceID
 }
+func (vd *VideoDetail) ChatID() string {
+	return vd.chatID
+}
 func (vd *VideoDetail) NillableChatID() *string {
 	if vd.chatID == "" {
 		return nil
