@@ -52,6 +52,19 @@ func (r *Realtime) InsertRecords(ctx context.Context, records []*Record) error {
 	return nil
 }
 
+func (r *Realtime) UpdateRecords(ctx context.Context, records []*Record) error {
+	if _, err := r.db.NewUpdate().Model(&records).Exec(ctx); err != nil {
+		slog.Error(
+			"Failed to update records in realtime",
+			"records", records,
+			slog.Group("Realtime", "error", err),
+		)
+		return err
+	}
+
+	return nil
+}
+
 func (r *Realtime) GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error) {
 	records := make([]Record, 0)
 	err := r.db.NewSelect().
