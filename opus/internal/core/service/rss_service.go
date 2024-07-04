@@ -92,17 +92,16 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 		}
 
 		// merge video info and rss info
-		vr := video.NewVideo(
-			ri.ChannelID(),
-			v.SourceID(),
-			ri.Title(),
-			ri.Description(),
-			v.ChatID(),
-			v.Status(),
-			v.PublishedAtUnix(),
-			v.ScheduledAtUnix(),
-			ri.UpdatedAtUnix(),
-		)
+		vr := video.NewVideoBuilder().
+			SetChannelID(ri.ChannelID()).
+			SetSourceID(ri.SourceID()).
+			SetTitle(ri.Title()).
+			SetStatus(v.Status()).
+			SetChatID(v.ChatID()).
+			SetPublishedAtUnix(v.PublishedAtUnix()).
+			SetScheduledAtUnix(v.ScheduledAtUnix()).
+			SetUpdatedAtUnix(ri.UpdatedAtUnix()).
+			Build()
 
 		// If the source ID is not in the video records, it is a new item
 		if _, ok := vrMap[v.SourceID()]; !ok {
