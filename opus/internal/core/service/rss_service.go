@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/db/realtime"
 	rssDomain "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"log/slog"
@@ -60,6 +61,19 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 	rssMap := make(map[string]rssDomain.Item)
 	for _, r := range rssItemList {
 		rssMap[r.SourceID()] = r
+	}
+
+	// Get video records from RealtimeDB
+	// for judging whether to newly register or update the video
+	vrList, err := r.rtdRepo.GetRecordsBySourceIDs(ctx, sidList)
+	if err != nil {
+		return err
+	}
+
+	// make vrList map
+	vrMap := make(map[string]*realtime.Record)
+	for _, v := range vrList {
+		vrMap[v.SourceID] = v
 	}
 
 	// Update video info
