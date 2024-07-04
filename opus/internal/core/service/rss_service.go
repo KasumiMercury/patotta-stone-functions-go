@@ -112,8 +112,45 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 		}
 	}
 
+	// Save new videos
+	if len(newItems) > 0 {
+		// convert video to video record
+		nrr := make([]*realtime.Record, 0, len(newItems))
+		for _, n := range newItems {
+			nrr = append(nrr, &realtime.Record{
+				SourceID:    n.SourceID(),
+				Title:       n.Title(),
+				Status:      n.Status(),
+				ChatID:      n.ChatID(),
+				ScheduledAt: *n.NillableScheduledAt(),
+				UpdatedAt:   *n.NillableUpdatedAt(),
+			})
+		}
+
+		if err := r.rtdRepo.InsertRecords(ctx, nrr); err != nil {
+			return err
+		}
+	}
+
 	// Update video info
-	// TODO: Implement
+	if len(updatedItems) > 0 {
+		// convert video to video record
+		urr := make([]*realtime.Record, 0, len(updatedItems))
+		for _, u := range updatedItems {
+			urr = append(urr, &realtime.Record{
+				SourceID:    u.SourceID(),
+				Title:       u.Title(),
+				Status:      u.Status(),
+				ChatID:      u.ChatID(),
+				ScheduledAt: *u.NillableScheduledAt(),
+				UpdatedAt:   *u.NillableUpdatedAt(),
+			})
+		}
+
+		if err := r.rtdRepo.UpdateRecords(ctx, urr); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
