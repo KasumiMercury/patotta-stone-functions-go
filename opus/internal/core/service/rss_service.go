@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/db/realtime"
 	rssDomain "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"log/slog"
 )
@@ -74,6 +75,41 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 	vrMap := make(map[string]*realtime.Record)
 	for _, v := range vrList {
 		vrMap[v.SourceID] = v
+	}
+
+	// Compare RSS items and video records
+	// and divide them into new items and updated items
+
+	newItems := make([]*video.Video, 0, len(rssItemList)/2)
+	updatedItems := make([]*video.Video, 0, len(rssItemList))
+
+	for _, v := range vdList {
+		ri, ok := rssMap[v.SourceID()]
+		if !ok {
+			continue
+		}
+
+		// merge video info and rss info
+		vr := video.NewVideo(
+			ri.ChannelID(),
+			v.SourceID(),
+			ri.Title(),
+			ri.Description(),
+			v.ChatID(),
+			v.Status(),
+			v.PublishedAtUnix(),
+			v.ScheduledAtUnix(),
+			ri.UpdatedAtUnix(),
+		)
+
+		// If the source ID is not in the video records, it is a new item
+		if _, ok := vrMap[v.SourceID()]; !ok {
+			newItems = append(newItems, vr)
+			continue
+		} else {
+			// If the source ID is in the video records, it is an updated item
+			updatedItems = append(updatedItems, vr)
+		}
 	}
 
 	// Update video info
