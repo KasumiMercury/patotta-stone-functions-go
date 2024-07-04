@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	rssDomain "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"log/slog"
 )
@@ -29,14 +30,14 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 	duri := "https://www.youtube.com/feeds/videos.xml?channel_id=UCeLzT-7b2PBcunJplmWtoDg"
 
 	// Get updated videos from RSS
-	rss, err := r.rssRepo.FetchRssItems(ctx, duri, luu)
+	rssItemList, err := r.rssRepo.FetchRssItems(ctx, duri, luu)
 	if err != nil {
 		return err
 	}
 
-	// Extract source IDs from updated rss
-	sidList := make([]string, 0, len(rss))
-	for _, r := range rss {
+	// Extract source IDs from updated rssItemList
+	sidList := make([]string, 0, len(rssItemList))
+	for _, r := range rssItemList {
 		sidList = append(sidList, r.SourceID())
 	}
 
@@ -46,13 +47,19 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 		return err
 	}
 
-	// if difference between len(rss) and len(vdList) is not 0, log it as a warning
-	if len(rss) != len(vdList) {
+	// if the difference between len(rssItemList) and len(vdList) is not 0, log it as a warning
+	if len(rssItemList) != len(vdList) {
 		slog.Warn(
 			"Failed to get video details for all updated videos",
-			"rss", len(rss),
+			"rssItemList", len(rssItemList),
 			"videoDetails", len(vdList),
 		)
+	}
+
+	// make rssItemList map
+	rssMap := make(map[string]rssDomain.Item)
+	for _, r := range rssItemList {
+		rssMap[r.SourceID()] = r
 	}
 
 	// Update video info
