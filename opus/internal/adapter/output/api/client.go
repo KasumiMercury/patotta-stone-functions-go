@@ -25,7 +25,7 @@ func NewYouTubeClient(ctx context.Context, apiKey string) (*Client, error) {
 	return &Client{ytSvc: svc}, nil
 }
 
-func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]*api.VideoDetail, error) {
+func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]api.VideoDetail, error) {
 	call := c.ytSvc.Videos.List([]string{"snippet", "contentDetails", "liveStreamingDetails"}).Id(videoIDs...)
 	call = call.Context(ctx)
 
@@ -34,7 +34,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 		return nil, err
 	}
 
-	vds := make([]*api.VideoDetail, 0, len(resp.Items))
+	vds := make([]api.VideoDetail, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
 		vd := api.NewVideoDetail(i.Id)
@@ -103,12 +103,12 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 			)
 		}
 
-		vds = append(vds, vd)
+		vds = append(vds, *vd)
 	}
 	return vds, nil
 }
 
-func (c *Client) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]*api.LiveScheduleInfo, error) {
+func (c *Client) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
 	call := c.ytSvc.Videos.List([]string{"liveStreamingDetails"}).Id(videoIDs...)
 	call = call.Context(ctx)
 
@@ -117,7 +117,7 @@ func (c *Client) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []stri
 		return nil, err
 	}
 
-	lsis := make([]*api.LiveScheduleInfo, 0, len(resp.Items))
+	lsis := make([]api.LiveScheduleInfo, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
 		lsi := api.NewLiveScheduleInfo(i.Id)
@@ -133,7 +133,7 @@ func (c *Client) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []stri
 		}
 
 		lsi.SetScheduledAtUnix(sa)
-		lsis = append(lsis, lsi)
+		lsis = append(lsis, *lsi)
 	}
 
 	return lsis, nil
