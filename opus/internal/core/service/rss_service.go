@@ -116,9 +116,9 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 	// Save new videos
 	if len(newItems) > 0 {
 		// convert video to video record
-		nrr := make([]*realtime.Record, 0, len(newItems))
+		nrr := make([]realtime.Record, 0, len(newItems))
 		for _, n := range newItems {
-			nrr = append(nrr, &realtime.Record{
+			nrr = append(nrr, realtime.Record{
 				SourceID:    n.SourceID(),
 				Title:       n.Title(),
 				Status:      n.Status(),
@@ -136,9 +136,9 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 	// Update video info
 	if len(updatedItems) > 0 {
 		// convert video to video record
-		urr := make([]*realtime.Record, 0, len(updatedItems))
+		urr := make([]realtime.Record, 0, len(updatedItems))
 		for _, u := range updatedItems {
-			urr = append(urr, &realtime.Record{
+			urr = append(urr, realtime.Record{
 				SourceID:    u.SourceID(),
 				Title:       u.Title(),
 				Status:      u.Status(),
