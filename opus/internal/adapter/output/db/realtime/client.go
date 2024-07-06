@@ -39,7 +39,7 @@ func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string
 	return records, nil
 }
 
-func (r *Realtime) InsertRecords(ctx context.Context, records []*Record) error {
+func (r *Realtime) InsertRecords(ctx context.Context, records []Record) error {
 	if _, err := r.db.NewInsert().Model(&records).Exec(ctx); err != nil {
 		slog.Error(
 			"Failed to insert records into realtime",
@@ -52,7 +52,7 @@ func (r *Realtime) InsertRecords(ctx context.Context, records []*Record) error {
 	return nil
 }
 
-func (r *Realtime) UpdateRecords(ctx context.Context, records []*Record) error {
+func (r *Realtime) UpdateRecords(ctx context.Context, records []Record) error {
 	if _, err := r.db.NewUpdate().Model(&records).Exec(ctx); err != nil {
 		slog.Error(
 			"Failed to update records in realtime",
