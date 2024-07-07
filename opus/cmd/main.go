@@ -14,7 +14,7 @@ import (
 	_ "github.com/KasumiMercury/patotta-stone-functions-go/opus"
 )
 
-var handler *cloudfunction.CloudFunctionHandler
+var handler *cloudfunction.Handler
 
 func init() {
 	handler = cloudfunction.NewCloudFunctionHandler()

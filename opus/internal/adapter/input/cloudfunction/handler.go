@@ -2,14 +2,14 @@ package cloudfunction
 
 import "net/http"
 
-type CloudFunctionHandler struct {
+type Handler struct {
 }
 
-func NewCloudFunctionHandler() *CloudFunctionHandler {
-	return &CloudFunctionHandler{}
+func NewCloudFunctionHandler() *Handler {
+	return &Handler{}
 }
 
-func (h *CloudFunctionHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Handle(w http.ResponseWriter, r *http.Request) {
 	// TODO: Implement
 
 	// TODO: RSS service
