@@ -3,6 +3,7 @@ package realtime
 import (
 	"context"
 	"database/sql"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
@@ -19,6 +20,27 @@ func NewRealtimeClient(dsn string) (*Realtime, error) {
 	db := bun.NewDB(sqldb, pgdialect.New())
 
 	return &Realtime{db: db}, nil
+}
+
+func (r *Realtime) UpsertRecords(ctx context.Context, videos []video.Video) error {
+	rec := make([]*Record, 0, len(videos))
+	for _, v := range videos {
+		rec = append(rec, toDBModel(&v))
+	}
+
+	if _, err := r.db.NewInsert().Model(&rec).
+		On("conflict (source_id) do update").
+		Set("source_id = EXCLUDED.source_id").
+		Exec(ctx); err != nil {
+		slog.Error(
+			"Failed to upsert records into realtime",
+			"videos", videos,
+			slog.Group("Realtime", "error", err),
+		)
+		return err
+	}
+
+	return nil
 }
 
 func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string) ([]*Record, error) {
