@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/db/realtime"
 	rssDomain "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
@@ -66,91 +65,36 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 		rssMap[r.SourceID()] = r
 	}
 
-	// Get video records from RealtimeDB
-	// for judging whether to newly register or update the video
-	vrList, err := r.rtdRepo.GetRecordsBySourceIDs(ctx, sidList)
-	if err != nil {
-		return err
-	}
-
-	// make vrList map
-	vrMap := make(map[string]*realtime.Record)
-	for _, v := range vrList {
-		vrMap[v.SourceID] = v
-	}
-
-	// Compare RSS items and video records
-	// and divide them into new items and updated items
-
-	newItems := make([]*video.Video, 0, len(rssItemList)/2)
-	updatedItems := make([]*video.Video, 0, len(rssItemList))
-
-	for _, vd := range vdList {
-		ri, ok := rssMap[vd.SourceID()]
+	videos := make([]video.Video, 0, len(vdList))
+	for _, v := range vdList {
+		ri, ok := rssMap[v.SourceID()]
 		if !ok {
 			continue
 		}
 
 		// merge video info and rss info
-		vr := video.NewVideoBuilder().
+		m := video.NewVideoBuilder().
 			SetChannelID(ri.ChannelID()).
 			SetSourceID(ri.SourceID()).
 			SetTitle(ri.Title()).
-			SetStatus(vd.Status()).
-			SetChatID(vd.ChatID()).
-			SetPublishedAtUnix(vd.PublishedAtUnix()).
-			SetScheduledAtUnix(vd.ScheduledAtUnix()).
+			SetStatus(v.Status()).
+			SetChatID(v.ChatID()).
+			SetPublishedAtUnix(v.PublishedAtUnix()).
+			SetScheduledAtUnix(v.ScheduledAtUnix()).
 			SetUpdatedAtUnix(ri.UpdatedAtUnix()).
 			Build()
 
-		// If the source ID is not in the video records, it is a new item
-		if _, ok := vrMap[vd.SourceID()]; !ok {
-			newItems = append(newItems, vr)
-			continue
-		} else {
-			// If the source ID is in the video records, it is an updated item
-			updatedItems = append(updatedItems, vr)
-		}
+		videos = append(videos, *m)
 	}
 
-	// Save new videos
-	if len(newItems) > 0 {
-		// convert video to video record
-		nrr := make([]realtime.Record, 0, len(newItems))
-		for _, n := range newItems {
-			nrr = append(nrr, realtime.Record{
-				SourceID:    n.SourceID(),
-				Title:       n.Title(),
-				Status:      n.Status(),
-				ChatID:      n.ChatID(),
-				ScheduledAt: *n.NillableScheduledAt(),
-				UpdatedAt:   *n.NillableUpdatedAt(),
-			})
-		}
-
-		if err := r.rtdRepo.InsertRecords(ctx, nrr); err != nil {
-			return err
-		}
+	if len(videos) == 0 {
+		slog.Info("No new videos found")
+		return nil
 	}
 
-	// Update video info
-	if len(updatedItems) > 0 {
-		// convert video to video record
-		urr := make([]realtime.Record, 0, len(updatedItems))
-		for _, u := range updatedItems {
-			urr = append(urr, realtime.Record{
-				SourceID:    u.SourceID(),
-				Title:       u.Title(),
-				Status:      u.Status(),
-				ChatID:      u.ChatID(),
-				ScheduledAt: *u.NillableScheduledAt(),
-				UpdatedAt:   *u.NillableUpdatedAt(),
-			})
-		}
-
-		if err := r.rtdRepo.UpdateRecords(ctx, urr); err != nil {
-			return err
-		}
+	// Upsert the merged video info into the database(RealtimeDB)
+	if err := r.rtdRepo.UpsertRecords(ctx, videos); err != nil {
+		return err
 	}
 
 	return nil
