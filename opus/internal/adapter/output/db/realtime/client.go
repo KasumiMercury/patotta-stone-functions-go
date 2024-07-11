@@ -61,11 +61,16 @@ func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string
 	return records, nil
 }
 
-func (r *Realtime) InsertRecords(ctx context.Context, records []Record) error {
-	if _, err := r.db.NewInsert().Model(&records).Exec(ctx); err != nil {
+func (r *Realtime) InsertRecords(ctx context.Context, videos []video.Video) error {
+	rec := make([]*Record, 0, len(videos))
+	for _, v := range videos {
+		rec = append(rec, toDBModel(&v))
+	}
+
+	if _, err := r.db.NewInsert().Model(&rec).Exec(ctx); err != nil {
 		slog.Error(
 			"Failed to insert records into realtime",
-			"records", records,
+			"records", videos,
 			slog.Group("Realtime", "error", err),
 		)
 		return err
@@ -74,11 +79,16 @@ func (r *Realtime) InsertRecords(ctx context.Context, records []Record) error {
 	return nil
 }
 
-func (r *Realtime) UpdateRecords(ctx context.Context, records []Record) error {
-	if _, err := r.db.NewUpdate().Model(&records).Exec(ctx); err != nil {
+func (r *Realtime) UpdateRecords(ctx context.Context, videos []video.Video) error {
+	rec := make([]*Record, 0, len(videos))
+	for _, v := range videos {
+		rec = append(rec, toDBModel(&v))
+	}
+
+	if _, err := r.db.NewUpdate().Model(&rec).Exec(ctx); err != nil {
 		slog.Error(
 			"Failed to update records in realtime",
-			"records", records,
+			"records", videos,
 			slog.Group("Realtime", "error", err),
 		)
 		return err
