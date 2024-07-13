@@ -33,7 +33,7 @@ func TestRssClient_FetchRssItem(t *testing.T) {
 	// test FetchRssItems
 
 	// arrange
-	client := NewRssClient()
+	client := NewRssClient(NewParser())
 	ctx := context.Background()
 
 	tests := map[string]struct {
