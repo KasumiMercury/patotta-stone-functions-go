@@ -15,7 +15,7 @@ type YouTubeVideo struct {
 	clt *Client
 }
 
-func NewYouTubeVideo(ctx context.Context, clt *Client) (*YouTubeVideo, error) {
+func NewYouTubeVideo(clt *Client) (*YouTubeVideo, error) {
 	return &YouTubeVideo{clt: clt}, nil
 }
 
