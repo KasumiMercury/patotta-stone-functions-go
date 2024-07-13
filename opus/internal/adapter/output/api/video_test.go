@@ -883,7 +883,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
 	}
 }
 
-func Test_extractScheduledAtUnix(t *testing.T) {
+func TestExtractScheduledAtUnixSuccessfully(t *testing.T) {
 	type args struct {
 		details *youtube.VideoLiveStreamingDetails
 	}
@@ -891,35 +891,18 @@ func Test_extractScheduledAtUnix(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		args    args
-		want    int64
-		wantErr bool
+		args args
+		want int64
 	}{
 		"details is nil": {
-			args:    args{details: nil},
-			want:    0,
-			wantErr: false,
+			args: args{details: nil},
+			want: 0,
 		},
 		"details is not nil": {
 			args: args{details: &youtube.VideoLiveStreamingDetails{
 				ScheduledStartTime: "2024-01-01T00:00:00Z",
 			}},
-			want:    1704067200,
-			wantErr: false,
-		},
-		"details is not nil, ScheduledStartTime is empty": {
-			args: args{details: &youtube.VideoLiveStreamingDetails{
-				ScheduledStartTime: "",
-			}},
-			want:    0,
-			wantErr: true,
-		},
-		"details is not nil, ScheduledStartTime is invalid": {
-			args: args{details: &youtube.VideoLiveStreamingDetails{
-				ScheduledStartTime: "invalid",
-			}},
-			want:    0,
-			wantErr: true,
+			want: 1704067200,
 		},
 	}
 
@@ -931,12 +914,47 @@ func Test_extractScheduledAtUnix(t *testing.T) {
 			// Act
 			got, err := extractScheduledAtUnix(tt.args.details)
 			// Assert
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
-			}
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
+
+func TestExtractScheduledAtUnixAbnormally(t *testing.T) {
+	type args struct {
+		details *youtube.VideoLiveStreamingDetails
+	}
+
+	t.Parallel()
+
+	tests := map[string]struct {
+		args args
+		want int64
+	}{
+		"details is not nil, ScheduledStartTime is empty": {
+			args: args{details: &youtube.VideoLiveStreamingDetails{
+				ScheduledStartTime: "",
+			}},
+			want: 0,
+		},
+		"details is not nil, ScheduledStartTime is invalid": {
+			args: args{details: &youtube.VideoLiveStreamingDetails{
+				ScheduledStartTime: "invalid",
+			}},
+			want: 0,
+		},
+	}
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			// Arrange
+			t.Parallel()
+			// Act
+			got, err := extractScheduledAtUnix(tt.args.details)
+			// Assert
+			assert.Error(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
