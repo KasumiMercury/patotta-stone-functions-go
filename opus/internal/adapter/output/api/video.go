@@ -6,16 +6,17 @@ import (
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 	"google.golang.org/api/youtube/v3"
 	"log/slog"
 )
 
 type YouTubeVideo struct {
-	clt *Client
+	clt output.Client
 }
 
-func NewYouTubeVideo(clt *Client) (*YouTubeVideo, error) {
+func NewYouTubeVideo(clt output.Client) (*YouTubeVideo, error) {
 	return &YouTubeVideo{clt: clt}, nil
 }
 
