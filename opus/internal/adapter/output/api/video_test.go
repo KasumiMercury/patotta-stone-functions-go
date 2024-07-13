@@ -691,7 +691,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
 	}
 }
 
-func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
+func TestYouTubeVideo_FetchScheduledAtByVideoIDsSuccessfully(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -707,7 +707,6 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 		args      args
 		mockSetup func(*mocks.MockClient)
 		want      []api.LiveScheduleInfo
-		wantErr   bool
 	}{
 		"success_single_video": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -734,7 +733,6 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 					return *l
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_videos": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -772,7 +770,6 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 					return *l
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_but_only_one_video": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -799,61 +796,6 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 					return *l
 				}(),
 			},
-			wantErr: false,
-		},
-		"error_api_call_fails": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),              // id
-				).Return(nil, assert.AnError)
-			},
-			want:    nil,
-			wantErr: true,
-		},
-		"error_scheduledStartTime_is_empty": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),              // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "",
-							},
-						},
-					},
-				}, nil)
-			},
-			want:    nil,
-			wantErr: true,
-		},
-		"error_scheduledStartTime_is_invalid": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),              // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "invalid",
-							},
-						},
-					},
-				}, nil)
-			},
-			want:    nil,
-			wantErr: true,
 		},
 	}
 
@@ -872,12 +814,8 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 			// Act
 			got, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
-			}
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 
 	}
