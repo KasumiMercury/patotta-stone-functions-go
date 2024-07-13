@@ -9,7 +9,7 @@ type Client struct {
 	svc *youtube.Service
 }
 
-func NewYouTubeImpl(svc *youtube.Service) *Client {
+func NewYouTubeClient(svc *youtube.Service) *Client {
 	return &Client{svc: svc}
 }
 
