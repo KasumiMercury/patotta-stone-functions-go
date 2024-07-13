@@ -699,6 +699,42 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		"success_multiple_videos_but_only_one_video_live": {
+			args: args{videoIDs: []string{"videoID1", "videoID2"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID1", "videoID2"}),                              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID1",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "live",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID1")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Live)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
 		"error_api_call_fails": {
 			args: args{videoIDs: []string{"videoID"}},
 			mockSetup: func(m *mocks.MockClient) {
