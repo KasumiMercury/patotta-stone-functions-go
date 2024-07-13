@@ -883,6 +883,98 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 	}
 }
 
+func TestYouTubeVideo_FetchScheduledAtByVideoIDsAbnormally(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := mocks.NewMockClient(ctrl)
+
+	type args struct {
+		videoIDs []string
+	}
+
+	t.Parallel()
+
+	tests := map[string]struct {
+		args      args
+		mockSetup func(*mocks.MockClient)
+		want      []api.LiveScheduleInfo
+	}{
+		"error_api_call_fails": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),              // id
+				).Return(nil, assert.AnError)
+			},
+			want: nil,
+		},
+		"error_scheduledStartTime_is_empty": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: nil,
+		},
+		"error_scheduledStartTime_is_invalid": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "invalid",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: nil,
+		},
+	}
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			// Arrange
+			tt.mockSetup(mockClient)
+
+			c := &YouTubeVideo{
+				clt: mockClient,
+			}
+
+			// Act
+			got, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
+			// Assert
+			assert.Error(t, err)
+			assert.Equal(t, tt.want, got)
+		})
+
+	}
+}
+
 func TestExtractScheduledAtUnixSuccessfully(t *testing.T) {
 	type args struct {
 		details *youtube.VideoLiveStreamingDetails
