@@ -33,9 +33,14 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 		"success": {
 			args: args{videoIDs: []string{"videoID"}},
 			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(gomock.Any(), gomock.Any(), "videoID").Return(&youtube.VideoListResponse{
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),              // id
+				).Return(&youtube.VideoListResponse{
 					Items: []*youtube.Video{
 						{
+							Id: "videoID",
 							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 								ScheduledStartTime: "2024-01-01T00:00:00Z",
 							},
@@ -60,7 +65,9 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 			// Arrange
 			tt.mockSetup(mockClient)
 
-			c, _ := NewYouTubeVideo(mockClient)
+			c := &YouTubeVideo{
+				clt: mockClient,
+			}
 
 			// Act
 			got, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
