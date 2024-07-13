@@ -3,12 +3,11 @@ package api
 import (
 	"context"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output/mocks"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/api/youtube/v3"
-	"reflect"
 	"testing"
 )
 
@@ -205,34 +204,81 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 }
 
 func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
-	type fields struct {
-		clt output.Client
-	}
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := mocks.NewMockClient(ctrl)
+
 	type args struct {
-		ctx      context.Context
 		videoIDs []string
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []api.VideoDetail
-		wantErr bool
+
+	t.Parallel()
+
+	tests := map[string]struct {
+		args      args
+		mockSetup func(*mocks.MockClient)
+		want      []api.VideoDetail
+		wantErr   bool
 	}{
-		// TODO: Add test cases.
+		"success_single_live_video": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "live",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Live)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			// Arrange
+			tt.mockSetup(mockClient)
+
 			c := &YouTubeVideo{
-				clt: tt.fields.clt,
+				clt: mockClient,
 			}
-			got, err := c.FetchVideoDetailsByVideoIDs(tt.args.ctx, tt.args.videoIDs)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("FetchVideoDetailsByVideoIDs() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("FetchVideoDetailsByVideoIDs() got = %v, want %v", got, tt.want)
+
+			// Act
+			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
+			// Assert
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.want, got)
 			}
 		})
 	}
