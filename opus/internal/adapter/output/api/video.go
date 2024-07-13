@@ -12,20 +12,20 @@ import (
 	"log/slog"
 )
 
-type Client struct {
+type YouTubeVideo struct {
 	ytSvc *youtube.Service
 }
 
-func NewYouTubeClient(ctx context.Context, apiKey string) (*Client, error) {
+func NewYouTubeVideo(ctx context.Context, apiKey string) (*YouTubeVideo, error) {
 	svc, err := youtube.NewService(ctx, option.WithAPIKey(apiKey))
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{ytSvc: svc}, nil
+	return &YouTubeVideo{ytSvc: svc}, nil
 }
 
-func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]api.VideoDetail, error) {
+func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]api.VideoDetail, error) {
 	call := c.ytSvc.Videos.List([]string{"snippet", "contentDetails", "liveStreamingDetails"}).Id(videoIDs...)
 	call = call.Context(ctx)
 
@@ -108,7 +108,7 @@ func (c *Client) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []str
 	return vds, nil
 }
 
-func (c *Client) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
+func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
 	call := c.ytSvc.Videos.List([]string{"liveStreamingDetails"}).Id(videoIDs...)
 	call = call.Context(ctx)
 
