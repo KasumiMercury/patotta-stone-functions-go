@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
+func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -543,6 +543,47 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
 			},
 			wantErr: false,
 		},
+	}
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			// Arrange
+			tt.mockSetup(mockClient)
+
+			c := &YouTubeVideo{
+				clt: mockClient,
+			}
+
+			// Act
+			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
+			// Assert
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.want, got)
+			}
+		})
+	}
+}
+
+func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := mocks.NewMockClient(ctrl)
+
+	type args struct {
+		videoIDs []string
+	}
+
+	tests := map[string]struct {
+		args      args
+		mockSetup func(*mocks.MockClient)
+		want      []api.VideoDetail
+		wantErr   bool
+	}{
 		"error_api_call_fails": {
 			args: args{videoIDs: []string{"videoID"}},
 			mockSetup: func(m *mocks.MockClient) {
