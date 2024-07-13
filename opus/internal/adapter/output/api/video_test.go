@@ -213,8 +213,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
 		videoIDs []string
 	}
 
-	t.Parallel()
-
 	tests := map[string]struct {
 		args      args
 		mockSetup func(*mocks.MockClient)
@@ -257,13 +255,578 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		"success_single_upcoming_video": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "upcoming",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Upcoming)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"success_single_archived_of_non_live_video": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "none",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Archived)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"success_single_archived_of_completed_live_video": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "completed",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Archived)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"success_multiple_videos_live_and_upcoming": {
+			args: args{videoIDs: []string{"videoID1", "videoID2"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID1", "videoID2"}),                              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID1",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "live",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+						{
+							Id: "videoID2",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "upcoming",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID1")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Live)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID2")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Upcoming)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"success_multiple_videos_live_and_archived_of_non_live": {
+			args: args{videoIDs: []string{"videoID1", "videoID2"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID1", "videoID2"}),                              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID1",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "live",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+						{
+							Id: "videoID2",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "none",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID1")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Live)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID2")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Archived)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"success_multiple_videos_live_and_archived_of_completed_live": {
+			args: args{videoIDs: []string{"videoID1", "videoID2"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID1", "videoID2"}),                              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID1",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "live",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+						{
+							Id: "videoID2",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "completed",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID1")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Live)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID2")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Archived)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"success_multiple_videos_upcoming_and_archived_of_non_live": {
+			args: args{videoIDs: []string{"videoID1", "videoID2"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID1", "videoID2"}),                              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID1",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "upcoming",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+						{
+							Id: "videoID2",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "none",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID1")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Upcoming)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID2")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Archived)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"success_multiple_videos_upcoming_and_archived_of_completed_live": {
+			args: args{videoIDs: []string{"videoID1", "videoID2"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID1", "videoID2"}),                              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID1",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "upcoming",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+						{
+							Id: "videoID2",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "completed",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID1")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Upcoming)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID2")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Archived)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"success_multiple_videos_archived_of_non_live_and_completed_live": {
+			args: args{videoIDs: []string{"videoID1", "videoID2"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID1", "videoID2"}),                              // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID1",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "none",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+						{
+							Id: "videoID2",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "completed",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.VideoDetail{
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID1")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Archived)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+				func() api.VideoDetail {
+					vd := api.NewVideoDetail("videoID2")
+					vd.SetPublishedAtUnix(1704067200)
+					vd.SetStatus(status.Archived)
+					err := vd.SetScheduledAtUnix(1704067200)
+					if err != nil {
+						return api.VideoDetail{}
+					}
+					return *vd
+				}(),
+			},
+			wantErr: false,
+		},
+		"error_api_call_fails": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(nil, assert.AnError)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		"error_snippet_is_nil": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+						},
+					},
+				}, nil)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		"error_publishedAt_is_invalid": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt: "invalid",
+							},
+						},
+					},
+				}, nil)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		"error_liveBroadcastContent_is_invalid": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "invalid",
+							},
+						},
+					},
+				}, nil)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		"error_scheduledStartTime_is_empty": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "live",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "",
+							},
+						},
+					},
+				}, nil)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		"error_scheduledStartTime_is_invalid": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID"}),                                           // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID",
+							Snippet: &youtube.VideoSnippet{
+								PublishedAt:          "2024-01-01T00:00:00Z",
+								LiveBroadcastContent: "live",
+							},
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "invalid",
+							},
+						},
+					},
+				}, nil)
+			},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 
 	for name, tt := range tests {
 		name, tt := name, tt
 		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
 			// Arrange
 			tt.mockSetup(mockClient)
 
