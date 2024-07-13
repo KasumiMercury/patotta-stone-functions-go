@@ -8,5 +8,5 @@ import (
 )
 
 type Client interface {
-	VideoList(ctx context.Context, part []string, id string) (*youtube.VideoListResponse, error)
+	VideoList(ctx context.Context, part []string, id []string) (*youtube.VideoListResponse, error)
 }

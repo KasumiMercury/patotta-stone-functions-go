@@ -41,7 +41,7 @@ func (m *MockClient) EXPECT() *MockClientMockRecorder {
 }
 
 // VideoList mocks base method.
-func (m *MockClient) VideoList(ctx context.Context, part []string, id string) (*youtube.VideoListResponse, error) {
+func (m *MockClient) VideoList(ctx context.Context, part, id []string) (*youtube.VideoListResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "VideoList", ctx, part, id)
 	ret0, _ := ret[0].(*youtube.VideoListResponse)
