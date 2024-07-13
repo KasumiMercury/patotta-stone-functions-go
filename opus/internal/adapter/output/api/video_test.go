@@ -25,7 +25,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 		args      args
 		mockSetup func(*mocks.MockClient)
 		want      []api.VideoDetail
-		wantErr   bool
 	}{
 		"success_single_live_video": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -61,7 +60,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_single_upcoming_video": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -97,7 +95,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_single_archived_of_non_live_video": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -133,7 +130,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_single_archived_of_completed_live_video": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -169,7 +165,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_videos_live_and_upcoming": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -225,7 +220,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_videos_live_and_archived_of_non_live": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -281,7 +275,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_videos_live_and_archived_of_completed_live": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -337,7 +330,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_videos_upcoming_and_archived_of_non_live": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -393,7 +385,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_videos_upcoming_and_archived_of_completed_live": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -449,7 +440,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_videos_archived_of_non_live_and_completed_live": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -505,7 +495,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 		"success_multiple_videos_but_only_one_video_live": {
 			args: args{videoIDs: []string{"videoID1", "videoID2"}},
@@ -541,7 +530,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					return *vd
 				}(),
 			},
-			wantErr: false,
 		},
 	}
 
@@ -558,12 +546,8 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			// Act
 			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
-			}
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
