@@ -3,49 +3,82 @@ package api
 import (
 	"context"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output/mocks"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/mock/gomock"
 	"google.golang.org/api/youtube/v3"
 	"reflect"
 	"testing"
 )
 
 func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
-	type fields struct {
-		clt *Client
-	}
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockClient := mocks.NewMockClient(ctrl)
+
 	type args struct {
-		ctx      context.Context
 		videoIDs []string
 	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []api.LiveScheduleInfo
-		wantErr bool
+
+	t.Parallel()
+
+	tests := map[string]struct {
+		args      args
+		mockSetup func(*mocks.MockClient)
+		want      []api.LiveScheduleInfo
+		wantErr   bool
 	}{
-		// TODO: Add test cases.
+		"success": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(gomock.Any(), gomock.Any(), "videoID").Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.LiveScheduleInfo{
+				func() api.LiveScheduleInfo {
+					l := api.NewLiveScheduleInfo("videoID")
+					l.SetScheduledAtUnix(1704067200)
+					return *l
+				}(),
+			},
+			wantErr: false,
+		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &YouTubeVideo{
-				clt: tt.fields.clt,
-			}
-			got, err := c.FetchScheduledAtByVideoIDs(tt.args.ctx, tt.args.videoIDs)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("FetchScheduledAtByVideoIDs() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("FetchScheduledAtByVideoIDs() got = %v, want %v", got, tt.want)
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			// Arrange
+			tt.mockSetup(mockClient)
+
+			c, _ := NewYouTubeVideo(mockClient)
+
+			// Act
+			got, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
+			// Assert
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.want, got)
 			}
 		})
+
 	}
 }
 
 func TestYouTubeVideo_FetchVideoDetailsByVideoIDs(t *testing.T) {
 	type fields struct {
-		clt *Client
+		clt output.Client
 	}
 	type args struct {
 		ctx      context.Context
