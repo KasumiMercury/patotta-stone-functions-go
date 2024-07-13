@@ -95,6 +95,33 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		"success_multiple_but_only_one_video": {
+			args: args{videoIDs: []string{"videoID1", "videoID2"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"liveStreamingDetails"}), // part
+					gomock.Eq([]string{"videoID1", "videoID2"}), // id
+				).Return(&youtube.VideoListResponse{
+					Items: []*youtube.Video{
+						{
+							Id: "videoID1",
+							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+								ScheduledStartTime: "2024-01-01T00:00:00Z",
+							},
+						},
+					},
+				}, nil)
+			},
+			want: []api.LiveScheduleInfo{
+				func() api.LiveScheduleInfo {
+					l := api.NewLiveScheduleInfo("videoID1")
+					l.SetScheduledAtUnix(1704067200)
+					return *l
+				}(),
+			},
+			wantErr: false,
+		},
 		"error_api_call_fails": {
 			args: args{videoIDs: []string{"videoID"}},
 			mockSetup: func(m *mocks.MockClient) {
