@@ -7,29 +7,20 @@ import (
 	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
-	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 	"log/slog"
 )
 
 type YouTubeVideo struct {
-	ytSvc *youtube.Service
+	clt *Client
 }
 
-func NewYouTubeVideo(ctx context.Context, apiKey string) (*YouTubeVideo, error) {
-	svc, err := youtube.NewService(ctx, option.WithAPIKey(apiKey))
-	if err != nil {
-		return nil, err
-	}
-
-	return &YouTubeVideo{ytSvc: svc}, nil
+func NewYouTubeVideo(ctx context.Context, clt *Client) (*YouTubeVideo, error) {
+	return &YouTubeVideo{clt: clt}, nil
 }
 
 func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]api.VideoDetail, error) {
-	call := c.ytSvc.Videos.List([]string{"snippet", "contentDetails", "liveStreamingDetails"}).Id(videoIDs...)
-	call = call.Context(ctx)
-
-	resp, err := call.Do()
+	resp, err := c.clt.VideoList(ctx, []string{"snippet", "contentDetails", "liveStreamingDetails"}, videoIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -109,10 +100,7 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 }
 
 func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
-	call := c.ytSvc.Videos.List([]string{"liveStreamingDetails"}).Id(videoIDs...)
-	call = call.Context(ctx)
-
-	resp, err := call.Do()
+	resp, err := c.clt.VideoList(ctx, []string{"liveStreamingDetails"}, videoIDs)
 	if err != nil {
 		return nil, err
 	}
