@@ -578,11 +578,12 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 		videoIDs []string
 	}
 
+	t.Parallel()
+
 	tests := map[string]struct {
 		args      args
 		mockSetup func(*mocks.MockClient)
 		want      []api.VideoDetail
-		wantErr   bool
 	}{
 		"error_api_call_fails": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -593,8 +594,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					gomock.Eq([]string{"videoID"}),                                           // id
 				).Return(nil, assert.AnError)
 			},
-			want:    nil,
-			wantErr: true,
+			want: nil,
 		},
 		"error_snippet_is_nil": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -611,8 +611,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want:    nil,
-			wantErr: true,
+			want: nil,
 		},
 		"error_publishedAt_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -632,8 +631,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want:    nil,
-			wantErr: true,
+			want: nil,
 		},
 		"error_liveBroadcastContent_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -654,8 +652,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want:    nil,
-			wantErr: true,
+			want: nil,
 		},
 		"error_scheduledStartTime_is_empty": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -679,8 +676,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want:    nil,
-			wantErr: true,
+			want: nil,
 		},
 		"error_scheduledStartTime_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -704,14 +700,15 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want:    nil,
-			wantErr: true,
+			want: nil,
 		},
 	}
 
 	for name, tt := range tests {
 		name, tt := name, tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			// Arrange
 			tt.mockSetup(mockClient)
 
@@ -722,12 +719,8 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 			// Act
 			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
-			}
+			assert.Error(t, err)
+			assert.Nil(t, got)
 		})
 	}
 }
