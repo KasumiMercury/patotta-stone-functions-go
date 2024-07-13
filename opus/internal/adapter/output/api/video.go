@@ -93,6 +93,7 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 				"sourceID", i.Id,
 				"liveBroadcastContent", i.Snippet.LiveBroadcastContent,
 			)
+			return nil, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
 		}
 
 		vds = append(vds, *vd)
@@ -110,10 +111,6 @@ func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs 
 
 	for _, i := range resp.Items {
 		lsi := api.NewLiveScheduleInfo(i.Id)
-
-		if i.Snippet == nil {
-			return nil, fmt.Errorf("snippet is not found")
-		}
 
 		// scheduledStartTime
 		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
