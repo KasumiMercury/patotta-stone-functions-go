@@ -154,6 +154,8 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDs(t *testing.T) {
 	for name, tt := range tests {
 		name, tt := name, tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			// Arrange
 			tt.mockSetup(mockClient)
 
