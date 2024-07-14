@@ -55,7 +55,10 @@ func (vd *VideoDetail) NillableChatID() *string {
 	}
 	return &vd.chatID
 }
-func (vd *VideoDetail) Status() string {
+func (vd *VideoDetail) Status() status.Status {
+	return vd.status
+}
+func (vd *VideoDetail) StatusString() string {
 	return vd.status.String()
 }
 func (vd *VideoDetail) ScheduledAtUnix() int64 {
