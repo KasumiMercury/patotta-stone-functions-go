@@ -37,7 +37,7 @@ func (r *Item) Description() string {
 func (r *Item) PublishedAtUnix() int64 {
 	return r.publishedAtUnix
 }
-func (r *Item) PublishedAt() *time.Time {
+func (r *Item) NillablePublishedAt() *time.Time {
 	if r.publishedAtUnix == 0 {
 		return nil
 	}
@@ -47,7 +47,7 @@ func (r *Item) PublishedAt() *time.Time {
 func (r *Item) UpdatedAtUnix() int64 {
 	return r.updatedAtUnix
 }
-func (r *Item) UpdatedAt() *time.Time {
+func (r *Item) NillableUpdatedAt() *time.Time {
 	if r.updatedAtUnix == 0 {
 		return nil
 	}
