@@ -73,9 +73,8 @@ func (r *RssService) UpdateVideosFromRssItem(ctx context.Context) error {
 		}
 
 		// merge video info and rss info
-		m := video.NewVideoBuilder().
+		m := video.NewVideoBuilder(ri.SourceID()).
 			SetChannelID(ri.ChannelID()).
-			SetSourceID(ri.SourceID()).
 			SetTitle(ri.Title()).
 			SetStatus(v.Status()).
 			SetChatID(v.ChatID()).
