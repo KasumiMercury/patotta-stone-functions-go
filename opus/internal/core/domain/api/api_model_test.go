@@ -194,7 +194,24 @@ func TestVideoDetail_SetScheduledAtUnix(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "publishedAtUnix is already set",
+			fields: fields{
+				publishedAtUnix: 1610000000,
+			},
+			args: args{
+				scheduledAtUnix: 1610000000,
+			},
+			wantErr: false,
+		},
+		{
+			name:   "publishedAtUnix is not set",
+			fields: fields{},
+			args: args{
+				scheduledAtUnix: 1610000000,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
