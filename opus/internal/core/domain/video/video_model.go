@@ -1,6 +1,9 @@
 package video
 
-import "time"
+import (
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
+	"time"
+)
 
 type Video struct {
 	channelID       string
@@ -8,7 +11,7 @@ type Video struct {
 	title           string
 	description     string
 	chatID          string
-	status          string
+	status          status.Status
 	publishedAtUnix int64
 	scheduledAtUnix int64
 	updatedAtUnix   int64
@@ -16,90 +19,71 @@ type Video struct {
 
 type Builder interface {
 	SetChannelID(string) Builder
-	SetSourceID(string) Builder
 	SetTitle(string) Builder
 	SetDescription(string) Builder
 	SetChatID(string) Builder
-	SetStatus(string) Builder
+	SetStatus(status.Status) Builder
 	SetPublishedAtUnix(int64) Builder
 	SetScheduledAtUnix(int64) Builder
 	SetUpdatedAtUnix(int64) Builder
 	Build() *Video
 }
 
-type builder struct {
-	channelID       string
-	sourceID        string
-	title           string
-	description     string
-	chatID          string
-	status          string
-	publishedAtUnix int64
-	scheduledAtUnix int64
-	updatedAtUnix   int64
+type builderImpl struct {
+	video *Video
 }
 
-func NewVideoBuilder() Builder {
-	return &builder{}
-}
-
-func (vb *builder) SetChannelID(channelID string) Builder {
-	vb.channelID = channelID
-	return vb
-}
-
-func (vb *builder) SetSourceID(sourceID string) Builder {
-	vb.channelID = sourceID
-	return vb
-}
-
-func (vb *builder) SetTitle(title string) Builder {
-	vb.title = title
-	return vb
-}
-
-func (vb *builder) SetDescription(description string) Builder {
-	vb.description = description
-	return vb
-}
-
-func (vb *builder) SetChatID(chatID string) Builder {
-	vb.chatID = chatID
-	return vb
-}
-
-func (vb *builder) SetStatus(status string) Builder {
-	vb.status = status
-	return vb
-}
-
-func (vb *builder) SetPublishedAtUnix(publishedAtUnix int64) Builder {
-	vb.publishedAtUnix = publishedAtUnix
-	return vb
-}
-
-func (vb *builder) SetScheduledAtUnix(scheduledAtUnix int64) Builder {
-	vb.scheduledAtUnix = scheduledAtUnix
-	return vb
-}
-
-func (vb *builder) SetUpdatedAtUnix(updatedAtUnix int64) Builder {
-	vb.updatedAtUnix = updatedAtUnix
-	return vb
-}
-
-func (vb *builder) Build() *Video {
-	return &Video{
-		channelID:       vb.channelID,
-		sourceID:        vb.sourceID,
-		title:           vb.title,
-		description:     vb.description,
-		chatID:          vb.chatID,
-		status:          vb.status,
-		publishedAtUnix: vb.publishedAtUnix,
-		scheduledAtUnix: vb.scheduledAtUnix,
-		updatedAtUnix:   vb.updatedAtUnix,
+func NewVideoBuilder(sourceID string) Builder {
+	return &builderImpl{
+		video: &Video{
+			sourceID: sourceID,
+			status:   status.Undefined,
+		},
 	}
+}
+
+func (vb *builderImpl) SetChannelID(channelID string) Builder {
+	vb.video.channelID = channelID
+	return vb
+}
+
+func (vb *builderImpl) SetTitle(title string) Builder {
+	vb.video.title = title
+	return vb
+}
+
+func (vb *builderImpl) SetDescription(description string) Builder {
+	vb.video.description = description
+	return vb
+}
+
+func (vb *builderImpl) SetChatID(chatID string) Builder {
+	vb.video.chatID = chatID
+	return vb
+}
+
+func (vb *builderImpl) SetStatus(status status.Status) Builder {
+	vb.video.status = status
+	return vb
+}
+
+func (vb *builderImpl) SetPublishedAtUnix(publishedAtUnix int64) Builder {
+	vb.video.publishedAtUnix = publishedAtUnix
+	return vb
+}
+
+func (vb *builderImpl) SetScheduledAtUnix(scheduledAtUnix int64) Builder {
+	vb.video.scheduledAtUnix = scheduledAtUnix
+	return vb
+}
+
+func (vb *builderImpl) SetUpdatedAtUnix(updatedAtUnix int64) Builder {
+	vb.video.updatedAtUnix = updatedAtUnix
+	return vb
+}
+
+func (vb *builderImpl) Build() *Video {
+	return vb.video
 }
 
 func (v *Video) ChannelID() string {
@@ -123,8 +107,11 @@ func (v *Video) NillableChatID() *string {
 	}
 	return &v.chatID
 }
-func (v *Video) Status() string {
+func (v *Video) Status() status.Status {
 	return v.status
+}
+func (v *Video) StatusString() string {
+	return v.status.String()
 }
 func (v *Video) PublishedAtUnix() int64 {
 	return v.publishedAtUnix
