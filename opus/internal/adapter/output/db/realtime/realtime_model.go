@@ -21,7 +21,7 @@ func toDBModel(v *video.Video) *Record {
 	return &Record{
 		SourceID:    v.SourceID(),
 		Title:       v.Title(),
-		Status:      v.Status(),
+		Status:      v.StatusString(),
 		ChatID:      v.ChatID(),
 		ScheduledAt: v.NillableScheduledAt(),
 		UpdatedAt:   v.NillableUpdatedAt(),
