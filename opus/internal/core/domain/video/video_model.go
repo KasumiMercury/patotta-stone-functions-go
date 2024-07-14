@@ -11,7 +11,7 @@ type Video struct {
 	title           string
 	description     string
 	chatID          string
-	status          string
+	status          status.Status
 	publishedAtUnix int64
 	scheduledAtUnix int64
 	updatedAtUnix   int64
@@ -22,7 +22,7 @@ type Builder interface {
 	SetTitle(string) Builder
 	SetDescription(string) Builder
 	SetChatID(string) Builder
-	SetStatus(string) Builder
+	SetStatus(status.Status) Builder
 	SetPublishedAtUnix(int64) Builder
 	SetScheduledAtUnix(int64) Builder
 	SetUpdatedAtUnix(int64) Builder
@@ -37,7 +37,7 @@ func NewVideoBuilder(sourceID string) Builder {
 	return &builderImpl{
 		video: &Video{
 			sourceID: sourceID,
-			status:   status.Undefined.String(),
+			status:   status.Undefined,
 		},
 	}
 }
@@ -62,7 +62,7 @@ func (vb *builderImpl) SetChatID(chatID string) Builder {
 	return vb
 }
 
-func (vb *builderImpl) SetStatus(status string) Builder {
+func (vb *builderImpl) SetStatus(status status.Status) Builder {
 	vb.video.status = status
 	return vb
 }
@@ -107,8 +107,11 @@ func (v *Video) NillableChatID() *string {
 	}
 	return &v.chatID
 }
-func (v *Video) Status() string {
+func (v *Video) Status() status.Status {
 	return v.status
+}
+func (v *Video) StatusString() string {
+	return v.status.String()
 }
 func (v *Video) PublishedAtUnix() int64 {
 	return v.publishedAtUnix
