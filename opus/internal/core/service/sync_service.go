@@ -7,6 +7,7 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/config"
 	"log/slog"
+	"sort"
 )
 
 var ytRssURL = "https://www.youtube.com/feeds/videos.xml?channel_id="
@@ -106,6 +107,11 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		slog.Info("No new videos found")
 		return nil
 	}
+
+	// Sort the merged video info by updated time
+	sort.Slice(videos, func(i, j int) bool {
+		return videos[i].UpdatedAtUnix() > videos[j].UpdatedAtUnix()
+	})
 
 	// Upsert the merged video info into the database(RealtimeDB)
 	if err := s.rtdRepo.UpsertRecords(ctx, videos); err != nil {
