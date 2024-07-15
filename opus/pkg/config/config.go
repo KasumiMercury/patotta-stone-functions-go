@@ -41,3 +41,12 @@ func (c *Config) loadTarget(j string) error {
 
 	return nil
 }
+
+func (c *Config) ChannelIDs() []string {
+	cids := make([]string, 0, len(c.target.Channel))
+	for _, c := range c.target.Channel {
+		cids = append(cids, c.ChannelId)
+	}
+
+	return cids
+}
