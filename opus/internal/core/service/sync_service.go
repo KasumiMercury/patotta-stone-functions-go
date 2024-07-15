@@ -5,20 +5,23 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/config"
 	"log/slog"
 )
 
 type SyncService struct {
-	rtdRepo output.RealtimeRepository
+	config  config.Config
 	rssRepo output.RSSRepository
 	apiRepo output.ApiRepository
+	rtdRepo output.RealtimeRepository
 }
 
-func NewSyncService(rtd *output.RealtimeRepository, rss *output.RSSRepository, api *output.ApiRepository) *SyncService {
+func NewSyncService(c config.Config, r output.RSSRepository, a output.ApiRepository, rt output.RealtimeRepository) *SyncService {
 	return &SyncService{
-		rtdRepo: *rtd,
-		rssRepo: *rss,
-		apiRepo: *api,
+		config:  c,
+		rssRepo: r,
+		apiRepo: a,
+		rtdRepo: rt,
 	}
 }
 
