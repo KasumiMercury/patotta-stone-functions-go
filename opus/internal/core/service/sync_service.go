@@ -5,20 +5,26 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/config"
 	"log/slog"
+	"sort"
 )
 
+var ytRssURL = "https://www.youtube.com/feeds/videos.xml?channel_id="
+
 type SyncService struct {
-	rtdRepo output.RealtimeRepository
+	config  config.Config
 	rssRepo output.RSSRepository
 	apiRepo output.ApiRepository
+	rtdRepo output.RealtimeRepository
 }
 
-func NewSyncService(rtd *output.RealtimeRepository, rss *output.RSSRepository, api *output.ApiRepository) *SyncService {
+func NewSyncService(c config.Config, r output.RSSRepository, a output.ApiRepository, rt output.RealtimeRepository) *SyncService {
 	return &SyncService{
-		rtdRepo: *rtd,
-		rssRepo: *rss,
-		apiRepo: *api,
+		config:  c,
+		rssRepo: r,
+		apiRepo: a,
+		rtdRepo: rt,
 	}
 }
 
@@ -30,12 +36,17 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		return err
 	}
 
-	duri := "https://www.youtube.com/feeds/videos.xml?channel_id=UCeLzT-7b2PBcunJplmWtoDg"
-
 	// Get updated videos from RSS
-	rssItemList, err := s.rssRepo.FetchRssItems(ctx, duri, luu)
-	if err != nil {
-		return err
+	rssItemList := make([]rss.Item, 0, 5)
+	for _, c := range s.config.ChannelIDs() {
+		// generate rss url
+		url := ytRssURL + c
+		// fetch rss items
+		items, err := s.rssRepo.FetchRssItems(ctx, url, luu)
+		if err != nil {
+			return err
+		}
+		rssItemList = append(rssItemList, items...)
 	}
 
 	// Extract source IDs from updated rssItemList
@@ -96,6 +107,11 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		slog.Info("No new videos found")
 		return nil
 	}
+
+	// Sort the merged video info by updated time
+	sort.Slice(videos, func(i, j int) bool {
+		return videos[i].UpdatedAtUnix() > videos[j].UpdatedAtUnix()
+	})
 
 	// Upsert the merged video info into the database(RealtimeDB)
 	if err := s.rtdRepo.UpsertRecords(ctx, videos); err != nil {
