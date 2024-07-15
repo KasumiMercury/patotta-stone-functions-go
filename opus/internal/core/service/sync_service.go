@@ -9,6 +9,8 @@ import (
 	"log/slog"
 )
 
+var ytRssURL = "https://www.youtube.com/feeds/videos.xml?channel_id="
+
 type SyncService struct {
 	config  config.Config
 	rssRepo output.RSSRepository
@@ -33,12 +35,17 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		return err
 	}
 
-	duri := "https://www.youtube.com/feeds/videos.xml?channel_id=UCeLzT-7b2PBcunJplmWtoDg"
-
 	// Get updated videos from RSS
-	rssItemList, err := s.rssRepo.FetchRssItems(ctx, duri, luu)
-	if err != nil {
-		return err
+	rssItemList := make([]rss.Item, 0, 5)
+	for _, c := range s.config.ChannelIDs() {
+		// generate rss url
+		url := ytRssURL + c
+		// fetch rss items
+		items, err := s.rssRepo.FetchRssItems(ctx, url, luu)
+		if err != nil {
+			return err
+		}
+		rssItemList = append(rssItemList, items...)
 	}
 
 	// Extract source IDs from updated rssItemList
