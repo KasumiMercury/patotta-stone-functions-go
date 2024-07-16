@@ -12,6 +12,12 @@ import (
 	"log/slog"
 )
 
+const (
+	PartSnippet              = "snippet"
+	PartContentDetails       = "contentDetails"
+	PartLiveStreamingDetails = "liveStreamingDetails"
+)
+
 type YouTubeVideo struct {
 	clt output.Client
 }
@@ -21,7 +27,7 @@ func NewYouTubeVideo(clt output.Client) (*YouTubeVideo, error) {
 }
 
 func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]api.VideoDetail, error) {
-	resp, err := c.clt.VideoList(ctx, []string{"snippet", "contentDetails", "liveStreamingDetails"}, videoIDs)
+	resp, err := c.clt.VideoList(ctx, []string{PartSnippet, PartContentDetails, PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +85,7 @@ func (c *YouTubeVideo) extractVideoStatus(i youtube.Video) (status.Status, strin
 }
 
 func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
-	resp, err := c.clt.VideoList(ctx, []string{"liveStreamingDetails"}, videoIDs)
+	resp, err := c.clt.VideoList(ctx, []string{PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
 	}
