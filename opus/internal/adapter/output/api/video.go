@@ -29,88 +29,53 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 	vds := make([]api.VideoDetail, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
-		vd, err := api.NewVideoDetail(i.Id, "", 0, 0, 0)
+		vd, err := c.extractVideoItem(ctx, i)
 		if err != nil {
-			slog.Warn(
-				"failed to create VideoDetail",
+			slog.Error(
+				"failed to extract video item",
 				"sourceID", i.Id,
-				slog.Group("fetchVideoDetailsByVideoIDs", "error", err),
+				"error", err,
 			)
 			continue
 		}
-
-		if i.Snippet == nil {
-			slog.Warn(
-				"snippet is not found",
-				"sourceID", i.Id,
-			)
-			continue
-		}
-
-		// publishedAt
-		pa, err := synchro.ParseISO[tz.AsiaTokyo](i.Snippet.PublishedAt)
-		if err != nil {
-			slog.Error(
-				"failed to parse 'publishedAt' for video ID; "+i.Id,
-				"publishedAt", i.Snippet.PublishedAt,
-				slog.Group("fetchVideoDetailsByVideoIDs", "error", err),
-			)
-			return nil, err
-		}
-		vd.SetPublishedAtUnix(pa.Unix())
-
-		// liveBroadcastContent
-		switch i.Snippet.LiveBroadcastContent {
-		case "live":
-			vd.SetStatus(status.Live)
-			vd.SetChatID(extractChatID(i.LiveStreamingDetails))
-			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
-			if err != nil {
-				return nil, err
-			}
-			if err := vd.SetScheduledAtUnix(sa); err != nil {
-				return nil, err
-			}
-		case "upcoming":
-			vd.SetStatus(status.Upcoming)
-			vd.SetChatID(extractChatID(i.LiveStreamingDetails))
-			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
-			if err != nil {
-				return nil, err
-			}
-			if err := vd.SetScheduledAtUnix(sa); err != nil {
-				return nil, err
-			}
-		case "none":
-			vd.SetStatus(status.Archived)
-			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
-			if err != nil {
-				return nil, err
-			}
-			if err := vd.SetScheduledAtUnix(sa); err != nil {
-				return nil, err
-			}
-		case "completed":
-			vd.SetStatus(status.Archived)
-			sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
-			if err != nil {
-				return nil, err
-			}
-			if err := vd.SetScheduledAtUnix(sa); err != nil {
-				return nil, err
-			}
-		default:
-			slog.Error(
-				"unexpected liveBroadcastContent",
-				"sourceID", i.Id,
-				"liveBroadcastContent", i.Snippet.LiveBroadcastContent,
-			)
-			return nil, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
-		}
-
 		vds = append(vds, *vd)
 	}
 	return vds, nil
+}
+
+func (c *YouTubeVideo) extractVideoItem(ctx context.Context, i *youtube.Video) (*api.VideoDetail, error) {
+	if i.Snippet == nil {
+		return nil, fmt.Errorf("snippet is not found for sourceID: %s", i.Id)
+	}
+
+	paTime, err := synchro.ParseISO[tz.AsiaTokyo](i.Snippet.PublishedAt)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse 'publishedAt' for video ID: %s: %w", i.Id, err)
+	}
+
+	sts, cID, sa, err := c.extractVideoStatus(*i)
+	if err != nil {
+		return nil, fmt.Errorf("failed to extract video status for sourceID: %s: %w", i.Id, err)
+	}
+
+	return api.NewVideoDetail(i.Id, cID, sts, paTime.Unix(), sa)
+}
+
+func (c *YouTubeVideo) extractVideoStatus(i youtube.Video) (status.Status, string, int64, error) {
+	switch i.Snippet.LiveBroadcastContent {
+	case "live":
+		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		return status.Live, "", sa, err
+	case "upcoming":
+		cID := extractChatID(i.LiveStreamingDetails)
+		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		return status.Upcoming, cID, sa, err
+	case "none", "completed":
+		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		return status.Archived, "", sa, err
+	default:
+		return status.Undefined, "", 0, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
+	}
 }
 
 func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
