@@ -35,7 +35,7 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 	vds := make([]api.VideoDetail, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
-		vd, err := c.extractVideoItem(ctx, i)
+		vd, err := extractVideoItem(i)
 		if err != nil {
 			slog.Error(
 				"failed to extract video item",
@@ -49,7 +49,7 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 	return vds, nil
 }
 
-func (c *YouTubeVideo) extractVideoItem(ctx context.Context, i *youtube.Video) (*api.VideoDetail, error) {
+func extractVideoItem(i *youtube.Video) (*api.VideoDetail, error) {
 	if i.Snippet == nil {
 		return nil, fmt.Errorf("snippet is not found for sourceID: %s", i.Id)
 	}
@@ -59,7 +59,7 @@ func (c *YouTubeVideo) extractVideoItem(ctx context.Context, i *youtube.Video) (
 		return nil, fmt.Errorf("failed to parse 'publishedAt' for video ID: %s: %w", i.Id, err)
 	}
 
-	sts, cID, sa, err := c.extractVideoStatus(*i)
+	sts, cID, sa, err := extractVideoStatus(*i)
 	if err != nil {
 		return nil, fmt.Errorf("failed to extract video status for sourceID: %s: %w", i.Id, err)
 	}
@@ -67,7 +67,7 @@ func (c *YouTubeVideo) extractVideoItem(ctx context.Context, i *youtube.Video) (
 	return api.NewVideoDetail(i.Id, cID, sts, paTime.Unix(), sa)
 }
 
-func (c *YouTubeVideo) extractVideoStatus(i youtube.Video) (status.Status, string, int64, error) {
+func extractVideoStatus(i youtube.Video) (status.Status, string, int64, error) {
 	switch i.Snippet.LiveBroadcastContent {
 	case "live":
 		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
