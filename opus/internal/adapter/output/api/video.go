@@ -84,6 +84,14 @@ func (c *YouTubeVideo) extractVideoStatus(i youtube.Video) (status.Status, strin
 	}
 }
 
+func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
+	if details == nil {
+		return ""
+	}
+
+	return details.ActiveLiveChatId
+}
+
 func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
 	resp, err := c.clt.VideoList(ctx, []string{PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
@@ -106,14 +114,6 @@ func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs 
 	}
 
 	return lsis, nil
-}
-
-func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
-	if details == nil {
-		return ""
-	}
-
-	return details.ActiveLiveChatId
 }
 
 func extractScheduledAtUnix(details *youtube.VideoLiveStreamingDetails) (int64, error) {
