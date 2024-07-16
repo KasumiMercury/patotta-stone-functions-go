@@ -15,11 +15,27 @@ type VideoDetail struct {
 	scheduledAtUnix int64
 }
 
-func NewVideoDetail(sourceID string) *VideoDetail {
-	return &VideoDetail{
-		sourceID: sourceID,
-		status:   status.Undefined,
+func NewVideoDetail(sourceID string, chatID string, status status.Status, pubAtUnix int64, scdAtUnix int64) (*VideoDetail, error) {
+	if sourceID == "" {
+		return nil, fmt.Errorf("sourceID is empty")
 	}
+	if pubAtUnix == 0 {
+		return nil, fmt.Errorf("publishedAtUnix is not set for sourceID: %s", sourceID)
+	}
+	if pubAtUnix < 0 {
+		return nil, fmt.Errorf("publishedAtUnix must be a positive integer for sourceID: %s", sourceID)
+	}
+
+	// chatID can be empty
+	// scheduledAtUnix can be 0
+
+	return &VideoDetail{
+		sourceID:        sourceID,
+		chatID:          chatID,
+		status:          status,
+		publishedAtUnix: pubAtUnix,
+		scheduledAtUnix: scdAtUnix,
+	}, nil
 }
 
 func (vd *VideoDetail) SetChatID(chatID string) {

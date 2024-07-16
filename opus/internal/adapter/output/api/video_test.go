@@ -50,13 +50,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Live)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID", "", status.Live, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -85,13 +79,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Upcoming)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID", "", status.Upcoming, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -120,13 +108,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Archived)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID", "", status.Archived, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -155,13 +137,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Archived)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID", "", status.Archived, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -200,23 +176,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID1")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Live)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID1", "", status.Live, 1704067200, 1704067200)
 					return *vd
 				}(),
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID2")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Upcoming)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID2", "", status.Upcoming, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -255,23 +219,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID1")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Live)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID1", "", status.Live, 1704067200, 1704067200)
 					return *vd
 				}(),
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID2")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Archived)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -310,23 +262,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID1")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Live)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID1", "", status.Live, 1704067200, 1704067200)
 					return *vd
 				}(),
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID2")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Archived)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -365,23 +305,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID1")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Upcoming)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID1", "", status.Upcoming, 1704067200, 1704067200)
 					return *vd
 				}(),
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID2")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Archived)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -420,23 +348,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID1")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Upcoming)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID1", "", status.Upcoming, 1704067200, 1704067200)
 					return *vd
 				}(),
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID2")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Archived)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -475,23 +391,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID1")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Archived)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID1", "", status.Archived, 1704067200, 1704067200)
 					return *vd
 				}(),
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID2")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Archived)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -520,13 +424,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []api.VideoDetail{
 				func() api.VideoDetail {
-					vd := api.NewVideoDetail("videoID1")
-					vd.SetPublishedAtUnix(1704067200)
-					vd.SetStatus(status.Live)
-					err := vd.SetScheduledAtUnix(1704067200)
-					if err != nil {
-						return api.VideoDetail{}
-					}
+					vd, _ := api.NewVideoDetail("videoID1", "", status.Live, 1704067200, 1704067200)
 					return *vd
 				}(),
 			},
@@ -595,7 +493,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 		"error_publishedAt_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -615,7 +513,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 		"error_liveBroadcastContent_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -636,7 +534,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 		"error_scheduledStartTime_is_empty": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -660,7 +558,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 		"error_scheduledStartTime_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -684,7 +582,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 	}
 
@@ -701,10 +599,10 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 			}
 
 			// Act
-			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
+			got, _ := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
-			assert.Error(t, err)
-			assert.Nil(t, got)
+			//assert.Error(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
