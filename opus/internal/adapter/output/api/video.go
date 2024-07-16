@@ -29,10 +29,22 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 	vds := make([]api.VideoDetail, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
-		vd := api.NewVideoDetail(i.Id)
+		vd, err := api.NewVideoDetail(i.Id, "", 0, 0, 0)
+		if err != nil {
+			slog.Warn(
+				"failed to create VideoDetail",
+				"sourceID", i.Id,
+				slog.Group("fetchVideoDetailsByVideoIDs", "error", err),
+			)
+			continue
+		}
 
 		if i.Snippet == nil {
-			return nil, fmt.Errorf("snippet is not found")
+			slog.Warn(
+				"snippet is not found",
+				"sourceID", i.Id,
+			)
+			continue
 		}
 
 		// publishedAt
