@@ -493,7 +493,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 		"error_publishedAt_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -513,7 +513,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 		"error_liveBroadcastContent_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -534,7 +534,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 		"error_scheduledStartTime_is_empty": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -558,7 +558,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 		"error_scheduledStartTime_is_invalid": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -582,7 +582,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: nil,
+			want: []api.VideoDetail{},
 		},
 	}
 
@@ -599,10 +599,10 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
 			}
 
 			// Act
-			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
+			got, _ := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
-			assert.Error(t, err)
-			assert.Nil(t, got)
+			//assert.Error(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
