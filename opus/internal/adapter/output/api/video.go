@@ -136,11 +136,6 @@ func extractScheduledAtUnix(details *youtube.VideoLiveStreamingDetails) (int64, 
 
 	sa, err := synchro.ParseISO[tz.AsiaTokyo](details.ScheduledStartTime)
 	if err != nil {
-		slog.Error(
-			"failed to parse scheduledStartTime",
-			"scheduledStartTime", details.ScheduledStartTime,
-			slog.Group("extractScheduledAtUnix", "error", err),
-		)
 		return 0, fmt.Errorf("failed to parse scheduledStartTime: %w", err)
 	}
 
