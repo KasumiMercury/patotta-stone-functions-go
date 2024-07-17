@@ -16,26 +16,35 @@ type VideoDetail struct {
 }
 
 func NewVideoDetail(sourceID string, chatID string, status status.Status, pubAtUnix int64, scdAtUnix int64) (*VideoDetail, error) {
-	if sourceID == "" {
-		return nil, fmt.Errorf("sourceID is empty")
-	}
-	if pubAtUnix == 0 {
-		return nil, fmt.Errorf("publishedAtUnix is not set for sourceID: %s", sourceID)
-	}
-	if pubAtUnix < 0 {
-		return nil, fmt.Errorf("publishedAtUnix must be a positive integer for sourceID: %s", sourceID)
-	}
-
-	// chatID can be empty
-	// scheduledAtUnix can be 0
-
-	return &VideoDetail{
+	vd := &VideoDetail{
 		sourceID:        sourceID,
 		chatID:          chatID,
 		status:          status,
 		publishedAtUnix: pubAtUnix,
 		scheduledAtUnix: scdAtUnix,
-	}, nil
+	}
+	err := vd.Validate()
+	if err != nil {
+		return nil, err
+	}
+	return vd, nil
+}
+
+func (vd *VideoDetail) Validate() error {
+	if vd.sourceID == "" {
+		return fmt.Errorf("sourceID is empty")
+	}
+	if vd.publishedAtUnix == 0 {
+		return fmt.Errorf("publishedAtUnix is not set for sourceID: %s", vd.sourceID)
+	}
+	if vd.publishedAtUnix < 0 {
+		return fmt.Errorf("publishedAtUnix must be a positive integer for sourceID: %s, publishedAtUnix: %d", vd.sourceID, vd.publishedAtUnix)
+	}
+
+	// chatID can be empty
+	// scheduledAtUnix can be 0
+
+	return nil
 }
 
 func (vd *VideoDetail) SetChatID(chatID string) {
