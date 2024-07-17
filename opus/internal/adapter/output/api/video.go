@@ -42,6 +42,10 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 				"sourceID", i.Id,
 				"error", err,
 			)
+
+			// if any error occurs, skip the item
+			// and continue to the next item
+			// because the error is not fatal
 			continue
 		}
 		vds = append(vds, *vd)
