@@ -71,14 +71,23 @@ func extractVideoStatus(i youtube.Video) (status.Status, string, int64, error) {
 	switch i.Snippet.LiveBroadcastContent {
 	case "live":
 		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
-		return status.Live, "", sa, err
+		if err != nil {
+			return status.Live, "", 0, fmt.Errorf("failed to extract ScheduledAtUnix for live video: %w", err)
+		}
+		return status.Live, "", sa, nil
 	case "upcoming":
 		cID := extractChatID(i.LiveStreamingDetails)
 		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
-		return status.Upcoming, cID, sa, err
+		if err != nil {
+			return status.Upcoming, cID, sa, fmt.Errorf("failed to extract ScheduledAtUnix for upcoming video: %w", err)
+		}
+		return status.Upcoming, cID, sa, nil
 	case "none", "completed":
 		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
-		return status.Archived, "", sa, err
+		if err != nil {
+			return status.Archived, "", 0, fmt.Errorf("failed to extract ScheduledAtUnix for archived video: %w", err)
+		}
+		return status.Archived, "", sa, nil
 	default:
 		return status.Undefined, "", 0, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
 	}
