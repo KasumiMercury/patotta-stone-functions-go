@@ -69,32 +69,32 @@ func extractVideoItem(i *youtube.Video) (*api.VideoDetail, error) {
 		return nil, fmt.Errorf("failed to extract video status for sourceID: %s: %w", i.Id, err)
 	}
 
-	return api.NewVideoDetail(i.Id, cID, sts, paTime.Unix(), sa)
+	return api.NewVideoDetail(i.Id, cID, sts, paTime.Unix(), sa.Unix())
 }
 
-func extractVideoStatus(i youtube.Video) (status.Status, string, int64, error) {
+func extractVideoStatus(i youtube.Video) (status.Status, string, synchro.Time[tz.AsiaTokyo], error) {
 	switch i.Snippet.LiveBroadcastContent {
 	case "live":
-		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
-			return status.Live, "", 0, fmt.Errorf("failed to extract ScheduledAtUnix for live video: %w", err)
+			return status.Live, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAtUnix for live video: %w", err)
 		}
 		return status.Live, "", sa, nil
 	case "upcoming":
 		cID := extractChatID(i.LiveStreamingDetails)
-		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
 			return status.Upcoming, cID, sa, fmt.Errorf("failed to extract ScheduledAtUnix for upcoming video: %w", err)
 		}
 		return status.Upcoming, cID, sa, nil
 	case "none", "completed":
-		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
-			return status.Archived, "", 0, fmt.Errorf("failed to extract ScheduledAtUnix for archived video: %w", err)
+			return status.Archived, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAtUnix for archived video: %w", err)
 		}
 		return status.Archived, "", sa, nil
 	default:
-		return status.Undefined, "", 0, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
+		return status.Undefined, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
 	}
 }
 
@@ -128,6 +128,19 @@ func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs 
 	}
 
 	return lsis, nil
+}
+
+func extractScheduledAt(details *youtube.VideoLiveStreamingDetails) (synchro.Time[tz.AsiaTokyo], error) {
+	if details == nil {
+		return synchro.Time[tz.AsiaTokyo]{}, nil
+	}
+
+	sa, err := synchro.ParseISO[tz.AsiaTokyo](details.ScheduledStartTime)
+	if err != nil {
+		return synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to parse scheduledStartTime: %w", err)
+	}
+
+	return sa, nil
 }
 
 func extractScheduledAtUnix(details *youtube.VideoLiveStreamingDetails) (int64, error) {
