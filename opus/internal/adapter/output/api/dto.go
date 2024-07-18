@@ -15,3 +15,8 @@ type DetailResponse struct {
 	ScheduledAt synchro.Time[tz.AsiaTokyo]
 	ChatId      string
 }
+
+type ScheduleResponse struct {
+	Id          string
+	ScheduledAt synchro.Time[tz.AsiaTokyo]
+}
