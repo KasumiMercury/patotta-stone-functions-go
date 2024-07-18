@@ -32,7 +32,7 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 		return nil, err
 	}
 
-	vds := make([]api.VideoDetail, 0, len(resp.Items))
+	vds := make([]DetailResponse, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
 		vd, err := extractVideoItem(i)
@@ -50,16 +50,15 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 		}
 		vds = append(vds, *vd)
 	}
-	// TODO: return DetailResponse
 	return nil, nil
 }
 
-func extractVideoItem(i *youtube.Video) (*api.VideoDetail, error) {
+func extractVideoItem(i *youtube.Video) (*DetailResponse, error) {
 	if i.Snippet == nil {
 		return nil, fmt.Errorf("snippet is not found for sourceID: %s", i.Id)
 	}
 
-	paTime, err := synchro.ParseISO[tz.AsiaTokyo](i.Snippet.PublishedAt)
+	pa, err := synchro.ParseISO[tz.AsiaTokyo](i.Snippet.PublishedAt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse 'publishedAt' for video ID: %s: %w", i.Id, err)
 	}
@@ -69,7 +68,15 @@ func extractVideoItem(i *youtube.Video) (*api.VideoDetail, error) {
 		return nil, fmt.Errorf("failed to extract video status for sourceID: %s: %w", i.Id, err)
 	}
 
-	return api.NewVideoDetail(i.Id, cID, sts, paTime.Unix(), sa.Unix())
+	return &DetailResponse{
+		Id:          i.Id,
+		Title:       i.Snippet.Title,
+		Description: i.Snippet.Description,
+		Status:      sts,
+		PublishedAt: pa,
+		ScheduledAt: sa,
+		ChatId:      cID,
+	}, nil
 }
 
 func extractVideoStatus(i youtube.Video) (status.Status, string, synchro.Time[tz.AsiaTokyo], error) {
