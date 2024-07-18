@@ -26,7 +26,7 @@ func NewYouTubeVideo(clt output.Client) (*YouTubeVideo, error) {
 	return &YouTubeVideo{clt: clt}, nil
 }
 
-func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]api.VideoDetail, error) {
+func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]DetailResponse, error) {
 	resp, err := c.clt.VideoList(ctx, []string{PartSnippet, PartContentDetails, PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,8 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 		}
 		vds = append(vds, *vd)
 	}
-	return vds, nil
+	// TODO: return DetailResponse
+	return nil, nil
 }
 
 func extractVideoItem(i *youtube.Video) (*api.VideoDetail, error) {
