@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 	"google.golang.org/api/youtube/v3"
@@ -119,23 +118,22 @@ func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs 
 		return nil, err
 	}
 
-	lsis := make([]api.LiveScheduleInfo, 0, len(resp.Items))
+	res := make([]ScheduleResponse, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
-		lsi := api.NewLiveScheduleInfo(i.Id)
-
 		// scheduledStartTime
-		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
 			return nil, err
 		}
 
-		lsi.SetScheduledAtUnix(sa)
-		lsis = append(lsis, *lsi)
+		res = append(res, ScheduleResponse{
+			Id:          i.Id,
+			ScheduledAt: sa,
+		})
 	}
 
-	// TODO: return ScheduleResponse
-	return nil, nil
+	return res, nil
 }
 
 func extractScheduledAt(details *youtube.VideoLiveStreamingDetails) (synchro.Time[tz.AsiaTokyo], error) {
