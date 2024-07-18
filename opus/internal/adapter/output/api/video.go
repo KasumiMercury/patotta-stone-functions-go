@@ -113,7 +113,7 @@ func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
 	return details.ActiveLiveChatId
 }
 
-func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
+func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]ScheduleResponse, error) {
 	resp, err := c.clt.VideoList(ctx, []string{PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
@@ -134,7 +134,8 @@ func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs 
 		lsis = append(lsis, *lsi)
 	}
 
-	return lsis, nil
+	// TODO: return ScheduleResponse
+	return nil, nil
 }
 
 func extractScheduledAt(details *youtube.VideoLiveStreamingDetails) (synchro.Time[tz.AsiaTokyo], error) {
