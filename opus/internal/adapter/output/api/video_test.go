@@ -7,7 +7,7 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/api/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output/mocks"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
-	"github.com/stretchr/testify/assert"
+	"github.com/google/go-cmp/cmp"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/api/youtube/v3"
 	"testing"
@@ -521,8 +521,14 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			// Act
 			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
+			//assert.NoError(t, err)
+			//assert.Equal(t, tt.want, got)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+			if !cmp.Equal(tt.want, got) {
+				t.Errorf("unexpected response: %v", cmp.Diff(tt.want, got))
+			}
 		})
 	}
 }
