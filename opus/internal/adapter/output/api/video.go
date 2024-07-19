@@ -50,7 +50,7 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 		}
 		vds = append(vds, *vd)
 	}
-	return nil, nil
+	return vds, nil
 }
 
 func extractVideoItem(i *youtube.Video) (*dto.DetailResponse, error) {
