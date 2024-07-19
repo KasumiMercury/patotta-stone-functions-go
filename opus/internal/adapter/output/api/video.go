@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/api/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 	"google.golang.org/api/youtube/v3"
@@ -25,13 +26,13 @@ func NewYouTubeVideo(clt output.Client) (*YouTubeVideo, error) {
 	return &YouTubeVideo{clt: clt}, nil
 }
 
-func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]DetailResponse, error) {
+func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]dto.DetailResponse, error) {
 	resp, err := c.clt.VideoList(ctx, []string{PartSnippet, PartContentDetails, PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	vds := make([]DetailResponse, 0, len(resp.Items))
+	vds := make([]dto.DetailResponse, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
 		vd, err := extractVideoItem(i)
@@ -52,7 +53,7 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 	return nil, nil
 }
 
-func extractVideoItem(i *youtube.Video) (*DetailResponse, error) {
+func extractVideoItem(i *youtube.Video) (*dto.DetailResponse, error) {
 	if i.Snippet == nil {
 		return nil, fmt.Errorf("snippet is not found for sourceID: %s", i.Id)
 	}
@@ -67,7 +68,7 @@ func extractVideoItem(i *youtube.Video) (*DetailResponse, error) {
 		return nil, fmt.Errorf("failed to extract video status for sourceID: %s: %w", i.Id, err)
 	}
 
-	return &DetailResponse{
+	return &dto.DetailResponse{
 		Id:          i.Id,
 		Title:       i.Snippet.Title,
 		Description: i.Snippet.Description,
@@ -112,13 +113,13 @@ func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
 	return details.ActiveLiveChatId
 }
 
-func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]ScheduleResponse, error) {
+func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]dto.ScheduleResponse, error) {
 	resp, err := c.clt.VideoList(ctx, []string{PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]ScheduleResponse, 0, len(resp.Items))
+	res := make([]dto.ScheduleResponse, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
 		// scheduledStartTime
@@ -127,7 +128,7 @@ func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs 
 			return nil, err
 		}
 
-		res = append(res, ScheduleResponse{
+		res = append(res, dto.ScheduleResponse{
 			Id:          i.Id,
 			ScheduledAt: sa,
 		})
