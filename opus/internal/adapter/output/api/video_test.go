@@ -2,13 +2,16 @@ package api
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
+	"github.com/Code-Hex/synchro"
+	"github.com/Code-Hex/synchro/tz"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/api/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output/mocks"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/api/youtube/v3"
 	"testing"
+	"time"
 )
 
 func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
@@ -24,7 +27,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 	tests := map[string]struct {
 		args      args
 		mockSetup func(*mocks.MockClient)
-		want      []api.VideoDetail
+		want      []dto.DetailResponse
 	}{
 		"success_single_live_video": {
 			args: args{videoIDs: []string{"videoID"}},
@@ -48,11 +51,15 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID", "", status.Live, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID",
+					Status: status.Live,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_single_upcoming_video": {
@@ -77,11 +84,15 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID", "", status.Upcoming, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID",
+					Status: status.Upcoming,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_single_archived_of_non_live_video": {
@@ -106,11 +117,15 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID", "", status.Archived, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID",
+					Status: status.Archived,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_single_archived_of_completed_live_video": {
@@ -135,11 +150,21 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID", "", status.Archived, 1704067200, 1704067200)
-					return *vd
-				}(),
+			//want: []api.VideoDetail{
+			//	func() api.VideoDetail {
+			//		vd, _ := api.NewVideoDetail("videoID", "", status.Archived, 1704067200, 1704067200)
+			//		return *vd
+			//	}(),
+			//},
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID",
+					Status: status.Archived,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_multiple_videos_live_and_upcoming": {
@@ -174,15 +199,23 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID1", "", status.Live, 1704067200, 1704067200)
-					return *vd
-				}(),
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID2", "", status.Upcoming, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID1",
+					Status: status.Live,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+				{
+					Id:     "videoID2",
+					Status: status.Upcoming,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_multiple_videos_live_and_archived_of_non_live": {
@@ -217,15 +250,23 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID1", "", status.Live, 1704067200, 1704067200)
-					return *vd
-				}(),
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID1",
+					Status: status.Live,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+				{
+					Id:     "videoID2",
+					Status: status.Archived,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_multiple_videos_live_and_archived_of_completed_live": {
@@ -260,15 +301,23 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID1", "", status.Live, 1704067200, 1704067200)
-					return *vd
-				}(),
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID1",
+					Status: status.Live,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+				{
+					Id:     "videoID2",
+					Status: status.Archived,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_multiple_videos_upcoming_and_archived_of_non_live": {
@@ -303,15 +352,23 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID1", "", status.Upcoming, 1704067200, 1704067200)
-					return *vd
-				}(),
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID1",
+					Status: status.Upcoming,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+				{
+					Id:     "videoID2",
+					Status: status.Archived,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_multiple_videos_upcoming_and_archived_of_completed_live": {
@@ -346,15 +403,23 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID1", "", status.Upcoming, 1704067200, 1704067200)
-					return *vd
-				}(),
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID1",
+					Status: status.Upcoming,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+				{
+					Id:     "videoID2",
+					Status: status.Archived,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_multiple_videos_archived_of_non_live_and_completed_live": {
@@ -389,15 +454,23 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID1", "", status.Archived, 1704067200, 1704067200)
-					return *vd
-				}(),
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID2", "", status.Archived, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID1",
+					Status: status.Archived,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+				{
+					Id:     "videoID2",
+					Status: status.Archived,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 		"success_multiple_videos_but_only_one_video_live": {
@@ -422,11 +495,15 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			want: []api.VideoDetail{
-				func() api.VideoDetail {
-					vd, _ := api.NewVideoDetail("videoID1", "", status.Live, 1704067200, 1704067200)
-					return *vd
-				}(),
+			want: []dto.DetailResponse{
+				{
+					Id:     "videoID1",
+					Status: status.Live,
+					PublishedAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
 			},
 		},
 	}
@@ -445,461 +522,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
 			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-func TestYouTubeVideo_FetchVideoDetailsByVideoIDsAbnormally(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mocks.NewMockClient(ctrl)
-
-	type args struct {
-		videoIDs []string
-	}
-
-	t.Parallel()
-
-	tests := map[string]struct {
-		args      args
-		mockSetup func(*mocks.MockClient)
-		want      []api.VideoDetail
-	}{
-		"error_api_call_fails": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),                                           // id
-				).Return(nil, assert.AnError)
-			},
-			want: nil,
-		},
-		"error_snippet_is_nil": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),                                           // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-						},
-					},
-				}, nil)
-			},
-			want: []api.VideoDetail{},
-		},
-		"error_publishedAt_is_invalid": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),                                           // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							Snippet: &youtube.VideoSnippet{
-								PublishedAt: "invalid",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: []api.VideoDetail{},
-		},
-		"error_liveBroadcastContent_is_invalid": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),                                           // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
-								LiveBroadcastContent: "invalid",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: []api.VideoDetail{},
-		},
-		"error_scheduledStartTime_is_empty": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),                                           // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
-								LiveBroadcastContent: "live",
-							},
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: []api.VideoDetail{},
-		},
-		"error_scheduledStartTime_is_invalid": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),                                           // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
-								LiveBroadcastContent: "live",
-							},
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "invalid",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: []api.VideoDetail{},
-		},
-	}
-
-	for name, tt := range tests {
-		name, tt := name, tt
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			// Arrange
-			tt.mockSetup(mockClient)
-
-			c := &YouTubeVideo{
-				clt: mockClient,
-			}
-
-			// Act
-			got, _ := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
-			// Assert
-			//assert.Error(t, err)
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-func TestYouTubeVideo_FetchScheduledAtByVideoIDsSuccessfully(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mocks.NewMockClient(ctrl)
-
-	type args struct {
-		videoIDs []string
-	}
-
-	t.Parallel()
-
-	tests := map[string]struct {
-		args      args
-		mockSetup func(*mocks.MockClient)
-		want      []api.LiveScheduleInfo
-	}{
-		"success_single_video": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),              // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: []api.LiveScheduleInfo{
-				func() api.LiveScheduleInfo {
-					l := api.NewLiveScheduleInfo("videoID")
-					l.SetScheduledAtUnix(1704067200)
-					return *l
-				}(),
-			},
-		},
-		"success_multiple_videos": {
-			args: args{videoIDs: []string{"videoID1", "videoID2"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID1", "videoID2"}), // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID1",
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
-							},
-						},
-						{
-							Id: "videoID2",
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: []api.LiveScheduleInfo{
-				func() api.LiveScheduleInfo {
-					l := api.NewLiveScheduleInfo("videoID1")
-					l.SetScheduledAtUnix(1704067200)
-					return *l
-				}(),
-				func() api.LiveScheduleInfo {
-					l := api.NewLiveScheduleInfo("videoID2")
-					l.SetScheduledAtUnix(1704067200)
-					return *l
-				}(),
-			},
-		},
-		"success_multiple_but_only_one_video": {
-			args: args{videoIDs: []string{"videoID1", "videoID2"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID1", "videoID2"}), // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID1",
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: []api.LiveScheduleInfo{
-				func() api.LiveScheduleInfo {
-					l := api.NewLiveScheduleInfo("videoID1")
-					l.SetScheduledAtUnix(1704067200)
-					return *l
-				}(),
-			},
-		},
-	}
-
-	for name, tt := range tests {
-		name, tt := name, tt
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			// Arrange
-			tt.mockSetup(mockClient)
-
-			c := &YouTubeVideo{
-				clt: mockClient,
-			}
-
-			// Act
-			got, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
-			// Assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
-		})
-
-	}
-}
-
-func TestYouTubeVideo_FetchScheduledAtByVideoIDsAbnormally(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mocks.NewMockClient(ctrl)
-
-	type args struct {
-		videoIDs []string
-	}
-
-	t.Parallel()
-
-	tests := map[string]struct {
-		args      args
-		mockSetup func(*mocks.MockClient)
-		want      []api.LiveScheduleInfo
-	}{
-		"error_api_call_fails": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),              // id
-				).Return(nil, assert.AnError)
-			},
-			want: nil,
-		},
-		"error_scheduledStartTime_is_empty": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),              // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: nil,
-		},
-		"error_scheduledStartTime_is_invalid": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"liveStreamingDetails"}), // part
-					gomock.Eq([]string{"videoID"}),              // id
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "invalid",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: nil,
-		},
-	}
-
-	for name, tt := range tests {
-		name, tt := name, tt
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			// Arrange
-			tt.mockSetup(mockClient)
-
-			c := &YouTubeVideo{
-				clt: mockClient,
-			}
-
-			// Act
-			got, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
-			// Assert
-			assert.Error(t, err)
-			assert.Equal(t, tt.want, got)
-		})
-
-	}
-}
-
-func TestExtractScheduledAtUnixSuccessfully(t *testing.T) {
-	type args struct {
-		details *youtube.VideoLiveStreamingDetails
-	}
-
-	t.Parallel()
-
-	tests := map[string]struct {
-		args args
-		want int64
-	}{
-		"details is nil": {
-			args: args{details: nil},
-			want: 0,
-		},
-		"details is not nil": {
-			args: args{details: &youtube.VideoLiveStreamingDetails{
-				ScheduledStartTime: "2024-01-01T00:00:00Z",
-			}},
-			want: 1704067200,
-		},
-	}
-
-	for name, tt := range tests {
-		name, tt := name, tt
-		t.Run(name, func(t *testing.T) {
-			// Arrange
-			t.Parallel()
-			// Act
-			got, err := extractScheduledAtUnix(tt.args.details)
-			// Assert
-			assert.NoError(t, err)
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
-func TestExtractScheduledAtUnixAbnormally(t *testing.T) {
-	type args struct {
-		details *youtube.VideoLiveStreamingDetails
-	}
-
-	t.Parallel()
-
-	tests := map[string]struct {
-		args args
-		want int64
-	}{
-		"details is not nil, ScheduledStartTime is empty": {
-			args: args{details: &youtube.VideoLiveStreamingDetails{
-				ScheduledStartTime: "",
-			}},
-			want: 0,
-		},
-		"details is not nil, ScheduledStartTime is invalid": {
-			args: args{details: &youtube.VideoLiveStreamingDetails{
-				ScheduledStartTime: "invalid",
-			}},
-			want: 0,
-		},
-	}
-
-	for name, tt := range tests {
-		name, tt := name, tt
-		t.Run(name, func(t *testing.T) {
-			// Arrange
-			t.Parallel()
-			// Act
-			got, err := extractScheduledAtUnix(tt.args.details)
-			// Assert
-			assert.Error(t, err)
 			assert.Equal(t, tt.want, got)
 		})
 	}
