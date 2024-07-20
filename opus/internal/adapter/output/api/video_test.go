@@ -575,6 +575,13 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 				},
 			},
 		},
+		"success_0_length_video_ids": {
+			args: args{videoIDs: []string{}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			want: make([]dto.DetailResponse, 0),
+		},
 		"abnormally_snippet_not_found": {
 			args: args{videoIDs: []string{"videoID"}},
 			mockSetup: func(m *mocks.MockClient) {
