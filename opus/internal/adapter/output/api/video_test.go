@@ -16,10 +16,7 @@ import (
 )
 
 func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mocks.NewMockClient(ctrl)
+	t.Parallel()
 
 	type args struct {
 		videoIDs []string
@@ -151,12 +148,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					},
 				}, nil)
 			},
-			//want: []api.VideoDetail{
-			//	func() api.VideoDetail {
-			//		vd, _ := api.NewVideoDetail("videoID", "", status.Archived, 1704067200, 1704067200)
-			//		return *vd
-			//	}(),
-			//},
 			want: []dto.DetailResponse{
 				{
 					Id:     "videoID",
@@ -180,11 +171,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 						{
 							Id: "videoID1",
 							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
+								PublishedAt:          "2024-01-02T00:00:00Z",
 								LiveBroadcastContent: "live",
 							},
 							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
+								ScheduledStartTime: "2024-01-02T00:00:00Z",
 							},
 						},
 						{
@@ -205,9 +196,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					Id:     "videoID1",
 					Status: status.Live,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
 					Id:     "videoID2",
@@ -231,11 +222,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 						{
 							Id: "videoID1",
 							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
+								PublishedAt:          "2024-01-02T00:00:00Z",
 								LiveBroadcastContent: "live",
 							},
 							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
+								ScheduledStartTime: "2024-01-02T00:00:00Z",
 							},
 						},
 						{
@@ -256,9 +247,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					Id:     "videoID1",
 					Status: status.Live,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
 					Id:     "videoID2",
@@ -282,11 +273,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 						{
 							Id: "videoID1",
 							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
+								PublishedAt:          "2024-01-02T00:00:00Z",
 								LiveBroadcastContent: "live",
 							},
 							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
+								ScheduledStartTime: "2024-01-02T00:00:00Z",
 							},
 						},
 						{
@@ -307,9 +298,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					Id:     "videoID1",
 					Status: status.Live,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
 					Id:     "videoID2",
@@ -333,11 +324,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 						{
 							Id: "videoID1",
 							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
+								PublishedAt:          "2024-01-02T00:00:00Z",
 								LiveBroadcastContent: "upcoming",
 							},
 							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
+								ScheduledStartTime: "2024-01-02T00:00:00Z",
 							},
 						},
 						{
@@ -358,9 +349,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					Id:     "videoID1",
 					Status: status.Upcoming,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
 					Id:     "videoID2",
@@ -384,11 +375,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 						{
 							Id: "videoID1",
 							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
+								PublishedAt:          "2024-01-02T00:00:00Z",
 								LiveBroadcastContent: "upcoming",
 							},
 							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
+								ScheduledStartTime: "2024-01-02T00:00:00Z",
 							},
 						},
 						{
@@ -409,9 +400,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					Id:     "videoID1",
 					Status: status.Upcoming,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
 					Id:     "videoID2",
@@ -435,11 +426,11 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 						{
 							Id: "videoID1",
 							Snippet: &youtube.VideoSnippet{
-								PublishedAt:          "2024-01-01T00:00:00Z",
+								PublishedAt:          "2024-01-02T00:00:00Z",
 								LiveBroadcastContent: "none",
 							},
 							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
-								ScheduledStartTime: "2024-01-01T00:00:00Z",
+								ScheduledStartTime: "2024-01-02T00:00:00Z",
 							},
 						},
 						{
@@ -460,9 +451,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 					Id:     "videoID1",
 					Status: status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
-						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
 					Id:     "videoID2",
@@ -634,7 +625,13 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 	for name, tt := range tests {
 		name, tt := name, tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			// Arrange
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockClient := mocks.NewMockClient(ctrl)
 			tt.mockSetup(mockClient)
 
 			c := &YouTubeVideo{
@@ -644,8 +641,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			// Act
 			got, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
-			//assert.NoError(t, err)
-			//assert.Equal(t, tt.want, got)
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -657,10 +652,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 }
 
 func TestNewYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockClient := mocks.NewMockClient(ctrl)
+	t.Parallel()
 
 	type args struct {
 		videoIDs []string
@@ -685,7 +677,13 @@ func TestNewYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
 	for name, tt := range tests {
 		name, tt := name, tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
 			// Arrange
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockClient := mocks.NewMockClient(ctrl)
 			tt.mockSetup(mockClient)
 
 			c := &YouTubeVideo{
