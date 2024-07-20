@@ -40,7 +40,6 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 	for _, i := range resp.Items {
 		vd, err := extractVideoItem(i)
 		if err != nil {
-			// TODO: improve error handling
 			slog.Error(
 				"failed to extract video item",
 				"sourceID", i.Id,
