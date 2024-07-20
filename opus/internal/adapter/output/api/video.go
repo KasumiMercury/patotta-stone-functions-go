@@ -69,7 +69,7 @@ func extractVideoItem(i *youtube.Video) (*dto.DetailResponse, error) {
 
 	sts, cID, sa, err := extractVideoStatus(*i)
 	if err != nil {
-		return nil, fmt.Errorf("failed to extract video status: %w", err)
+		return nil, err
 	}
 
 	return &dto.DetailResponse{
@@ -104,6 +104,8 @@ func extractVideoStatus(i youtube.Video) (status.Status, string, synchro.Time[tz
 			return status.Archived, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAt for archived video: %w", err)
 		}
 		return status.Archived, "", sa, nil
+	case "":
+		return status.Undefined, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("liveBroadcastContent is not found")
 	default:
 		return status.Undefined, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
 	}
