@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/api"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/api/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
 	"google.golang.org/api/youtube/v3"
@@ -26,17 +26,21 @@ func NewYouTubeVideo(clt output.Client) (*YouTubeVideo, error) {
 	return &YouTubeVideo{clt: clt}, nil
 }
 
-func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]api.VideoDetail, error) {
+func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]dto.DetailResponse, error) {
+	// TODO: when the number of videoIds is 0, return an empty slice
+	// TODO: when the number of videoIDs is more than 50, split the videoIDs into multiple requests
+
 	resp, err := c.clt.VideoList(ctx, []string{PartSnippet, PartContentDetails, PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	vds := make([]api.VideoDetail, 0, len(resp.Items))
+	vds := make([]dto.DetailResponse, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
 		vd, err := extractVideoItem(i)
 		if err != nil {
+			// TODO: improve error handling
 			slog.Error(
 				"failed to extract video item",
 				"sourceID", i.Id,
@@ -53,12 +57,12 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 	return vds, nil
 }
 
-func extractVideoItem(i *youtube.Video) (*api.VideoDetail, error) {
+func extractVideoItem(i *youtube.Video) (*dto.DetailResponse, error) {
 	if i.Snippet == nil {
 		return nil, fmt.Errorf("snippet is not found for sourceID: %s", i.Id)
 	}
 
-	paTime, err := synchro.ParseISO[tz.AsiaTokyo](i.Snippet.PublishedAt)
+	pa, err := synchro.ParseISO[tz.AsiaTokyo](i.Snippet.PublishedAt)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse 'publishedAt' for video ID: %s: %w", i.Id, err)
 	}
@@ -68,32 +72,40 @@ func extractVideoItem(i *youtube.Video) (*api.VideoDetail, error) {
 		return nil, fmt.Errorf("failed to extract video status for sourceID: %s: %w", i.Id, err)
 	}
 
-	return api.NewVideoDetail(i.Id, cID, sts, paTime.Unix(), sa)
+	return &dto.DetailResponse{
+		Id:          i.Id,
+		Title:       i.Snippet.Title,
+		Description: i.Snippet.Description,
+		Status:      sts,
+		PublishedAt: pa,
+		ScheduledAt: sa,
+		ChatId:      cID,
+	}, nil
 }
 
-func extractVideoStatus(i youtube.Video) (status.Status, string, int64, error) {
+func extractVideoStatus(i youtube.Video) (status.Status, string, synchro.Time[tz.AsiaTokyo], error) {
 	switch i.Snippet.LiveBroadcastContent {
 	case "live":
-		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
-			return status.Live, "", 0, fmt.Errorf("failed to extract ScheduledAtUnix for live video: %w", err)
+			return status.Live, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAtUnix for live video: %w", err)
 		}
 		return status.Live, "", sa, nil
 	case "upcoming":
 		cID := extractChatID(i.LiveStreamingDetails)
-		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
 			return status.Upcoming, cID, sa, fmt.Errorf("failed to extract ScheduledAtUnix for upcoming video: %w", err)
 		}
 		return status.Upcoming, cID, sa, nil
 	case "none", "completed":
-		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
-			return status.Archived, "", 0, fmt.Errorf("failed to extract ScheduledAtUnix for archived video: %w", err)
+			return status.Archived, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAtUnix for archived video: %w", err)
 		}
 		return status.Archived, "", sa, nil
 	default:
-		return status.Undefined, "", 0, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
+		return status.Undefined, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("unexpected liveBroadcastContent: %s", i.Snippet.LiveBroadcastContent)
 	}
 }
 
@@ -105,28 +117,41 @@ func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
 	return details.ActiveLiveChatId
 }
 
-func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]api.LiveScheduleInfo, error) {
+func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]dto.ScheduleResponse, error) {
 	resp, err := c.clt.VideoList(ctx, []string{PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
 	}
 
-	lsis := make([]api.LiveScheduleInfo, 0, len(resp.Items))
+	res := make([]dto.ScheduleResponse, 0, len(resp.Items))
 
 	for _, i := range resp.Items {
-		lsi := api.NewLiveScheduleInfo(i.Id)
-
 		// scheduledStartTime
-		sa, err := extractScheduledAtUnix(i.LiveStreamingDetails)
+		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
 			return nil, err
 		}
 
-		lsi.SetScheduledAtUnix(sa)
-		lsis = append(lsis, *lsi)
+		res = append(res, dto.ScheduleResponse{
+			Id:          i.Id,
+			ScheduledAt: sa,
+		})
 	}
 
-	return lsis, nil
+	return res, nil
+}
+
+func extractScheduledAt(details *youtube.VideoLiveStreamingDetails) (synchro.Time[tz.AsiaTokyo], error) {
+	if details == nil {
+		return synchro.Time[tz.AsiaTokyo]{}, nil
+	}
+
+	sa, err := synchro.ParseISO[tz.AsiaTokyo](details.ScheduledStartTime)
+	if err != nil {
+		return synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to parse scheduledStartTime: %w", err)
+	}
+
+	return sa, nil
 }
 
 func extractScheduledAtUnix(details *youtube.VideoLiveStreamingDetails) (int64, error) {

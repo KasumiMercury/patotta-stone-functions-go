@@ -80,23 +80,23 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 	videos := make([]video.Video, 0, len(vdList))
 
 	for _, vd := range vdList {
-		r, ok := rssMap[vd.SourceID()]
+		r, ok := rssMap[vd.Id]
 		if !ok {
 			slog.Warn(
 				"Video  not found in RSS",
-				"sourceID", vd.SourceID(),
+				"sourceID", vd.Id,
 			)
 			continue
 		}
 
 		// merge video info and rss info
-		m := video.NewVideoBuilder(vd.SourceID()).
+		m := video.NewVideoBuilder(vd.Id).
 			SetChannelID(r.ChannelID()).
 			SetTitle(r.Title()).
 			SetDescription(r.Description()).
-			SetChatID(vd.ChatID()).
-			SetPublishedAtUnix(vd.PublishedAtUnix()).
-			SetScheduledAtUnix(vd.ScheduledAtUnix()).
+			SetChatID(vd.ChatId).
+			SetPublishedAtUnix(vd.PublishedAt.Unix()).
+			SetScheduledAtUnix(vd.ScheduledAt.Unix()).
 			SetUpdatedAtUnix(r.UpdatedAtUnix()).
 			Build()
 
