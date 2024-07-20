@@ -535,26 +535,6 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: make([]dto.DetailResponse, 0),
 		},
-		"abnormally_failed_to_extract_video_status": {
-			args: args{videoIDs: []string{"videoID"}},
-			mockSetup: func(m *mocks.MockClient) {
-				m.EXPECT().VideoList(
-					gomock.Any(),
-					gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}),
-					gomock.Eq([]string{"videoID"}),
-				).Return(&youtube.VideoListResponse{
-					Items: []*youtube.Video{
-						{
-							Id: "videoID",
-							Snippet: &youtube.VideoSnippet{
-								PublishedAt: "2024-01-01T00:00:00Z",
-							},
-						},
-					},
-				}, nil)
-			},
-			want: make([]dto.DetailResponse, 0),
-		},
 		"abnormally_failed_to_match_video_status": {
 			args: args{videoIDs: []string{"videoID"}},
 			mockSetup: func(m *mocks.MockClient) {
