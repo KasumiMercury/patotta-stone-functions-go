@@ -18,6 +18,8 @@ const (
 	PartLiveStreamingDetails = "liveStreamingDetails"
 )
 
+const MaxVideoIDs = 50
+
 type YouTubeVideo struct {
 	clt output.Client
 }
@@ -27,12 +29,13 @@ func NewYouTubeVideo(clt output.Client) (*YouTubeVideo, error) {
 }
 
 func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]dto.DetailResponse, error) {
-	// TODO: when the number of videoIds is 0, return an empty slice
 	if len(videoIDs) == 0 {
 		return []dto.DetailResponse{}, nil
 	}
 
-	// TODO: when the number of videoIDs is more than 50, split the videoIDs into multiple requests
+	if len(videoIDs) > MaxVideoIDs {
+		return nil, fmt.Errorf("the number of videoIDs is more than %d", MaxVideoIDs)
+	}
 
 	resp, err := c.clt.VideoList(ctx, []string{PartSnippet, PartContentDetails, PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
