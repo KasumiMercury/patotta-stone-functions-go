@@ -736,6 +736,12 @@ func TestNewYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
 				).Return(nil, assert.AnError)
 			},
 		},
+		"error_too_many_video_ids": {
+			args: args{videoIDs: make([]string, 51)},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+		},
 	}
 
 	for name, tt := range tests {
