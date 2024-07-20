@@ -129,7 +129,14 @@ func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs 
 		// scheduledStartTime
 		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
-			return nil, err
+			slog.Error(
+				"failed to extract scheduledStartTime",
+				"sourceID", i.Id,
+				"error", err,
+			)
+
+			// if any error occurs, skip the item
+			continue
 		}
 
 		res = append(res, dto.ScheduleResponse{
