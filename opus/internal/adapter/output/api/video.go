@@ -148,7 +148,7 @@ func extractScheduledAt(details *youtube.VideoLiveStreamingDetails) (synchro.Tim
 
 	sa, err := synchro.ParseISO[tz.AsiaTokyo](details.ScheduledStartTime)
 	if err != nil {
-		return synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to parse scheduledStartTime: %w", err)
+		return synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to parse scheduledStartTime: %s, %w", details.ScheduledStartTime, err)
 	}
 
 	return sa, nil
