@@ -64,12 +64,12 @@ func extractVideoItem(i *youtube.Video) (*dto.DetailResponse, error) {
 
 	pa, err := synchro.ParseISO[tz.AsiaTokyo](i.Snippet.PublishedAt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse 'publishedAt' for video ID: %s: %w", i.Id, err)
+		return nil, fmt.Errorf("failed to parse publishedAt: %s, %w", i.Snippet.PublishedAt, err)
 	}
 
 	sts, cID, sa, err := extractVideoStatus(*i)
 	if err != nil {
-		return nil, fmt.Errorf("failed to extract video status for sourceID: %s: %w", i.Id, err)
+		return nil, fmt.Errorf("failed to extract video status: %w", err)
 	}
 
 	return &dto.DetailResponse{
