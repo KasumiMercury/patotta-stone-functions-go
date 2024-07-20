@@ -27,6 +27,9 @@ func NewYouTubeVideo(clt output.Client) (*YouTubeVideo, error) {
 }
 
 func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]dto.DetailResponse, error) {
+	// TODO: when the number of videoIds is 0, return an empty slice
+	// TODO: when the number of videoIDs is more than 50, split the videoIDs into multiple requests
+
 	resp, err := c.clt.VideoList(ctx, []string{PartSnippet, PartContentDetails, PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
@@ -37,6 +40,7 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 	for _, i := range resp.Items {
 		vd, err := extractVideoItem(i)
 		if err != nil {
+			// TODO: improve error handling
 			slog.Error(
 				"failed to extract video item",
 				"sourceID", i.Id,
