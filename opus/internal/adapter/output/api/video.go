@@ -88,20 +88,20 @@ func extractVideoStatus(i youtube.Video) (status.Status, string, synchro.Time[tz
 	case "live":
 		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
-			return status.Live, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAtUnix for live video: %w", err)
+			return status.Live, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAt for live video: %w", err)
 		}
 		return status.Live, "", sa, nil
 	case "upcoming":
 		cID := extractChatID(i.LiveStreamingDetails)
 		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
-			return status.Upcoming, cID, sa, fmt.Errorf("failed to extract ScheduledAtUnix for upcoming video: %w", err)
+			return status.Upcoming, cID, sa, fmt.Errorf("failed to extract ScheduledAt for upcoming video: %w", err)
 		}
 		return status.Upcoming, cID, sa, nil
 	case "none", "completed":
 		sa, err := extractScheduledAt(i.LiveStreamingDetails)
 		if err != nil {
-			return status.Archived, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAtUnix for archived video: %w", err)
+			return status.Archived, "", synchro.Time[tz.AsiaTokyo]{}, fmt.Errorf("failed to extract ScheduledAt for archived video: %w", err)
 		}
 		return status.Archived, "", sa, nil
 	default:
