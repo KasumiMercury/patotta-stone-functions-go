@@ -176,20 +176,3 @@ func extractScheduledAt(details *youtube.VideoLiveStreamingDetails) (synchro.Tim
 
 	return sa, nil
 }
-
-func extractScheduledAtUnix(details *youtube.VideoLiveStreamingDetails) (int64, error) {
-	if details == nil {
-		return 0, nil
-	}
-
-	if details.ScheduledStartTime == "" {
-		return 0, fmt.Errorf("scheduledStartTime is not found")
-	}
-
-	sa, err := synchro.ParseISO[tz.AsiaTokyo](details.ScheduledStartTime)
-	if err != nil {
-		return 0, fmt.Errorf("failed to parse scheduledStartTime: %w", err)
-	}
-
-	return sa.Unix(), nil
-}
