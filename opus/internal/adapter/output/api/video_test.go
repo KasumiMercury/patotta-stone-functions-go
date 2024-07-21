@@ -582,6 +582,53 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: make([]dto.DetailResponse, 0),
 		},
+		"success_long_length_video_ids": {
+			args: args{
+				videoIDs: make([]string, 130),
+			},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().
+					VideoList(gomock.Any(), gomock.Eq([]string{"snippet", "contentDetails", "liveStreamingDetails"}), gomock.Any()).
+					Times(3).
+					DoAndReturn(func(_ context.Context, part []string, ids []string) (*youtube.VideoListResponse, error) {
+						if len(ids) > 50 {
+							return nil, assert.AnError
+						}
+
+						items := make([]*youtube.Video, 0, len(ids))
+						for i := 0; i < len(ids); i++ {
+							items = append(items, &youtube.Video{
+								Id: "videoID",
+								Snippet: &youtube.VideoSnippet{
+									PublishedAt:          "2024-01-01T00:00:00Z",
+									LiveBroadcastContent: "completed",
+								},
+								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+									ScheduledStartTime: "2024-01-01T00:00:00Z",
+								},
+							})
+						}
+
+						return &youtube.VideoListResponse{
+							Items: items,
+						}, nil
+					})
+			},
+			want: func() []dto.DetailResponse {
+				var res []dto.DetailResponse
+				for i := 0; i < 130; i++ {
+					res = append(res, dto.DetailResponse{
+						Id:     "videoID",
+						Status: status.Archived,
+						PublishedAt: synchro.In[tz.AsiaTokyo](
+							time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						ScheduledAt: synchro.In[tz.AsiaTokyo](
+							time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					})
+				}
+				return res
+			}(),
+		},
 		"abnormally_snippet_not_found": {
 			args: args{videoIDs: []string{"videoID"}},
 			mockSetup: func(m *mocks.MockClient) {
