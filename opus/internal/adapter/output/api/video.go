@@ -33,33 +33,41 @@ func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs
 		return []dto.DetailResponse{}, nil
 	}
 
-	if len(videoIDs) > MaxVideoIDs {
-		return nil, fmt.Errorf("the number of videoIDs is more than %d", MaxVideoIDs)
-	}
-
-	resp, err := c.clt.VideoList(ctx, []string{PartSnippet, PartContentDetails, PartLiveStreamingDetails}, videoIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	vds := make([]dto.DetailResponse, 0, len(resp.Items))
-
-	for _, i := range resp.Items {
-		vd, err := extractVideoItem(i)
-		if err != nil {
-			slog.Error(
-				"failed to extract video item",
-				"sourceID", i.Id,
-				"error", err,
-			)
-
-			// if any error occurs, skip the item
-			// and continue to the next item
-			// because the error is not fatal
-			continue
+	idsSlice := make([][]string, 0, len(videoIDs)/MaxVideoIDs+1)
+	for i := 0; i < len(videoIDs); i += MaxVideoIDs {
+		end := i + MaxVideoIDs
+		if end > len(videoIDs) {
+			end = len(videoIDs)
 		}
-		vds = append(vds, *vd)
+		idsSlice = append(idsSlice, videoIDs[i:end])
 	}
+
+	vds := make([]dto.DetailResponse, 0, len(videoIDs))
+
+	for _, ids := range idsSlice {
+		resp, err := c.clt.VideoList(ctx, []string{PartSnippet, PartContentDetails, PartLiveStreamingDetails}, ids)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, i := range resp.Items {
+			vd, err := extractVideoItem(i)
+			if err != nil {
+				slog.Error(
+					"failed to extract video item",
+					"sourceID", i.Id,
+					"error", err,
+				)
+
+				// if any error occurs, skip the item
+				// and continue to the next item
+				// because the error is not fatal
+				continue
+			}
+			vds = append(vds, *vd)
+		}
+	}
+
 	return vds, nil
 }
 
