@@ -2,7 +2,9 @@ package rss
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
+	"github.com/Code-Hex/synchro"
+	"github.com/Code-Hex/synchro/tz"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/rss/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/mmcdole/gofeed"
 )
@@ -15,13 +17,13 @@ func NewRssClient(p output.ParserRepository) *Client {
 	return &Client{parser: p}
 }
 
-func (c *Client) FetchRssItems(ctx context.Context, url string, limitUnix int64) ([]rss.Item, error) {
+func (c *Client) FetchRssItems(ctx context.Context, url string, limitUnix int64) ([]dto.Item, error) {
 	feed, err := c.parser.ParseURLWithContext(url, ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	items := make([]rss.Item, 0, len(feed.Items))
+	items := make([]dto.Item, 0, len(feed.Items))
 	for _, i := range feed.Items {
 		// if updated is less than or equal to limitUnix, skip
 		ut := i.UpdatedParsed.Unix()
@@ -29,15 +31,14 @@ func (c *Client) FetchRssItems(ctx context.Context, url string, limitUnix int64)
 			continue
 		}
 
-		item := rss.NewRssItem(
-			i.Extensions["yt"]["channelId"][0].Value,
-			i.Extensions["yt"]["videoId"][0].Value,
-			i.Title,
-			extractDescriptionFromRssItem(i),
-			i.PublishedParsed.Unix(),
-			ut,
-		)
-		items = append(items, *item)
+		items = append(items, dto.Item{
+			ChannelID:   i.Extensions["yt"]["channelId"][0].Value,
+			SourceID:    i.Extensions["yt"]["videoId"][0].Value,
+			Title:       i.Title,
+			Description: extractDescriptionFromRssItem(i),
+			PublishedAt: synchro.In[tz.AsiaTokyo](*i.PublishedParsed),
+			UpdatedAt:   synchro.In[tz.AsiaTokyo](*i.UpdatedParsed),
+		})
 	}
 
 	return items, nil

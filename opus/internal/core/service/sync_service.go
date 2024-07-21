@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/rss"
+	rssDto "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/rss/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/config"
@@ -37,7 +37,7 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 	}
 
 	// Get updated videos from RSS
-	rssItemList := make([]rss.Item, 0, 5)
+	rssItemList := make([]rssDto.Item, 0, 5)
 	for _, c := range s.config.ChannelIDs() {
 		// generate rss url
 		url := ytRssURL + c
@@ -52,7 +52,7 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 	// Extract source IDs from updated rssItemList
 	sidList := make([]string, 0, len(rssItemList))
 	for _, r := range rssItemList {
-		sidList = append(sidList, r.SourceID())
+		sidList = append(sidList, r.SourceID)
 	}
 
 	// Get video details of updated videos from YouTube Data API
@@ -71,9 +71,9 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 	}
 
 	// make an item map from rssItemList
-	rssMap := make(map[string]rss.Item, len(rssItemList))
+	rssMap := make(map[string]rssDto.Item, len(rssItemList))
 	for _, r := range rssItemList {
-		rssMap[r.SourceID()] = r
+		rssMap[r.SourceID] = r
 	}
 
 	// Update the video details in the database(RealtimeDB)
@@ -91,13 +91,13 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 
 		// merge video info and rss info
 		m := video.NewVideoBuilder(vd.Id).
-			SetChannelID(r.ChannelID()).
-			SetTitle(r.Title()).
-			SetDescription(r.Description()).
+			SetChannelID(r.ChannelID).
+			SetTitle(r.Title).
+			SetDescription(r.Description).
 			SetChatID(vd.ChatId).
 			SetPublishedAtUnix(vd.PublishedAt.Unix()).
 			SetScheduledAtUnix(vd.ScheduledAt.Unix()).
-			SetUpdatedAtUnix(r.UpdatedAtUnix()).
+			SetUpdatedAtUnix(r.UpdatedAt.Unix()).
 			Build()
 
 		videos = append(videos, *m)
