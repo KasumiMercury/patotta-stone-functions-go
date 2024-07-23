@@ -762,7 +762,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 	}
 }
 
-func TestNewYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
+func TestYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -805,6 +805,82 @@ func TestNewYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
 			_, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
 			assert.Error(t, err)
+		})
+	}
+}
+
+func TestYouTubeVideo_FetchScheduledAtByVideoIDsSuccessfully(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		videoIDs []string
+	}
+
+	tests := map[string]struct {
+		args      args
+		mockSetup func(*mocks.MockClient)
+		want      []dto.ScheduleResponse
+	}{
+		"success_single_live_video": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().
+					VideoList(
+						gomock.Any(),
+						gomock.Eq([]string{"liveStreamingDetails"}), // part
+						gomock.Eq([]string{"videoID"}),              // id
+					).
+					Times(1).
+					Do(func(_ context.Context, part []string, ids []string) {
+						assert.Equal(t, []string{"liveStreamingDetails"}, part)
+						assert.Equal(t, []string{"videoID"}, ids)
+					}).
+					Return(&youtube.VideoListResponse{
+						Items: []*youtube.Video{
+							{
+								Id: "videoID",
+								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+									ScheduledStartTime: "2024-01-01T00:00:00Z",
+								},
+							},
+						},
+					}, nil)
+			},
+			want: []dto.ScheduleResponse{
+				{
+					Id: "videoID",
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+			},
+		},
+	}
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			// Arrange
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockClient := mocks.NewMockClient(ctrl)
+			tt.mockSetup(mockClient)
+
+			c := &YouTubeVideo{
+				clt: mockClient,
+			}
+
+			// Act
+			got, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
+			// Assert
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+			if !cmp.Equal(tt.want, got) {
+				t.Errorf("unexpected response: %v", cmp.Diff(tt.want, got))
+			}
 		})
 	}
 }
