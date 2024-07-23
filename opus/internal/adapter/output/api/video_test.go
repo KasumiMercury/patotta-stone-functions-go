@@ -883,6 +883,53 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDsSuccessfully(t *testing.T) {
 				},
 			},
 		},
+		"success_0_length_video_ids": {
+			args: args{videoIDs: []string{}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			want: make([]dto.ScheduleResponse, 0),
+		},
+		"success_long_length_video_ids": {
+			args: args{
+				videoIDs: make([]string, 130),
+			},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().
+					VideoList(gomock.Any(), gomock.Eq([]string{"liveStreamingDetails"}), gomock.Any()).
+					Times(3).
+					DoAndReturn(func(_ context.Context, part []string, ids []string) (*youtube.VideoListResponse, error) {
+						if len(ids) > 50 {
+							return nil, assert.AnError
+						}
+
+						items := make([]*youtube.Video, 0, len(ids))
+						for i := 0; i < len(ids); i++ {
+							items = append(items, &youtube.Video{
+								Id: "videoID",
+								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+									ScheduledStartTime: "2024-01-01T00:00:00Z",
+								},
+							})
+						}
+
+						return &youtube.VideoListResponse{
+							Items: items,
+						}, nil
+					})
+			},
+			want: func() []dto.ScheduleResponse {
+				var res []dto.ScheduleResponse
+				for i := 0; i < 130; i++ {
+					res = append(res, dto.ScheduleResponse{
+						Id: "videoID",
+						ScheduledAt: synchro.In[tz.AsiaTokyo](
+							time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					})
+				}
+				return res
+			}(),
+		},
 	}
 
 	for name, tt := range tests {
