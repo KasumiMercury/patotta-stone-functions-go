@@ -138,34 +138,46 @@ func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs 
 		return []dto.ScheduleResponse{}, nil
 	}
 
-	resp, err := c.clt.VideoList(ctx, []string{PartLiveStreamingDetails}, videoIDs)
-	if err != nil {
-		return nil, err
+	idsSlice := make([][]string, 0, len(videoIDs)/MaxVideoIDs+1)
+	for i := 0; i < len(videoIDs); i += MaxVideoIDs {
+		end := i + MaxVideoIDs
+		if end > len(videoIDs) {
+			end = len(videoIDs)
+		}
+		idsSlice = append(idsSlice, videoIDs[i:end])
 	}
 
-	res := make([]dto.ScheduleResponse, 0, len(resp.Items))
+	vss := make([]dto.ScheduleResponse, 0, len(videoIDs))
 
-	for _, i := range resp.Items {
-		// scheduledStartTime
-		sa, err := extractScheduledAt(i.LiveStreamingDetails)
+	for _, ids := range idsSlice {
+		resp, err := c.clt.VideoList(ctx, []string{PartLiveStreamingDetails}, ids)
 		if err != nil {
-			slog.Error(
-				"failed to extract scheduledStartTime",
-				"sourceID", i.Id,
-				"error", err,
-			)
-
-			// if any error occurs, skip the item
-			continue
+			return nil, err
 		}
 
-		res = append(res, dto.ScheduleResponse{
-			Id:          i.Id,
-			ScheduledAt: sa,
-		})
+		for _, i := range resp.Items {
+			sa, err := extractScheduledAt(i.LiveStreamingDetails)
+			if err != nil {
+				slog.Error(
+					"failed to extract scheduledStartTime",
+					"sourceID", i.Id,
+					"error", err,
+				)
+
+				// if any error occurs, skip the item
+				// and continue to the next item
+				// because the error is not fatal
+				continue
+			}
+
+			vss = append(vss, dto.ScheduleResponse{
+				Id:          i.Id,
+				ScheduledAt: sa,
+			})
+		}
 	}
 
-	return res, nil
+	return vss, nil
 }
 
 func extractScheduledAt(details *youtube.VideoLiveStreamingDetails) (synchro.Time[tz.AsiaTokyo], error) {
