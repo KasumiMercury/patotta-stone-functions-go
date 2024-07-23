@@ -134,6 +134,10 @@ func extractChatID(details *youtube.VideoLiveStreamingDetails) string {
 }
 
 func (c *YouTubeVideo) FetchScheduledAtByVideoIDs(ctx context.Context, videoIDs []string) ([]dto.ScheduleResponse, error) {
+	if len(videoIDs) == 0 {
+		return []dto.ScheduleResponse{}, nil
+	}
+
 	resp, err := c.clt.VideoList(ctx, []string{PartLiveStreamingDetails}, videoIDs)
 	if err != nil {
 		return nil, err
