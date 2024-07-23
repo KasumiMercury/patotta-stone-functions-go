@@ -854,6 +854,35 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDsSuccessfully(t *testing.T) {
 				},
 			},
 		},
+		"success_non_live_video": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().
+					VideoList(
+						gomock.Any(),
+						gomock.Eq([]string{"liveStreamingDetails"}), // part
+						gomock.Eq([]string{"videoID"}),              // id
+					).
+					Times(1).
+					Do(func(_ context.Context, part []string, ids []string) {
+						assert.Equal(t, []string{"liveStreamingDetails"}, part)
+						assert.Equal(t, []string{"videoID"}, ids)
+					}).
+					Return(&youtube.VideoListResponse{
+						Items: []*youtube.Video{
+							{
+								Id: "videoID",
+							},
+						},
+					}, nil)
+			},
+			want: []dto.ScheduleResponse{
+				{
+					Id:          "videoID",
+					ScheduledAt: synchro.Time[tz.AsiaTokyo]{},
+				},
+			},
+		},
 	}
 
 	for name, tt := range tests {
