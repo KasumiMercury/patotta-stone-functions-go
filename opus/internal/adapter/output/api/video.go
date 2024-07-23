@@ -24,8 +24,8 @@ type YouTubeVideo struct {
 	clt output.Client
 }
 
-func NewYouTubeVideo(clt output.Client) (*YouTubeVideo, error) {
-	return &YouTubeVideo{clt: clt}, nil
+func NewYouTubeVideo(clt output.Client) *YouTubeVideo {
+	return &YouTubeVideo{clt: clt}
 }
 
 func (c *YouTubeVideo) FetchVideoDetailsByVideoIDs(ctx context.Context, videoIDs []string) ([]dto.DetailResponse, error) {
