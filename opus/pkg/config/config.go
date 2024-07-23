@@ -9,7 +9,7 @@ import (
 var target string
 
 type Config struct {
-	target Target
+	Target Target
 }
 
 type Target struct {
@@ -37,14 +37,14 @@ func (c *Config) loadTarget(j string) error {
 		return err
 	}
 
-	c.target = *t
+	c.Target = *t
 
 	return nil
 }
 
 func (c *Config) ChannelIDs() []string {
-	cids := make([]string, 0, len(c.target.Channel))
-	for _, c := range c.target.Channel {
+	cids := make([]string, 0, len(c.Target.Channel))
+	for _, c := range c.Target.Channel {
 		cids = append(cids, c.ChannelId)
 	}
 
