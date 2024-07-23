@@ -3,6 +3,8 @@ package config
 import (
 	_ "embed"
 	"encoding/json"
+	"github.com/joho/godotenv"
+	"os"
 )
 
 //go:embed target.json
@@ -10,6 +12,11 @@ var target string
 
 type Config struct {
 	Target Target
+	Api    Api
+}
+
+type Api struct {
+	ApiKey string
 }
 
 type Target struct {
@@ -28,6 +35,17 @@ func NewConfig() (*Config, error) {
 	}
 
 	return c, nil
+}
+
+func (c *Config) loadEnv() error {
+	err := godotenv.Load()
+	if err != nil {
+		return err
+	}
+
+	c.Api.ApiKey = os.Getenv("API_KEY")
+
+	return nil
 }
 
 func (c *Config) loadTarget(j string) error {
