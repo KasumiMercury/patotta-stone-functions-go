@@ -762,7 +762,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 	}
 }
 
-func TestNewYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
+func TestYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
@@ -803,6 +803,205 @@ func TestNewYouTubeVideo_FetchVideoDetailsByVideoIDsError(t *testing.T) {
 
 			// Act
 			_, err := c.FetchVideoDetailsByVideoIDs(context.Background(), tt.args.videoIDs)
+			// Assert
+			assert.Error(t, err)
+		})
+	}
+}
+
+func TestYouTubeVideo_FetchScheduledAtByVideoIDsSuccessfully(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		videoIDs []string
+	}
+
+	tests := map[string]struct {
+		args      args
+		mockSetup func(*mocks.MockClient)
+		want      []dto.ScheduleResponse
+	}{
+		"success_single_live_video": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().
+					VideoList(
+						gomock.Any(),
+						gomock.Eq([]string{"liveStreamingDetails"}), // part
+						gomock.Eq([]string{"videoID"}),              // id
+					).
+					Times(1).
+					Do(func(_ context.Context, part []string, ids []string) {
+						assert.Equal(t, []string{"liveStreamingDetails"}, part)
+						assert.Equal(t, []string{"videoID"}, ids)
+					}).
+					Return(&youtube.VideoListResponse{
+						Items: []*youtube.Video{
+							{
+								Id: "videoID",
+								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+									ScheduledStartTime: "2024-01-01T00:00:00Z",
+								},
+							},
+						},
+					}, nil)
+			},
+			want: []dto.ScheduleResponse{
+				{
+					Id: "videoID",
+					ScheduledAt: synchro.In[tz.AsiaTokyo](
+						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				},
+			},
+		},
+		"success_non_live_video": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().
+					VideoList(
+						gomock.Any(),
+						gomock.Eq([]string{"liveStreamingDetails"}), // part
+						gomock.Eq([]string{"videoID"}),              // id
+					).
+					Times(1).
+					Do(func(_ context.Context, part []string, ids []string) {
+						assert.Equal(t, []string{"liveStreamingDetails"}, part)
+						assert.Equal(t, []string{"videoID"}, ids)
+					}).
+					Return(&youtube.VideoListResponse{
+						Items: []*youtube.Video{
+							{
+								Id: "videoID",
+							},
+						},
+					}, nil)
+			},
+			want: []dto.ScheduleResponse{
+				{
+					Id:          "videoID",
+					ScheduledAt: synchro.Time[tz.AsiaTokyo]{},
+				},
+			},
+		},
+		"success_0_length_video_ids": {
+			args: args{videoIDs: []string{}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(gomock.Any(), gomock.Any(), gomock.Any()).Times(0)
+			},
+			want: make([]dto.ScheduleResponse, 0),
+		},
+		"success_long_length_video_ids": {
+			args: args{
+				videoIDs: make([]string, 130),
+			},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().
+					VideoList(gomock.Any(), gomock.Eq([]string{"liveStreamingDetails"}), gomock.Any()).
+					Times(3).
+					DoAndReturn(func(_ context.Context, part []string, ids []string) (*youtube.VideoListResponse, error) {
+						if len(ids) > 50 {
+							return nil, assert.AnError
+						}
+
+						items := make([]*youtube.Video, 0, len(ids))
+						for i := 0; i < len(ids); i++ {
+							items = append(items, &youtube.Video{
+								Id: "videoID",
+								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
+									ScheduledStartTime: "2024-01-01T00:00:00Z",
+								},
+							})
+						}
+
+						return &youtube.VideoListResponse{
+							Items: items,
+						}, nil
+					})
+			},
+			want: func() []dto.ScheduleResponse {
+				var res []dto.ScheduleResponse
+				for i := 0; i < 130; i++ {
+					res = append(res, dto.ScheduleResponse{
+						Id: "videoID",
+						ScheduledAt: synchro.In[tz.AsiaTokyo](
+							time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					})
+				}
+				return res
+			}(),
+		},
+	}
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			// Arrange
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockClient := mocks.NewMockClient(ctrl)
+			tt.mockSetup(mockClient)
+
+			c := &YouTubeVideo{
+				clt: mockClient,
+			}
+
+			// Act
+			got, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
+			// Assert
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+			if !cmp.Equal(tt.want, got) {
+				t.Errorf("unexpected response: %v", cmp.Diff(tt.want, got))
+			}
+		})
+	}
+}
+
+func TestYouTubeVideo_FetchScheduledAtByVideoIDsError(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		videoIDs []string
+	}
+
+	tests := map[string]struct {
+		args      args
+		mockSetup func(*mocks.MockClient)
+	}{
+		"error_api_call_failed": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"liveStreamingDetails"}),
+					gomock.Eq([]string{"videoID"}),
+				).Return(nil, assert.AnError)
+			},
+		},
+	}
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			// Arrange
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockClient := mocks.NewMockClient(ctrl)
+			tt.mockSetup(mockClient)
+
+			c := &YouTubeVideo{
+				clt: mockClient,
+			}
+
+			// Act
+			_, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
 			// Assert
 			assert.Error(t, err)
 		})
