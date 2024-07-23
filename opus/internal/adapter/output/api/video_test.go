@@ -960,3 +960,50 @@ func TestYouTubeVideo_FetchScheduledAtByVideoIDsSuccessfully(t *testing.T) {
 		})
 	}
 }
+
+func TestYouTubeVideo_FetchScheduledAtByVideoIDsError(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		videoIDs []string
+	}
+
+	tests := map[string]struct {
+		args      args
+		mockSetup func(*mocks.MockClient)
+	}{
+		"error_api_call_failed": {
+			args: args{videoIDs: []string{"videoID"}},
+			mockSetup: func(m *mocks.MockClient) {
+				m.EXPECT().VideoList(
+					gomock.Any(),
+					gomock.Eq([]string{"liveStreamingDetails"}),
+					gomock.Eq([]string{"videoID"}),
+				).Return(nil, assert.AnError)
+			},
+		},
+	}
+
+	for name, tt := range tests {
+		name, tt := name, tt
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			// Arrange
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			mockClient := mocks.NewMockClient(ctrl)
+			tt.mockSetup(mockClient)
+
+			c := &YouTubeVideo{
+				clt: mockClient,
+			}
+
+			// Act
+			_, err := c.FetchScheduledAtByVideoIDs(context.Background(), tt.args.videoIDs)
+			// Assert
+			assert.Error(t, err)
+		})
+	}
+}
