@@ -11,7 +11,7 @@ import (
 
 func TestRssClient_FetchRssItem(t *testing.T) {
 	// read test data
-	data, err := os.ReadFile("../../../..//pkg/test/videos.xml")
+	data, err := os.ReadFile("../../../../test/videos.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
