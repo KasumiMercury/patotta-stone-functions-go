@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/config"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/config"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 )

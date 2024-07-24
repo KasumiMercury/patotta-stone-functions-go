@@ -1,7 +1,7 @@
 package video
 
 import (
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
 	"time"
 )
 

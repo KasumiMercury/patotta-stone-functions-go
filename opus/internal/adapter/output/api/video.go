@@ -7,7 +7,7 @@ import (
 	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/api/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
 	"google.golang.org/api/youtube/v3"
 	"log/slog"
 )

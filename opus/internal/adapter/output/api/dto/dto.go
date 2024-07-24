@@ -3,7 +3,7 @@ package dto
 import (
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
 )
 
 type DetailResponse struct {

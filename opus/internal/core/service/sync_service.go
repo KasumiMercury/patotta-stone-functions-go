@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/config"
 	rssDto "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/rss/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/config"
 	"log/slog"
 	"sort"
 )

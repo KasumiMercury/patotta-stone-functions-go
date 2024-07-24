@@ -6,7 +6,7 @@ import (
 	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/api/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output/mocks"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/pkg/status"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
