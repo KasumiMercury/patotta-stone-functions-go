@@ -1,7 +1,7 @@
-package input
+package cloudfunction
 
 import "net/http"
 
-type Handler interface {
+type HandlerRepository interface {
 	Handle(w http.ResponseWriter, r *http.Request)
 }
