@@ -4,16 +4,15 @@ import (
 	"context"
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/rss/dto"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/rss/dto"
 	"github.com/mmcdole/gofeed"
 )
 
 type Client struct {
-	parser output.ParserRepository
+	parser ParserRepository
 }
 
-func NewRssClient(p output.ParserRepository) *Client {
+func NewRssClient(p ParserRepository) *Client {
 	return &Client{parser: p}
 }
 

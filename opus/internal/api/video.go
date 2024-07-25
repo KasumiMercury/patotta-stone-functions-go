@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/api/dto"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/api/dto"
+	youtube2 "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/youtube"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
 	"google.golang.org/api/youtube/v3"
 	"log/slog"
@@ -21,10 +21,10 @@ const (
 const MaxVideoIDs = 50
 
 type YouTubeVideo struct {
-	clt output.Client
+	clt youtube2.Client
 }
 
-func NewYouTubeVideo(clt output.Client) *YouTubeVideo {
+func NewYouTubeVideo(clt youtube2.Client) *YouTubeVideo {
 	return &YouTubeVideo{clt: clt}
 }
 

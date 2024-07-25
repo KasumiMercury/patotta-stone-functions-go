@@ -1,4 +1,4 @@
-package output
+package youtube
 
 //go:generate mockgen -source=$GOFILE -destination=./mocks/mock_$GOFILE -package=mocks
 

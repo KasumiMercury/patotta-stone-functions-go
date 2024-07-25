@@ -1,8 +1,8 @@
-package output
+package api
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/api/dto"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/api/dto"
 )
 
 type ApiRepository interface {

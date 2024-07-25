@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/config"
-	rssDto "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/rss/dto"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/api"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/port/output"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/db/realtime"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/rss"
+	rssDto "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/rss/dto"
 	"log/slog"
 	"sort"
 )
@@ -14,12 +16,12 @@ var ytRssURL = "https://www.youtube.com/feeds/videos.xml?channel_id="
 
 type SyncService struct {
 	config  config.Config
-	rssRepo output.RSSRepository
-	apiRepo output.ApiRepository
-	rtdRepo output.RealtimeRepository
+	rssRepo rss.RSSRepository
+	apiRepo api.ApiRepository
+	rtdRepo realtime.RealtimeRepository
 }
 
-func NewSyncService(c config.Config, r output.RSSRepository, a output.ApiRepository, rt output.RealtimeRepository) *SyncService {
+func NewSyncService(c config.Config, r rss.RSSRepository, a api.ApiRepository, rt realtime.RealtimeRepository) *SyncService {
 	return &SyncService{
 		config:  c,
 		rssRepo: r,

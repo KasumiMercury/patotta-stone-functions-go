@@ -1,8 +1,8 @@
-package output
+package rss
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapter/output/rss/dto"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/rss/dto"
 )
 
 type RSSRepository interface {
