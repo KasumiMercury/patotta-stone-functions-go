@@ -1,6 +1,6 @@
 package rss
 
-//go:generate mockgen -source=$GOFILE -destination=./mocks/mock_$GOFILE -package=mocks
+//go:generate mockgen -source=$GOFILE -destination=./../mocks/mock_$GOFILE -package=mocks
 
 import (
 	"context"
