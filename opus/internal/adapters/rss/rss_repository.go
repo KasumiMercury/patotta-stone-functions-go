@@ -2,7 +2,7 @@ package rss
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/rss/dto"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/rss/dto"
 )
 
 type RSSRepository interface {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/rss/dto"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/rss/dto"
 	"github.com/mmcdole/gofeed"
 )
 

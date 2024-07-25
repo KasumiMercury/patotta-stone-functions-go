@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/config"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/api"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/db/realtime"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/api"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/db/realtime"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/rss"
+	rssDto "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/rss/dto"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/domain/video"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/rss"
-	rssDto "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/rss/dto"
 	"log/slog"
 	"sort"
 )

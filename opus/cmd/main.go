@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/cloudfunction"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/cloudfunction"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/logging"
 	"log"
 	"log/slog"
