@@ -5,7 +5,7 @@ import (
 	"github.com/Code-Hex/synchro"
 	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/api/dto"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/mocks"
+	mocks "github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/youtube/mock"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
