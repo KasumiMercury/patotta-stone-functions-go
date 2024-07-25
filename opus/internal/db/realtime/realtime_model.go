@@ -1,7 +1,7 @@
 package realtime
 
 import (
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/domain/video"
 	"github.com/uptrace/bun"
 	"time"
 )

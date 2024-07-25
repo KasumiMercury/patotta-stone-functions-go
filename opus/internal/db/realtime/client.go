@@ -3,7 +3,7 @@ package realtime
 import (
 	"context"
 	"database/sql"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/domain/video"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"

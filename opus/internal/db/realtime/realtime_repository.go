@@ -2,7 +2,7 @@ package realtime
 
 import (
 	"context"
-	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/core/domain/video"
+	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/domain/video"
 	"time"
 )
 
