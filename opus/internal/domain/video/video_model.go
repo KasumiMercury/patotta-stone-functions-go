@@ -62,7 +62,7 @@ func (v *Video) validate() error {
 
 	// scheduledAtUnix is optional
 	// scheduledAtUnix is must be greater than publishedAtUnix
-	if v.scheduledAtUnix != 0 && v.scheduledAtUnix <= v.publishedAtUnix {
+	if v.scheduledAtUnix != 0 && v.scheduledAtUnix < v.publishedAtUnix {
 		return fmt.Errorf("scheduledAtUnix must be greater than publishedAtUnix")
 	}
 
