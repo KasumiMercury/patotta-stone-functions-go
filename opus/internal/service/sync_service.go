@@ -121,7 +121,6 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 	}
 
 	// Sort the merged video info by updated time
-	// TODO: Consider sorting by updated time
 	sort.Slice(videos, func(i, j int) bool {
 		return videos[i].UpdatedAtUnix() > videos[j].UpdatedAtUnix()
 	})
