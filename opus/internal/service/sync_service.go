@@ -92,15 +92,25 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		}
 
 		// merge video info and rss info
-		m := video.NewVideoBuilder(vd.Id).
-			SetChannelID(r.ChannelID).
-			SetTitle(r.Title).
-			SetDescription(r.Description).
-			SetChatID(vd.ChatId).
-			SetPublishedAtUnix(vd.PublishedAt.Unix()).
-			SetScheduledAtUnix(vd.ScheduledAt.Unix()).
-			SetUpdatedAtUnix(r.UpdatedAt.Unix()).
-			Build()
+		m, err := video.NewVideo(
+			r.ChannelID,
+			vd.Id,
+			vd.Title,
+			vd.Description,
+			vd.ChatId,
+			vd.Status,
+			vd.PublishedAt.Unix(),
+			vd.ScheduledAt.Unix(),
+			r.UpdatedAt.Unix(),
+		)
+		if err != nil {
+			slog.Error(
+				"Failed to create a video",
+				"sourceID", vd.Id,
+				"error", err,
+			)
+			continue
+		}
 
 		videos = append(videos, *m)
 	}

@@ -1,6 +1,7 @@
 package video
 
 import (
+	"fmt"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
 	"time"
 )
@@ -17,73 +18,59 @@ type Video struct {
 	updatedAtUnix   int64
 }
 
-type Builder interface {
-	SetChannelID(string) Builder
-	SetTitle(string) Builder
-	SetDescription(string) Builder
-	SetChatID(string) Builder
-	SetStatus(status.Status) Builder
-	SetPublishedAtUnix(int64) Builder
-	SetScheduledAtUnix(int64) Builder
-	SetUpdatedAtUnix(int64) Builder
-	Build() *Video
-}
-
-type builderImpl struct {
-	video *Video
-}
-
-func NewVideoBuilder(sourceID string) Builder {
-	return &builderImpl{
-		video: &Video{
-			sourceID: sourceID,
-			status:   status.Undefined,
-		},
+func NewVideo(channelID, sourceID, title, description, chatID string, status status.Status, publishedAtUnix, scheduledAtUnix, updatedAtUnix int64) (*Video, error) {
+	v := &Video{
+		channelID:       channelID,
+		sourceID:        sourceID,
+		title:           title,
+		description:     description,
+		chatID:          chatID,
+		status:          status,
+		publishedAtUnix: publishedAtUnix,
+		scheduledAtUnix: scheduledAtUnix,
+		updatedAtUnix:   updatedAtUnix,
 	}
+
+	if err := v.validate(); err != nil {
+		return nil, err
+	}
+
+	return v, nil
 }
 
-func (vb *builderImpl) SetChannelID(channelID string) Builder {
-	vb.video.channelID = channelID
-	return vb
-}
+func (v *Video) validate() error {
+	if v.channelID == "" {
+		return fmt.Errorf("channelID is required")
+	}
+	if v.sourceID == "" {
+		return fmt.Errorf("sourceID is required")
+	}
+	if v.title == "" {
+		return fmt.Errorf("title is required")
+	}
 
-func (vb *builderImpl) SetTitle(title string) Builder {
-	vb.video.title = title
-	return vb
-}
+	// description is optional
+	// chatID is optional
 
-func (vb *builderImpl) SetDescription(description string) Builder {
-	vb.video.description = description
-	return vb
-}
+	if v.status == status.Undefined {
+		return fmt.Errorf("status is undefined")
+	}
 
-func (vb *builderImpl) SetChatID(chatID string) Builder {
-	vb.video.chatID = chatID
-	return vb
-}
+	if v.publishedAtUnix == 0 {
+		return fmt.Errorf("publishedAtUnix is required")
+	}
 
-func (vb *builderImpl) SetStatus(status status.Status) Builder {
-	vb.video.status = status
-	return vb
-}
+	// scheduledAtUnix is optional
+	// scheduledAtUnix is must be greater than publishedAtUnix
+	if v.scheduledAtUnix != 0 && v.scheduledAtUnix < v.publishedAtUnix {
+		return fmt.Errorf("scheduledAtUnix must be greater than publishedAtUnix")
+	}
 
-func (vb *builderImpl) SetPublishedAtUnix(publishedAtUnix int64) Builder {
-	vb.video.publishedAtUnix = publishedAtUnix
-	return vb
-}
+	if v.updatedAtUnix == 0 {
+		return fmt.Errorf("updatedAtUnix is required")
+	}
 
-func (vb *builderImpl) SetScheduledAtUnix(scheduledAtUnix int64) Builder {
-	vb.video.scheduledAtUnix = scheduledAtUnix
-	return vb
-}
-
-func (vb *builderImpl) SetUpdatedAtUnix(updatedAtUnix int64) Builder {
-	vb.video.updatedAtUnix = updatedAtUnix
-	return vb
-}
-
-func (vb *builderImpl) Build() *Video {
-	return vb.video
+	return nil
 }
 
 func (v *Video) ChannelID() string {
@@ -101,45 +88,29 @@ func (v *Video) Description() string {
 func (v *Video) ChatID() string {
 	return v.chatID
 }
-func (v *Video) NillableChatID() *string {
-	if v.chatID == "" {
-		return nil
-	}
-	return &v.chatID
-}
 func (v *Video) Status() status.Status {
 	return v.status
-}
-func (v *Video) StatusString() string {
-	return v.status.String()
 }
 func (v *Video) PublishedAtUnix() int64 {
 	return v.publishedAtUnix
 }
-func (v *Video) NillablePublishedAt() *time.Time {
-	if v.publishedAtUnix == 0 {
-		return nil
-	}
-	t := time.Unix(v.publishedAtUnix, 0)
-	return &t
+func (v *Video) PublishedAtUTC() time.Time {
+	return time.Unix(v.publishedAtUnix, 0).UTC()
 }
 func (v *Video) ScheduledAtUnix() int64 {
 	return v.scheduledAtUnix
 }
-func (v *Video) NillableScheduledAt() *time.Time {
+func (v *Video) NillableScheduledAtUTC() *time.Time {
 	if v.scheduledAtUnix == 0 {
 		return nil
 	}
-	t := time.Unix(v.scheduledAtUnix, 0)
+
+	t := time.Unix(v.scheduledAtUnix, 0).UTC()
 	return &t
 }
 func (v *Video) UpdatedAtUnix() int64 {
 	return v.updatedAtUnix
 }
-func (v *Video) NillableUpdatedAt() *time.Time {
-	if v.updatedAtUnix == 0 {
-		return nil
-	}
-	t := time.Unix(v.updatedAtUnix, 0)
-	return &t
+func (v *Video) UpdatedAtUTC() time.Time {
+	return time.Unix(v.updatedAtUnix, 0).UTC()
 }

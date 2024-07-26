@@ -14,16 +14,16 @@ type Record struct {
 	Status      string     `bun:",type:varchar(255)"`
 	ChatID      string     `bun:",type:varchar(255)"`
 	ScheduledAt *time.Time `bun:",type:timestamptz"`
-	UpdatedAt   *time.Time `bun:",type:timestamptz"`
+	UpdatedAt   time.Time  `bun:",type:timestamptz"`
 }
 
 func toDBModel(v *video.Video) *Record {
 	return &Record{
 		SourceID:    v.SourceID(),
 		Title:       v.Title(),
-		Status:      v.StatusString(),
+		Status:      v.Status().String(),
 		ChatID:      v.ChatID(),
-		ScheduledAt: v.NillableScheduledAt(),
-		UpdatedAt:   v.NillableUpdatedAt(),
+		ScheduledAt: v.NillableScheduledAtUTC(),
+		UpdatedAt:   v.UpdatedAtUTC(),
 	}
 }
