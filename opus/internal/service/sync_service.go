@@ -10,6 +10,7 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/domain/video"
 	"log/slog"
 	"sort"
+	"time"
 )
 
 var ytRssURL = "https://www.youtube.com/feeds/videos.xml?channel_id="
@@ -82,18 +83,9 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 	videos := make([]video.Video, 0, len(vdList))
 
 	for _, vd := range vdList {
-		r, ok := rssMap[vd.Id]
-		if !ok {
-			slog.Warn(
-				"Video  not found in RSS",
-				"sourceID", vd.Id,
-			)
-			continue
-		}
-
 		// merge video info and rss info
 		m, err := video.NewVideo(
-			r.ChannelID,
+			vd.ChannelId,
 			vd.Id,
 			vd.Title,
 			vd.Description,
@@ -101,7 +93,7 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 			vd.Status,
 			vd.PublishedAt.Unix(),
 			vd.ScheduledAt.Unix(),
-			r.UpdatedAt.Unix(),
+			time.Now().Unix(),
 		)
 		if err != nil {
 			slog.Error(
