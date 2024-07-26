@@ -23,7 +23,7 @@ func toDBModel(v *video.Video) *Record {
 		Title:       v.Title(),
 		Status:      v.Status().String(),
 		ChatID:      v.ChatID(),
-		ScheduledAt: v.NillableScheduledAt(),
-		UpdatedAt:   v.UpdatedAt(),
+		ScheduledAt: v.NillableScheduledAtUTC(),
+		UpdatedAt:   v.UpdatedAtUTC(),
 	}
 }

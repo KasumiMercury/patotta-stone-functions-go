@@ -328,11 +328,11 @@ func TestVideo_PublishedAt(t *testing.T) {
 	}
 
 	// Act
-	got := v.PublishedAt()
+	got := v.PublishedAtUTC()
 
 	// Assert
 	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC) {
-		t.Errorf("PublishedAt() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+		t.Errorf("PublishedAtUTC() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
 	}
 }
 
@@ -379,9 +379,9 @@ func TestVideo_NillableScheduledAt(t *testing.T) {
 		t.Parallel()
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			got := tt.v.NillableScheduledAt()
+			got := tt.v.NillableScheduledAtUTC()
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NillableScheduledAt() got = %v, want %v", got, tt.want)
+				t.Errorf("NillableScheduledAtUTC() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -411,11 +411,11 @@ func TestVideo_UpdatedAt(t *testing.T) {
 	}
 
 	// Act
-	got := v.UpdatedAt()
+	got := v.UpdatedAtUTC()
 
 	// Assert
 	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC) {
-		t.Errorf("UpdatedAt() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+		t.Errorf("UpdatedAtUTC() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
 	}
 }
 
