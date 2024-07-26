@@ -71,3 +71,5 @@ func (v *Video) validate() error {
 
 	return nil
 }
+
+// TODO: getter or convert to DTO
