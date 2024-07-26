@@ -8,6 +8,7 @@ import (
 
 type DetailResponse struct {
 	Id          string
+	ChannelId   string
 	Title       string
 	Description string
 	Status      status.Status

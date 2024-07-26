@@ -10,6 +10,7 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/domain/video"
 	"log/slog"
 	"sort"
+	"time"
 )
 
 var ytRssURL = "https://www.youtube.com/feeds/videos.xml?channel_id="
@@ -72,28 +73,13 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		)
 	}
 
-	// make an item map from rssItemList
-	rssMap := make(map[string]rssDto.Item, len(rssItemList))
-	for _, r := range rssItemList {
-		rssMap[r.SourceID] = r
-	}
-
 	// Update the video details in the database(RealtimeDB)
 	videos := make([]video.Video, 0, len(vdList))
 
 	for _, vd := range vdList {
-		r, ok := rssMap[vd.Id]
-		if !ok {
-			slog.Warn(
-				"Video  not found in RSS",
-				"sourceID", vd.Id,
-			)
-			continue
-		}
-
 		// merge video info and rss info
 		m, err := video.NewVideo(
-			r.ChannelID,
+			vd.ChannelId,
 			vd.Id,
 			vd.Title,
 			vd.Description,
@@ -101,7 +87,7 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 			vd.Status,
 			vd.PublishedAt.Unix(),
 			vd.ScheduledAt.Unix(),
-			r.UpdatedAt.Unix(),
+			time.Now().Unix(),
 		)
 		if err != nil {
 			slog.Error(
@@ -120,9 +106,9 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		return nil
 	}
 
-	// Sort the merged video info by updated time
+	// Sort the merged video info by published time
 	sort.Slice(videos, func(i, j int) bool {
-		return videos[i].UpdatedAtUnix() > videos[j].UpdatedAtUnix()
+		return videos[i].PublishedAtUnix() > videos[j].PublishedAtUnix()
 	})
 
 	// Upsert the merged video info into the database(RealtimeDB)

@@ -48,6 +48,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "live",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -58,8 +59,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID",
-					Status: status.Live,
+					Id:        "videoID",
+					ChannelId: "channelID",
+					Status:    status.Live,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -88,6 +90,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "upcoming",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -98,8 +101,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID",
-					Status: status.Upcoming,
+					Id:        "videoID",
+					ChannelId: "channelID",
+					Status:    status.Upcoming,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -128,6 +132,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "none",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -138,8 +143,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID",
-					Status: status.Archived,
+					Id:        "videoID",
+					ChannelId: "channelID",
+					Status:    status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -168,6 +174,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "completed",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -178,8 +185,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID",
-					Status: status.Archived,
+					Id:        "videoID",
+					ChannelId: "channelID",
+					Status:    status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -208,6 +216,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-02T00:00:00Z",
 									LiveBroadcastContent: "live",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-02T00:00:00Z",
@@ -218,6 +227,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "upcoming",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -228,16 +238,18 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID1",
-					Status: status.Live,
+					Id:        "videoID1",
+					ChannelId: "channelID",
+					Status:    status.Live,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
-					Id:     "videoID2",
-					Status: status.Upcoming,
+					Id:        "videoID2",
+					ChannelId: "channelID",
+					Status:    status.Upcoming,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -266,6 +278,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-02T00:00:00Z",
 									LiveBroadcastContent: "live",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-02T00:00:00Z",
@@ -276,6 +289,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "none",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -286,16 +300,18 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID1",
-					Status: status.Live,
+					Id:        "videoID1",
+					ChannelId: "channelID",
+					Status:    status.Live,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
-					Id:     "videoID2",
-					Status: status.Archived,
+					Id:        "videoID2",
+					ChannelId: "channelID",
+					Status:    status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -324,6 +340,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-02T00:00:00Z",
 									LiveBroadcastContent: "live",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-02T00:00:00Z",
@@ -334,6 +351,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "completed",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -344,16 +362,18 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID1",
-					Status: status.Live,
+					Id:        "videoID1",
+					ChannelId: "channelID",
+					Status:    status.Live,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
-					Id:     "videoID2",
-					Status: status.Archived,
+					Id:        "videoID2",
+					ChannelId: "channelID",
+					Status:    status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -382,6 +402,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-02T00:00:00Z",
 									LiveBroadcastContent: "upcoming",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-02T00:00:00Z",
@@ -392,6 +413,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "none",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -402,16 +424,18 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID1",
-					Status: status.Upcoming,
+					Id:        "videoID1",
+					ChannelId: "channelID",
+					Status:    status.Upcoming,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
-					Id:     "videoID2",
-					Status: status.Archived,
+					Id:        "videoID2",
+					ChannelId: "channelID",
+					Status:    status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -440,6 +464,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-02T00:00:00Z",
 									LiveBroadcastContent: "upcoming",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-02T00:00:00Z",
@@ -450,6 +475,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "completed",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -460,16 +486,18 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID1",
-					Status: status.Upcoming,
+					Id:        "videoID1",
+					ChannelId: "channelID",
+					Status:    status.Upcoming,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
-					Id:     "videoID2",
-					Status: status.Archived,
+					Id:        "videoID2",
+					ChannelId: "channelID",
+					Status:    status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -498,6 +526,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-02T00:00:00Z",
 									LiveBroadcastContent: "none",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-02T00:00:00Z",
@@ -508,6 +537,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "completed",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -518,16 +548,18 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID1",
-					Status: status.Archived,
+					Id:        "videoID1",
+					ChannelId: "channelID",
+					Status:    status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 				},
 				{
-					Id:     "videoID2",
-					Status: status.Archived,
+					Id:        "videoID2",
+					ChannelId: "channelID",
+					Status:    status.Archived,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -556,6 +588,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "live",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -566,8 +599,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 			},
 			want: []dto.DetailResponse{
 				{
-					Id:     "videoID1",
-					Status: status.Live,
+					Id:        "videoID1",
+					ChannelId: "channelID",
+					Status:    status.Live,
 					PublishedAt: synchro.In[tz.AsiaTokyo](
 						time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -602,6 +636,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 								Snippet: &youtube.VideoSnippet{
 									PublishedAt:          "2024-01-01T00:00:00Z",
 									LiveBroadcastContent: "completed",
+									ChannelId:            "channelID",
 								},
 								LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 									ScheduledStartTime: "2024-01-01T00:00:00Z",
@@ -618,8 +653,9 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 				var res []dto.DetailResponse
 				for i := 0; i < 130; i++ {
 					res = append(res, dto.DetailResponse{
-						Id:     "videoID",
-						Status: status.Archived,
+						Id:        "videoID",
+						ChannelId: "channelID",
+						Status:    status.Archived,
 						PublishedAt: synchro.In[tz.AsiaTokyo](
 							time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 						ScheduledAt: synchro.In[tz.AsiaTokyo](
@@ -680,6 +716,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 							Snippet: &youtube.VideoSnippet{
 								PublishedAt:          "2024-01-01T00:00:00Z",
 								LiveBroadcastContent: "unknown",
+								ChannelId:            "channelID",
 							},
 						},
 					},
@@ -701,6 +738,7 @@ func TestYouTubeVideo_FetchVideoDetailsByVideoIDsSuccessfully(t *testing.T) {
 							Snippet: &youtube.VideoSnippet{
 								PublishedAt:          "2024-01-01T00:00:00Z",
 								LiveBroadcastContent: "live",
+								ChannelId:            "channelID",
 							},
 							LiveStreamingDetails: &youtube.VideoLiveStreamingDetails{
 								ScheduledStartTime: "invalid",
