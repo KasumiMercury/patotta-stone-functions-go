@@ -23,7 +23,15 @@ func toDBModel(v *video.Video) *Record {
 		Title:       v.Title(),
 		Status:      v.Status().String(),
 		ChatID:      v.ChatID(),
-		ScheduledAt: v.NillableScheduledAtUTC(),
-		UpdatedAt:   v.UpdatedAtUTC(),
+		ScheduledAt: unixToNillableTime(v.ScheduledAtUnix()),
+		UpdatedAt:   *unixToNillableTime(v.UpdatedAtUnix()),
 	}
+}
+
+func unixToNillableTime(unix int64) *time.Time {
+	if unix == 0 {
+		return nil
+	}
+	t := time.Unix(unix, 0).UTC()
+	return &t
 }

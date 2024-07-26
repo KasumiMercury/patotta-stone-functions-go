@@ -3,7 +3,6 @@ package video
 import (
 	"fmt"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
-	"time"
 )
 
 type Video struct {
@@ -94,23 +93,9 @@ func (v *Video) Status() status.Status {
 func (v *Video) PublishedAtUnix() int64 {
 	return v.publishedAtUnix
 }
-func (v *Video) PublishedAtUTC() time.Time {
-	return time.Unix(v.publishedAtUnix, 0).UTC()
-}
 func (v *Video) ScheduledAtUnix() int64 {
 	return v.scheduledAtUnix
 }
-func (v *Video) NillableScheduledAtUTC() *time.Time {
-	if v.scheduledAtUnix == 0 {
-		return nil
-	}
-
-	t := time.Unix(v.scheduledAtUnix, 0).UTC()
-	return &t
-}
 func (v *Video) UpdatedAtUnix() int64 {
 	return v.updatedAtUnix
-}
-func (v *Video) UpdatedAtUTC() time.Time {
-	return time.Unix(v.updatedAtUnix, 0).UTC()
 }
