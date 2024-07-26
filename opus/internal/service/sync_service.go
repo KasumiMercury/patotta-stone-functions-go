@@ -73,12 +73,6 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		)
 	}
 
-	// make an item map from rssItemList
-	rssMap := make(map[string]rssDto.Item, len(rssItemList))
-	for _, r := range rssItemList {
-		rssMap[r.SourceID] = r
-	}
-
 	// Update the video details in the database(RealtimeDB)
 	videos := make([]video.Video, 0, len(vdList))
 
