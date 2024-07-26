@@ -88,6 +88,7 @@ func extractVideoItem(i *youtube.Video) (*dto.DetailResponse, error) {
 
 	return &dto.DetailResponse{
 		Id:          i.Id,
+		ChannelId:   i.Snippet.ChannelId,
 		Title:       i.Snippet.Title,
 		Description: i.Snippet.Description,
 		Status:      sts,
