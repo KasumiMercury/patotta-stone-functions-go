@@ -207,3 +207,218 @@ func TestNewVideo(t *testing.T) {
 		})
 	}
 }
+
+func TestVideo_ChannelID(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		channelID: "channelID",
+	}
+
+	// Act
+	got := v.ChannelID()
+
+	// Assert
+	if got != "channelID" {
+		t.Errorf("ChannelID() got = %v, want %v", got, "channelID")
+	}
+}
+
+func TestVideo_SourceID(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		sourceID: "sourceID",
+	}
+
+	// Act
+	got := v.SourceID()
+
+	// Assert
+	if got != "sourceID" {
+		t.Errorf("SourceID() got = %v, want %v", got, "sourceID")
+	}
+}
+
+func TestVideo_Title(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		title: "title",
+	}
+
+	// Act
+	got := v.Title()
+
+	// Assert
+	if got != "title" {
+		t.Errorf("Title() got = %v, want %v", got, "title")
+	}
+}
+
+func TestVideo_Description(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		description: "description",
+	}
+
+	// Act
+	got := v.Description()
+
+	// Assert
+	if got != "description" {
+		t.Errorf("Description() got = %v, want %v", got, "description")
+	}
+}
+
+func TestVideo_ChatID(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		chatID: "chatID",
+	}
+
+	// Act
+	got := v.ChatID()
+
+	// Assert
+	if got != "chatID" {
+		t.Errorf("ChatID() got = %v, want %v", got, "chatID")
+	}
+}
+
+func TestVideo_Status(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		status: status.Upcoming,
+	}
+
+	// Act
+	got := v.Status()
+
+	// Assert
+	if got != status.Upcoming {
+		t.Errorf("Status() got = %v, want %v", got, status.Upcoming)
+	}
+}
+
+func TestVideo_PublishedAtUnix(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+	}
+
+	// Act
+	got := v.PublishedAtUnix()
+
+	// Assert
+	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix() {
+		t.Errorf("PublishedAtUnix() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix())
+	}
+}
+
+func TestVideo_PublishedAt(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+	}
+
+	// Act
+	got := v.PublishedAt()
+
+	// Assert
+	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC) {
+		t.Errorf("PublishedAt() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+	}
+}
+
+func TestVideo_ScheduledAtUnix(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
+	}
+
+	// Act
+	got := v.ScheduledAtUnix()
+
+	// Assert
+	if got != time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix() {
+		t.Errorf("ScheduledAtUnix() got = %v, want %v", got, time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix())
+	}
+}
+
+func TestVideo_NillableScheduledAt(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name string
+		v    *Video
+		want *time.Time
+	}{
+		{
+			name: "when scheduledAtUnix is 0, return nil",
+			v: &Video{
+				scheduledAtUnix: 0,
+			},
+			want: nil,
+		},
+		{
+			name: "when scheduledAtUnix is not 0, return time.Time",
+			v: &Video{
+				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
+			},
+			want: timePtr(time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Parallel()
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.v.NillableScheduledAt()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NillableScheduledAt() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestVideo_UpdatedAtUnix(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		updatedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+	}
+
+	// Act
+	got := v.UpdatedAtUnix()
+
+	// Assert
+	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix() {
+		t.Errorf("UpdatedAtUnix() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix())
+	}
+}
+
+func TestVideo_UpdatedAt(t *testing.T) {
+	t.Parallel()
+	// Arrange
+	v := &Video{
+		updatedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+	}
+
+	// Act
+	got := v.UpdatedAt()
+
+	// Assert
+	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC) {
+		t.Errorf("UpdatedAt() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
+	}
+}
+
+func timePtr(t time.Time) *time.Time {
+	return &t
+}
