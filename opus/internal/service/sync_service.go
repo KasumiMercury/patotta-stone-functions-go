@@ -106,9 +106,9 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 		return nil
 	}
 
-	// Sort the merged video info by updated time
+	// Sort the merged video info by published time
 	sort.Slice(videos, func(i, j int) bool {
-		return videos[i].UpdatedAtUnix() > videos[j].UpdatedAtUnix()
+		return videos[i].PublishedAtUnix() > videos[j].PublishedAtUnix()
 	})
 
 	// Upsert the merged video info into the database(RealtimeDB)
