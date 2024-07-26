@@ -48,5 +48,5 @@ tasks:
     desc: "Run the coverage for opus"
     dir: "opus"
     cmds:
-      - go test -coverprofile=./pkg/test/coverage/coverage.txt ./...
-      - go tool cover -html=./pkg/test/coverage/coverage.txt
+      - go test -coverprofile=./coverage.txt ./...
+      - go tool cover -html=./coverage.txt
