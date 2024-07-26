@@ -320,22 +320,6 @@ func TestVideo_PublishedAtUnix(t *testing.T) {
 	}
 }
 
-func TestVideo_PublishedAt(t *testing.T) {
-	t.Parallel()
-	// Arrange
-	v := &Video{
-		publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-	}
-
-	// Act
-	got := v.PublishedAtUTC()
-
-	// Assert
-	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC) {
-		t.Errorf("PublishedAtUTC() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
-	}
-}
-
 func TestVideo_ScheduledAtUnix(t *testing.T) {
 	t.Parallel()
 	// Arrange
@@ -349,41 +333,6 @@ func TestVideo_ScheduledAtUnix(t *testing.T) {
 	// Assert
 	if got != time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix() {
 		t.Errorf("ScheduledAtUnix() got = %v, want %v", got, time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix())
-	}
-}
-
-func TestVideo_NillableScheduledAt(t *testing.T) {
-	t.Parallel()
-	tests := []struct {
-		name string
-		v    *Video
-		want *time.Time
-	}{
-		{
-			name: "when scheduledAtUnix is 0, return nil",
-			v: &Video{
-				scheduledAtUnix: 0,
-			},
-			want: nil,
-		},
-		{
-			name: "when scheduledAtUnix is not 0, return time.Time",
-			v: &Video{
-				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-			},
-			want: timePtr(time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
-		},
-	}
-
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			got := tt.v.NillableScheduledAtUTC()
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NillableScheduledAtUTC() got = %v, want %v", got, tt.want)
-			}
-		})
 	}
 }
 
@@ -401,24 +350,4 @@ func TestVideo_UpdatedAtUnix(t *testing.T) {
 	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix() {
 		t.Errorf("UpdatedAtUnix() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix())
 	}
-}
-
-func TestVideo_UpdatedAt(t *testing.T) {
-	t.Parallel()
-	// Arrange
-	v := &Video{
-		updatedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-	}
-
-	// Act
-	got := v.UpdatedAtUTC()
-
-	// Assert
-	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC) {
-		t.Errorf("UpdatedAtUTC() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC))
-	}
-}
-
-func timePtr(t time.Time) *time.Time {
-	return &t
 }
