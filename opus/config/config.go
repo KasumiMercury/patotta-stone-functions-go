@@ -3,6 +3,7 @@ package config
 import (
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"github.com/joho/godotenv"
 	"os"
 )
@@ -31,7 +32,10 @@ type Channel struct {
 func NewConfig() (*Config, error) {
 	c := &Config{}
 	if err := c.loadTarget(target); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load target: %w", err)
+	}
+	if err := c.loadEnv(); err != nil {
+		return nil, fmt.Errorf("failed to load env: %w", err)
 	}
 
 	return c, nil
