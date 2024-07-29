@@ -8,6 +8,7 @@
         <option value="govet" />
         <option value="errcheck" />
         <option value="unused" />
+        <option value="exhaustruct" />
         <option value="gosimple" />
       </list>
     </option>
