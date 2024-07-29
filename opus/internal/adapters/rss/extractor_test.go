@@ -10,6 +10,7 @@ import (
 )
 
 func TestRssClient_FetchRssItem(t *testing.T) {
+	t.Parallel()
 	// read test data
 	data, err := os.ReadFile("./test/videos.xml")
 	if err != nil {
@@ -28,7 +29,7 @@ func TestRssClient_FetchRssItem(t *testing.T) {
 				}
 			}),
 	)
-	defer mockServer.Close()
+	t.Cleanup(mockServer.Close)
 
 	// test FetchRssItems
 
@@ -57,6 +58,7 @@ func TestRssClient_FetchRssItem(t *testing.T) {
 	for name, tt := range tests {
 		name, tt := name, tt
 		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 			// act
 			items, err := client.FetchRssItems(ctx, mockServer.URL, tt.LimitUnix)
 
