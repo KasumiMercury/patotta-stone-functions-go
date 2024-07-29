@@ -3,6 +3,5 @@ linters:
     - exhaustruct
 linters-settings:
   exhaustruct:
-#    exclude test files
-    exclude:
-      - '_test\.go$'
+    include:
+      - '.+\.Test'
