@@ -1,6 +1,10 @@
 linters:
   enable:
     - exhaustruct
+    - goconst
+    - gofmt
+    - tparallel
+    - paralleltest
 linters-settings:
   exhaustruct:
     include:
