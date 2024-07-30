@@ -22,10 +22,15 @@ jobs:
 
     - name: Test
       working-directory: opus
-      run: go test -v ./... -coverprofile=coverage.txt
+      run: go test -v ./... -coverprofile=coverage.out --covermode=atomic
 
     - name: Golangci-lint
       uses: golangci/golangci-lint-action@v6.1.0
       with:
         args: --config=../.golangci.yml
         working-directory: opus
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
