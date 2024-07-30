@@ -1,36 +1,6 @@
 version: '3'
 
 tasks:
-  run-*:
-    desc: "Run the function"
-    vars:
-      FUNCTION_TARGET: '{{index .MATCH 0}}'
-    cmds:
-      - FUNCTION_TARGET={{.FUNCTION_TARGET}} go run cmd/main.go
-  build:
-    desc: "Build the docker image"
-    cmds:
-      - docker-compose build
-  up:
-    desc: "Start the docker container"
-    cmds:
-      - docker-compose up -d
-  down:
-    desc: "Stop the docker container"
-    cmds:
-      - docker-compose down
-  destroy:
-    desc: "Destroy the docker container"
-    cmds:
-      - docker-compose down --rmi all --volumes --remove-orphans
-  deploy-*-*-*:
-    desc: "Deploy the function to GOOGLE CLOUD FUNCTIONS"
-    vars:
-      FUNCTION_NAME: '{{index .MATCH 0}}'
-      FUNCTION_DIR: '{{index .MATCH 1}}'
-      FUNCTION_TARGET: '{{index .MATCH 2}}'
-    cmds:
-      - gcloud functions deploy {{.FUNCTION_NAME}} --no-gen2 --runtime go121 --region=asia-northeast1 --source=./{{.FUNCTION_DIR}} --entry-point {{.FUNCTION_TARGET}} --trigger-http
   generate-opus:
     desc: "go generate for opus"
     dir: "opus"
