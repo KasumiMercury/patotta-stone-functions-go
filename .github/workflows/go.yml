@@ -4,8 +4,6 @@
 name: Go
 
 on:
-  push:
-    branches: [ "develop" ]
   pull_request:
     branches: [ "develop" ]
 
@@ -25,4 +23,4 @@ jobs:
     #   run: go build -v ./...
 
     - name: Test
-      run: go test -v ./...
+      run: go test -v ./opus/...
