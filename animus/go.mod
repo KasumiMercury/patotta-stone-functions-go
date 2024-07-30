@@ -2,16 +2,16 @@ module github.com/KasumiMercury/patotta-stone-functions-go/animus
 
 go 1.21.6
 
-toolchain go1.21.12
+toolchain go1.22.5
 
 require (
 	cloud.google.com/go/language v1.12.9
 	github.com/Code-Hex/synchro v0.5.2
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/rivo/uniseg v0.4.7
-	github.com/uptrace/bun v1.1.17
-	github.com/uptrace/bun/dialect/pgdialect v1.1.17
-	github.com/uptrace/bun/driver/pgdriver v1.1.17
+	github.com/uptrace/bun v1.2.1
+	github.com/uptrace/bun/dialect/pgdialect v1.2.1
+	github.com/uptrace/bun/driver/pgdriver v1.2.1
 	golang.org/x/text v0.16.0
 	google.golang.org/api v0.189.0
 )
