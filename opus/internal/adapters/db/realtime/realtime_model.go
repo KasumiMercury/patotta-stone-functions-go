@@ -1,6 +1,8 @@
 package realtime
 
 import (
+	"github.com/Code-Hex/synchro"
+	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/domain/video"
 	"github.com/uptrace/bun"
 	"time"
@@ -23,15 +25,15 @@ func toDBModel(v *video.Video) *Record {
 		Title:       v.Title(),
 		Status:      v.Status().String(),
 		ChatID:      v.ChatID(),
-		ScheduledAt: unixToNillableTime(v.ScheduledAtUnix()),
-		UpdatedAt:   *unixToNillableTime(v.UpdatedAtUnix()),
+		ScheduledAt: synchroTimeToNillableTime(v.ScheduledAt()),
+		UpdatedAt:   v.UpdatedAt().StdTime(),
 	}
 }
 
-func unixToNillableTime(unix int64) *time.Time {
-	if unix == 0 {
+func synchroTimeToNillableTime(t synchro.Time[tz.AsiaTokyo]) *time.Time {
+	if t.IsZero() {
 		return nil
 	}
-	t := time.Unix(unix, 0).UTC()
-	return &t
+	tt := t.StdTime()
+	return &tt
 }
