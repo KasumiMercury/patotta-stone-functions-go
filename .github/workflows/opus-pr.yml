@@ -11,7 +11,16 @@ on:
         - '.github/workflows/opus-pr.yml'
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      go-version: ${{ steps.set_go.outputs.go-version }}
+    steps:
+      - id: go-version
+        run: echo "version=1.22" >> $GITHUB_OUTPUT
+
   test:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -22,7 +31,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.22'
+        go-version: ${{ needs.setup.outputs.go-version }}
         cache: true
         cache-dependency-path: go.sum
 
@@ -35,6 +44,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
 
   lint:
+    needs: setup
     runs-on: ubuntu-latest
     defaults:
         run:
@@ -45,7 +55,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
-        go-version: '1.22'
+        go-version: ${{ needs.setup.outputs.go-version }}
         cache: true
         cache-dependency-path: go.sum
 
