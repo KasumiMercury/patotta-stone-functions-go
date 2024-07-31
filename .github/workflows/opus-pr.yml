@@ -13,6 +13,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: opus
     steps:
     - uses: actions/checkout@v4
 
@@ -24,7 +27,6 @@ jobs:
         cache-dependency-path: go.sum
 
     - name: Test
-      working-directory: opus
       run: go test -v ./... -coverprofile=coverage.out --covermode=atomic
 
     - name: Upload coverage reports to Codecov
@@ -34,6 +36,9 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: opus
     steps:
     - uses: actions/checkout@v4
 
@@ -48,4 +53,3 @@ jobs:
       uses: golangci/golangci-lint-action@v6.1.0
       with:
         args: --config=../.golangci.yml
-        working-directory: opus
