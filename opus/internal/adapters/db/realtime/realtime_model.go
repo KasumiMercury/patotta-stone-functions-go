@@ -30,14 +30,6 @@ func toDBModel(v *video.Video) *Record {
 	}
 }
 
-//func unixToNillableTime(unix int64) *time.Time {
-//	if unix == 0 {
-//		return nil
-//	}
-//	t := time.Unix(unix, 0).UTC()
-//	return &t
-//}
-
 func synchroTimeToNillableTime(t synchro.Time[tz.AsiaTokyo]) *time.Time {
 	if t.IsZero() {
 		return nil
