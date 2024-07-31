@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"github.com/Code-Hex/synchro"
+	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/config"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/api"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/adapters/db/realtime"
@@ -10,7 +12,6 @@ import (
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/internal/domain/video"
 	"log/slog"
 	"sort"
-	"time"
 )
 
 var ytRssURL = "https://www.youtube.com/feeds/videos.xml?channel_id="
@@ -85,9 +86,9 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 			vd.Description,
 			vd.ChatId,
 			vd.Status,
-			vd.PublishedAt.Unix(),
-			vd.ScheduledAt.Unix(),
-			time.Now().Unix(),
+			vd.PublishedAt,
+			vd.ScheduledAt,
+			synchro.Now[tz.AsiaTokyo](),
 		)
 		if err != nil {
 			slog.Error(
@@ -108,7 +109,7 @@ func (s *SyncService) SyncVideosWithRSS(ctx context.Context) error {
 
 	// Sort the merged video info by published time
 	sort.Slice(videos, func(i, j int) bool {
-		return videos[i].PublishedAtUnix() > videos[j].PublishedAtUnix()
+		return videos[i].PublishedAt().After(videos[j].PublishedAt())
 	})
 
 	// Upsert the merged video info into the database(RealtimeDB)
