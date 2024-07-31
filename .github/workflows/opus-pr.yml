@@ -46,9 +46,6 @@ jobs:
   lint:
     needs: setup
     runs-on: ubuntu-latest
-    defaults:
-        run:
-            working-directory: opus
     steps:
     - uses: actions/checkout@v4
 
@@ -63,3 +60,4 @@ jobs:
       uses: golangci/golangci-lint-action@v6.1.0
       with:
         args: --config=../.golangci.yml
+        working-directory: opus
