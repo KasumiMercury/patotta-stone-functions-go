@@ -1,6 +1,8 @@
 package video
 
 import (
+	"github.com/Code-Hex/synchro"
+	"github.com/Code-Hex/synchro/tz"
 	"github.com/KasumiMercury/patotta-stone-functions-go/opus/status"
 	"reflect"
 	"testing"
@@ -11,15 +13,15 @@ func TestNewVideo(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		channelID       string
-		sourceID        string
-		title           string
-		description     string
-		chatID          string
-		status          status.Status
-		publishedAtUnix int64
-		scheduledAtUnix int64
-		updatedAtUnix   int64
+		channelID   string
+		sourceID    string
+		title       string
+		description string
+		chatID      string
+		status      status.Status
+		publishedAt synchro.Time[tz.AsiaTokyo]
+		scheduledAt synchro.Time[tz.AsiaTokyo]
+		updatedAt   synchro.Time[tz.AsiaTokyo]
 	}
 	tests := []struct {
 		name    string
@@ -30,41 +32,41 @@ func TestNewVideo(t *testing.T) {
 		{
 			name: "valid",
 			args: args{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			want: &Video{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			wantErr: false,
 		},
 		{
 			name: "when channelID is empty, return error",
 			args: args{
-				channelID:       "",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			want:    nil,
 			wantErr: true,
@@ -72,15 +74,15 @@ func TestNewVideo(t *testing.T) {
 		{
 			name: "when sourceID is empty, return error",
 			args: args{
-				channelID:       "channelID",
-				sourceID:        "",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			want:    nil,
 			wantErr: true,
@@ -88,15 +90,15 @@ func TestNewVideo(t *testing.T) {
 		{
 			name: "when title is empty, return error",
 			args: args{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			want:    nil,
 			wantErr: true,
@@ -104,15 +106,15 @@ func TestNewVideo(t *testing.T) {
 		{
 			name: "when status is undefined, return error",
 			args: args{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Undefined,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Undefined,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			want:    nil,
 			wantErr: true,
@@ -120,15 +122,15 @@ func TestNewVideo(t *testing.T) {
 		{
 			name: "when publishedAtUnix is 0, return error",
 			args: args{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: 0,
-				scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.Time[tz.AsiaTokyo]{},
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			want:    nil,
 			wantErr: true,
@@ -136,15 +138,15 @@ func TestNewVideo(t *testing.T) {
 		{
 			name: "when scheduledAtUnix is less than publishedAtUnix, return error",
 			args: args{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			want:    nil,
 			wantErr: true,
@@ -152,41 +154,41 @@ func TestNewVideo(t *testing.T) {
 		{
 			name: "when scheduledAtUnix is equal to publishedAtUnix, not return error",
 			args: args{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			want: &Video{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 			wantErr: false,
 		},
 		{
 			name: "when updatedAtUnix is 0, not return error",
 			args: args{
-				channelID:       "channelID",
-				sourceID:        "sourceID",
-				title:           "title",
-				description:     "description",
-				chatID:          "chatID",
-				status:          status.Upcoming,
-				publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				scheduledAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
-				updatedAtUnix:   0,
+				channelID:   "channelID",
+				sourceID:    "sourceID",
+				title:       "title",
+				description: "description",
+				chatID:      "chatID",
+				status:      status.Upcoming,
+				publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				updatedAt:   synchro.Time[tz.AsiaTokyo]{},
 			},
 			want:    nil,
 			wantErr: true,
@@ -196,7 +198,7 @@ func TestNewVideo(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := NewVideo(tt.args.channelID, tt.args.sourceID, tt.args.title, tt.args.description, tt.args.chatID, tt.args.status, tt.args.publishedAtUnix, tt.args.scheduledAtUnix, tt.args.updatedAtUnix)
+			got, err := NewVideo(tt.args.channelID, tt.args.sourceID, tt.args.title, tt.args.description, tt.args.chatID, tt.args.status, tt.args.publishedAt, tt.args.scheduledAt, tt.args.updatedAt)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewVideo() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -304,35 +306,35 @@ func TestVideo_Status(t *testing.T) {
 	}
 }
 
-func TestVideo_PublishedAtUnix(t *testing.T) {
+func TestVideo_PublishedAt(t *testing.T) {
 	t.Parallel()
 	// Arrange
 	v := &Video{
-		publishedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+		publishedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 	}
 
 	// Act
-	got := v.PublishedAtUnix()
+	got := v.PublishedAt()
 
 	// Assert
-	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix() {
-		t.Errorf("PublishedAtUnix() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix())
+	if got != synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)) {
+		t.Errorf("PublishedAt() got = %v, want %v", got, synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)))
 	}
 }
 
-func TestVideo_ScheduledAtUnix(t *testing.T) {
+func TestVideo_ScheduledAt(t *testing.T) {
 	t.Parallel()
 	// Arrange
 	v := &Video{
-		scheduledAtUnix: time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix(),
+		scheduledAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 	}
 
 	// Act
-	got := v.ScheduledAtUnix()
+	got := v.ScheduledAt()
 
 	// Assert
-	if got != time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix() {
-		t.Errorf("ScheduledAtUnix() got = %v, want %v", got, time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC).Unix())
+	if got != synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)) {
+		t.Errorf("ScheduledAt() got = %v, want %v", got, synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)))
 	}
 }
 
@@ -340,14 +342,14 @@ func TestVideo_UpdatedAtUnix(t *testing.T) {
 	t.Parallel()
 	// Arrange
 	v := &Video{
-		updatedAtUnix: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix(),
+		updatedAt: synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 	}
 
 	// Act
-	got := v.UpdatedAtUnix()
+	got := v.UpdatedAt()
 
 	// Assert
-	if got != time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix() {
-		t.Errorf("UpdatedAtUnix() got = %v, want %v", got, time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).Unix())
+	if got != synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)) {
+		t.Errorf("UpdatedAtUnix() got = %v, want %v", got, synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)))
 	}
 }
