@@ -12,7 +12,7 @@ import (
 func TestRssClient_FetchRssItem(t *testing.T) {
 	t.Parallel()
 	// read test data
-	data, err := os.ReadFile("./test/videos.xml")
+	data, err := os.ReadFile("./../../../testdata/videos.xml")
 	if err != nil {
 		t.Fatal(err)
 	}
