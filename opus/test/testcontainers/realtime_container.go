@@ -29,5 +29,10 @@ func SetUpRealtimeContainer(ctx context.Context) (*RealtimeContainer, error) {
 		return nil, err
 	}
 
+	// migrate
+	if _, _, err := container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "test", "-c", "CREATE TABLE videos (id SERIAL PRIMARY KEY, title TEXT, url TEXT, source_id TEXT, chat_id TEXT, status TEXT, scheduled_at TIMESTAMP, created_at TIMESTAMP, updated_at TIMESTAMP)"}); err != nil {
+		return nil, err
+	}
+
 	return &RealtimeContainer{container}, nil
 }
