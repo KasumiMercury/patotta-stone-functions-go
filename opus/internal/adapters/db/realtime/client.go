@@ -29,7 +29,6 @@ func (r *Realtime) UpsertRecords(ctx context.Context, videos []video.Video) erro
 	}
 
 	if _, err := r.db.NewInsert().Model(&rec).
-		// TODO: uncomment this line after implementing the conflict handling
 		On("conflict (source_id) do update").
 		Set("source_id = EXCLUDED.source_id").
 		Exec(ctx); err != nil {
