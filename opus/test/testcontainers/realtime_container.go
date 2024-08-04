@@ -33,6 +33,10 @@ func SetUpRealtimeContainer(ctx context.Context) (*RealtimeContainer, error) {
 	if _, _, err := container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "test", "-c", "CREATE TABLE videos (id SERIAL PRIMARY KEY, title TEXT, url TEXT, source_id TEXT, chat_id TEXT, status TEXT, scheduled_at TIMESTAMP, created_at TIMESTAMP, updated_at TIMESTAMP)"}); err != nil {
 		return nil, err
 	}
+	// unique index
+	if _, _, err := container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "test", "-c", "CREATE UNIQUE INDEX idx_videos_source_id ON videos (source_id)"}); err != nil {
+		return nil, err
+	}
 
 	return &RealtimeContainer{container}, nil
 }
