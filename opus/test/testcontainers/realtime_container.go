@@ -38,5 +38,10 @@ func SetUpRealtimeContainer(ctx context.Context) (*RealtimeContainer, error) {
 		return nil, err
 	}
 
+	// insert test data
+	if _, _, err := container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "test", "-c", "INSERT INTO videos (title, url, source_id, chat_id, status, scheduled_at, created_at, updated_at) VALUES ('title', 'url', 'sourceID', 'chatID', 'status', '2022-01-01 00:00:00', '2022-01-01 00:00:00', '2022-01-01 00:00:00')"}); err != nil {
+		return nil, err
+	}
+
 	return &RealtimeContainer{container}, nil
 }

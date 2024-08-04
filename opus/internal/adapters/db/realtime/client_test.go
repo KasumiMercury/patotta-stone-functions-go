@@ -47,6 +47,50 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+func TestRealtime_GetRecordsBySourceIDs(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		sourceIDs []string
+		want      []*Record
+	}{
+		{
+			name:      "success",
+			sourceIDs: []string{"sourceID"},
+			want: []*Record{
+				{
+					SourceID:    "sourceID",
+					Title:       "title",
+					Status:      "archived",
+					ChatID:      "chatID",
+					ScheduledAt: timeToPtr(time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC)),
+					UpdatedAt:   time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+			},
+		},
+		{
+			name:      "empty",
+			sourceIDs: []string{"sourceID2"},
+			want:      nil,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := clt.GetRecordsBySourceIDs(context.Background(), tt.sourceIDs)
+			if err != nil {
+				t.Errorf("error: %v", err)
+			}
+			if len(got) != len(tt.want) {
+				t.Errorf("want: %v, got: %v", tt.want, got)
+			}
+		})
+	}
+}
+
 func TestRealtime_UpsertRecords(t *testing.T) {
 	t.Parallel()
 
@@ -83,4 +127,8 @@ func TestRealtime_UpsertRecords(t *testing.T) {
 			}
 		})
 	}
+}
+
+func timeToPtr(t time.Time) *time.Time {
+	return &t
 }
