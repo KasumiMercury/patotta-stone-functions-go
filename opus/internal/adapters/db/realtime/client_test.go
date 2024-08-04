@@ -38,6 +38,20 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
+	// migrate
+	if _, _, err := container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "test", "-c", "CREATE TABLE videos (id SERIAL PRIMARY KEY, title TEXT, url TEXT, source_id TEXT, chat_id TEXT, status TEXT, scheduled_at TIMESTAMP, created_at TIMESTAMP, updated_at TIMESTAMP)"}); err != nil {
+		log.Fatal(err)
+	}
+	// unique index
+	if _, _, err := container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "test", "-c", "CREATE UNIQUE INDEX idx_videos_source_id ON videos (source_id)"}); err != nil {
+		log.Fatal(err)
+	}
+
+	// insert test data
+	if _, _, err := container.Exec(ctx, []string{"psql", "-U", "postgres", "-d", "test", "-c", "INSERT INTO videos (title, url, source_id, chat_id, status, scheduled_at, created_at, updated_at) VALUES ('title', 'url', 'sourceID', 'chatID', 'status', '2022-01-01 00:00:00', '2022-01-01 00:00:00', '2022-01-01 00:00:00')"}); err != nil {
+		log.Fatal(err)
+	}
+
 	code := m.Run()
 
 	if err := container.Terminate(ctx); err != nil {
