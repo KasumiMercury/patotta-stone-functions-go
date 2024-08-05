@@ -62,21 +62,21 @@ func TestRealtime_GetRecordsBySourceIDs(t *testing.T) {
 	}{
 		{
 			name:      "success",
-			sourceIDs: []string{"sourceID"},
+			sourceIDs: []string{"get_source_id"},
 			want: []*Record{
 				{
-					SourceID:    "sourceID",
-					Title:       "title",
+					SourceID:    "sget_source_id",
+					Title:       "get_title",
 					Status:      "archived",
-					ChatID:      "chatID",
-					ScheduledAt: timeToPtr(time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC)),
-					UpdatedAt:   time.Date(2022, 1, 1, 0, 0, 0, 0, time.UTC),
+					ChatID:      "get_chat_id",
+					ScheduledAt: nil,
+					UpdatedAt:   time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
 				},
 			},
 		},
 		{
 			name:      "empty",
-			sourceIDs: []string{"sourceID2"},
+			sourceIDs: []string{"non_existent_source_id"},
 			want:      nil,
 		},
 	}
@@ -107,15 +107,15 @@ func TestRealtime_UpsertRecords(t *testing.T) {
 			name: "success",
 			video: func() []video.Video {
 				v, _ := video.NewVideo(
-					"channelID",
-					"sourceID",
-					"title",
-					"description",
-					"chatID",
+					"new_channel_id",
+					"new_source_id",
+					"new_title",
+					"new_description",
+					"new_chat_id",
 					status.Archived,
-					synchro.In[tz.AsiaTokyo](time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-					synchro.In[tz.AsiaTokyo](time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-					synchro.In[tz.AsiaTokyo](time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 				)
 
 				return []video.Video{*v}
@@ -132,8 +132,4 @@ func TestRealtime_UpsertRecords(t *testing.T) {
 			}
 		})
 	}
-}
-
-func timeToPtr(t time.Time) *time.Time {
-	return &t
 }
