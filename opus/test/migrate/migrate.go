@@ -5,8 +5,10 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/golang-migrate/migrate/v4/source/github"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"log"
 )
 
 func Migrate(dsn string, migrationPath string) error {
@@ -16,6 +18,9 @@ func Migrate(dsn string, migrationPath string) error {
 	if err != nil {
 		return err
 	}
+
+	log.Println("migrate start")
+	log.Println("migrationPath: ", migrationPath)
 
 	m, err := migrate.NewWithDatabaseInstance(
 		"file://"+migrationPath,

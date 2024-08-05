@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	if err := migrate.Migrate(connStr, "../../../migrations"); err != nil {
+	if err := migrate.Migrate(connStr, "../../../../migrations"); err != nil {
 		log.Fatal(err)
 	}
 
@@ -65,7 +65,7 @@ func TestRealtime_GetRecordsBySourceIDs(t *testing.T) {
 			sourceIDs: []string{"get_source_id"},
 			want: []*Record{
 				{
-					SourceID:    "sget_source_id",
+					SourceID:    "get_source_id",
 					Title:       "get_title",
 					Status:      "archived",
 					ChatID:      "get_chat_id",
