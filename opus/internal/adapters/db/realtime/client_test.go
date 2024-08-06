@@ -183,3 +183,31 @@ func TestRealtime_UpsertRecords(t *testing.T) {
 		})
 	}
 }
+
+func TestRealtime_GetLastUpdatedUnixOfVideo(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		want int64
+	}{
+		{
+			name: "success",
+			want: time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC).Unix(),
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			got, err := clt.GetLastUpdatedUnixOfVideo(context.Background())
+			if err != nil {
+				t.Errorf("error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("want: %v, got: %v", tt.want, got)
+			}
+		})
+	}
+}
