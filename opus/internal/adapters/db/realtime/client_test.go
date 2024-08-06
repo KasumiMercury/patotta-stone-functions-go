@@ -104,7 +104,7 @@ func TestRealtime_UpsertRecords(t *testing.T) {
 		video []video.Video
 	}{
 		{
-			name: "success",
+			name: "insert",
 			video: func() []video.Video {
 				v, _ := video.NewVideo(
 					"new_channel_id",
@@ -115,6 +115,24 @@ func TestRealtime_UpsertRecords(t *testing.T) {
 					status.Archived,
 					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+				)
+
+				return []video.Video{*v}
+			}(),
+		},
+		{
+			"update",
+			func() []video.Video {
+				v, _ := video.NewVideo(
+					"already_channel_id",
+					"already_source_id",
+					"updated_title",
+					"updated_description",
+					"updated_chat_id",
+					status.Archived,
+					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 2, 0, 0, 0, 0, time.UTC)),
 					synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 				)
 
