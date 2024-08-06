@@ -148,6 +148,38 @@ func TestRealtime_UpsertRecords(t *testing.T) {
 			if err := clt.UpsertRecords(context.Background(), tt.video); err != nil {
 				t.Errorf("error: %v", err)
 			}
+
+			srcIDs := make([]string, 0, len(tt.video))
+			for _, v := range tt.video {
+				srcIDs = append(srcIDs, v.SourceID())
+			}
+
+			records, err := clt.GetRecordsBySourceIDs(context.Background(), srcIDs)
+			if err != nil {
+				t.Errorf("error: %v", err)
+			}
+
+			if len(records) != len(tt.video) {
+				t.Errorf("want: %v, got: %v", len(tt.video), len(records))
+			}
+
+			for i, r := range records {
+				if r.SourceID != tt.video[i].SourceID() {
+					t.Errorf("want: %v, got: %v", tt.video[i].SourceID(), r.SourceID)
+				}
+				if r.Title != tt.video[i].Title() {
+					t.Errorf("want: %v, got: %v", tt.video[i].Title(), r.Title)
+				}
+				if r.Status != tt.video[i].Status().String() {
+					t.Errorf("want: %v, got: %v", tt.video[i].Status().String(), r.Status)
+				}
+				if r.ChatID != tt.video[i].ChatID() {
+					t.Errorf("want: %v, got: %v", tt.video[i].ChatID(), r.ChatID)
+				}
+				if r.ScheduledAt != nil && tt.video[i].ScheduledAt().StdTime().Compare(*r.ScheduledAt) != 0 {
+					t.Errorf("want: %v, got: %v", tt.video[i].ScheduledAt().StdTime(), r.ScheduledAt)
+				}
+			}
 		})
 	}
 }
