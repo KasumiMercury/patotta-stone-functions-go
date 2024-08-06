@@ -8,7 +8,6 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"log/slog"
-	"time"
 )
 
 type Realtime struct {
@@ -61,42 +60,6 @@ func (r *Realtime) GetRecordsBySourceIDs(ctx context.Context, sourceIDs []string
 	return records, nil
 }
 
-func (r *Realtime) InsertRecords(ctx context.Context, videos []video.Video) error {
-	rec := make([]*Record, 0, len(videos))
-	for _, v := range videos {
-		rec = append(rec, toDBModel(&v))
-	}
-
-	if _, err := r.db.NewInsert().Model(&rec).Exec(ctx); err != nil {
-		slog.Error(
-			"Failed to insert records into realtime",
-			"records", videos,
-			slog.Group("Realtime", "error", err),
-		)
-		return err
-	}
-
-	return nil
-}
-
-func (r *Realtime) UpdateRecords(ctx context.Context, videos []video.Video) error {
-	rec := make([]*Record, 0, len(videos))
-	for _, v := range videos {
-		rec = append(rec, toDBModel(&v))
-	}
-
-	if _, err := r.db.NewUpdate().Model(&rec).Exec(ctx); err != nil {
-		slog.Error(
-			"Failed to update records in realtime",
-			"records", videos,
-			slog.Group("Realtime", "error", err),
-		)
-		return err
-	}
-
-	return nil
-}
-
 func (r *Realtime) GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error) {
 	records := make([]Record, 0)
 	err := r.db.NewSelect().
@@ -118,42 +81,4 @@ func (r *Realtime) GetLastUpdatedUnixOfVideo(ctx context.Context) (int64, error)
 
 	updatedAt := records[0].UpdatedAt
 	return updatedAt.Unix(), nil
-}
-
-func (r *Realtime) UpdateScheduledAtBySourceID(ctx context.Context, sourceID string, scheduledAt time.Time) error {
-	_, err := r.db.NewUpdate().
-		Model(&Record{}).
-		Set("scheduled_at = ?", scheduledAt).
-		Where("source_id = ?", sourceID).
-		Exec(ctx)
-	if err != nil {
-		slog.Error(
-			"Failed to update scheduled_at by source ID",
-			"sourceID", sourceID,
-			"scheduledAt", scheduledAt,
-			slog.Group("Realtime", "error", err),
-		)
-		return err
-	}
-
-	return nil
-}
-
-func (r *Realtime) UpdateStatusBySourceID(ctx context.Context, sourceID string, status string) error {
-	_, err := r.db.NewUpdate().
-		Model(&Record{}).
-		Set("status = ?", status).
-		Where("source_id = ?", sourceID).
-		Exec(ctx)
-	if err != nil {
-		slog.Error(
-			"Failed to update status by source ID",
-			"sourceID", sourceID,
-			"status", status,
-			slog.Group("Realtime", "error", err),
-		)
-		return err
-	}
-
-	return nil
 }
