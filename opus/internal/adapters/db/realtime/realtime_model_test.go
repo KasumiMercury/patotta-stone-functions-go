@@ -79,8 +79,8 @@ func Test_toDBModel(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			if !cmp.Equal(toDBModel(tt.args.v), tt.want) {
-				t.Errorf("want: %v, got: %v", tt.want, toDBModel(tt.args.v))
+			if diff := cmp.Diff(tt.want, toDBModel(tt.args.v)); diff != "" {
+				t.Errorf("toDBModel() mismatch (-want +got):\n%s", diff)
 			}
 		})
 	}
