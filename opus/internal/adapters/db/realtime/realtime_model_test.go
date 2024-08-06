@@ -47,6 +47,33 @@ func Test_toDBModel(t *testing.T) {
 				UpdatedAt:   utcToJST(time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
 			},
 		},
+		{
+			name: "when scheduledAt is 0",
+			args: args{
+				v: func() *video.Video {
+					v, _ := video.NewVideo(
+						"channelID",
+						"sourceID",
+						"title",
+						"description",
+						"chatID",
+						status.Archived,
+						synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+						synchro.In[tz.AsiaTokyo](time.Time{}),
+						synchro.In[tz.AsiaTokyo](time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+					)
+					return v
+				}(),
+			},
+			want: &Record{
+				SourceID:    "sourceID",
+				Title:       "title",
+				Status:      status.Archived.String(),
+				ChatID:      "chatID",
+				ScheduledAt: nil,
+				UpdatedAt:   utcToJST(time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)),
+			},
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
