@@ -79,6 +79,16 @@ func TestRealtime_GetRecordsBySourceIDs(t *testing.T) {
 			sourceIDs: []string{"non_existent_source_id"},
 			want:      nil,
 		},
+		{
+			name:      "empty sourceIDs",
+			sourceIDs: []string{},
+			want:      nil,
+		},
+		{
+			name:      "invalid sourceID",
+			sourceIDs: []string{"invalid_source_id"},
+			want:      nil,
+		},
 	}
 
 	for _, tt := range tests {
