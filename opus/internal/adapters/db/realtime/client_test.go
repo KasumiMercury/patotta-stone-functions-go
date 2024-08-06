@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 	}
 
 	if err := migrate.Migrate(connStr, "../../../../migrations"); err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to migrate: %v", err)
 	}
 
 	code := m.Run()
