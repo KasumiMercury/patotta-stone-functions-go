@@ -777,6 +777,8 @@ github.com/Code-Hex/synchro v0.5.2 h1:xBk/EIsqfu+yiuX9XC39xLXWm9mcLJ3zegem9itybz
 github.com/Code-Hex/synchro v0.5.2/go.mod h1:F9Z4Uf1SP7V5K1xPM17h19sS8DmuH6OFt8LI917ZpQ4=
 github.com/GoogleCloudPlatform/functions-framework-go v1.8.1 h1:wMO6lE8uR68ReG+/XwSgjTm79o4xJ+Aj9pNnCMnQzPk=
 github.com/GoogleCloudPlatform/functions-framework-go v1.8.1/go.mod h1:kKqAKLm08tjDVs37IG/Dl4hC1/go4E85Udn1LeSdAEI=
+github.com/GoogleCloudPlatform/functions-framework-go v1.9.0 h1:Fq0sKuCyyFFVFm1r6fEQJ4TRnbbhXP9Q6MEUX+UAd/0=
+github.com/GoogleCloudPlatform/functions-framework-go v1.9.0/go.mod h1:8Ww7VHPCGKqCfZOCT9INIiakNgGQPGRfL4U4yy5F5Kc=
 github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c/go.mod h1:X0CRv0ky0k6m906ixxpzmDRLvX58TFUKS2eePweuyxk=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
@@ -1735,6 +1737,8 @@ google.golang.org/api v0.126.0/go.mod h1:mBwVAtz+87bEN6CbA1GtZPDOqY2R5ONPqJeIlvy
 google.golang.org/api v0.128.0/go.mod h1:Y611qgqaE92On/7g65MQgxYul3c0rEB894kniWLY750=
 google.golang.org/api v0.190.0 h1:ASM+IhLY1zljNdLu19W1jTmU6A+gMk6M46Wlur61s+Q=
 google.golang.org/api v0.190.0/go.mod h1:QIr6I9iedBLnfqoD6L6Vze1UvS5Hzj5r2aUBOaZnLHo=
+google.golang.org/api v0.191.0 h1:cJcF09Z+4HAB2t5qTQM1ZtfL/PemsLFkcFG67qq2afk=
+google.golang.org/api v0.191.0/go.mod h1:tD5dsFGxFza0hnQveGfVk9QQYKcfp+VzgRqyXFxE0+E=
 google.golang.org/appengine v1.1.0/go.mod h1:EbEs0AVv82hx2wNQdGPgUI5lhzA/G0D9YwlJXL52JkM=
 google.golang.org/appengine v1.4.0/go.mod h1:xpcJRLb0r/rnEns0DIKYYv+WjYCduHsrkT7/EB5XEv4=
 google.golang.org/appengine v1.5.0/go.mod h1:xpcJRLb0r/rnEns0DIKYYv+WjYCduHsrkT7/EB5XEv4=
