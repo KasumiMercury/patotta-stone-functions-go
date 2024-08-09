@@ -6,7 +6,7 @@ toolchain go1.22.5
 
 require (
 	github.com/Code-Hex/synchro v0.5.2
-	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
+	github.com/GoogleCloudPlatform/functions-framework-go v1.9.0
 	github.com/golang-migrate/migrate/v4 v4.17.1
 	github.com/google/go-cmp v0.6.0
 	github.com/joho/godotenv v1.5.1
@@ -18,7 +18,7 @@ require (
 	github.com/uptrace/bun/dialect/pgdialect v1.2.1
 	github.com/uptrace/bun/driver/pgdriver v1.2.1
 	go.uber.org/mock v0.4.0
-	google.golang.org/api v0.190.0
+	google.golang.org/api v0.191.0
 )
 
 require (
