@@ -2,7 +2,7 @@ module github.com/KasumiMercury/patotta-stone-functions-go/opus
 
 go 1.21.6
 
-toolchain go1.22.6
+toolchain go1.23.0
 
 require (
 	github.com/Code-Hex/synchro v0.5.2
@@ -18,11 +18,11 @@ require (
 	github.com/uptrace/bun/dialect/pgdialect v1.2.1
 	github.com/uptrace/bun/driver/pgdriver v1.2.1
 	go.uber.org/mock v0.4.0
-	google.golang.org/api v0.191.0
+	google.golang.org/api v0.192.0
 )
 
 require (
-	cloud.google.com/go/auth v0.7.3 // indirect
+	cloud.google.com/go/auth v0.8.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/functions v1.16.6 // indirect
