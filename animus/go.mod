@@ -2,7 +2,7 @@ module github.com/KasumiMercury/patotta-stone-functions-go/animus
 
 go 1.21.6
 
-toolchain go1.22.6
+toolchain go1.23.0
 
 require (
 	cloud.google.com/go/language v1.13.1
@@ -13,11 +13,11 @@ require (
 	github.com/uptrace/bun/dialect/pgdialect v1.2.1
 	github.com/uptrace/bun/driver/pgdriver v1.2.1
 	golang.org/x/text v0.17.0
-	google.golang.org/api v0.191.0
+	google.golang.org/api v0.192.0
 )
 
 require (
-	cloud.google.com/go/auth v0.8.0 // indirect
+	cloud.google.com/go/auth v0.8.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/functions v1.16.6 // indirect
