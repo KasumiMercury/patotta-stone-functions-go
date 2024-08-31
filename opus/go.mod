@@ -1,6 +1,6 @@
 module github.com/KasumiMercury/patotta-stone-functions-go/opus
 
-go 1.21.6
+go 1.22
 
 toolchain go1.23.0
 
@@ -14,9 +14,9 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.33.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.33.0
-	github.com/uptrace/bun v1.2.1
-	github.com/uptrace/bun/dialect/pgdialect v1.2.1
-	github.com/uptrace/bun/driver/pgdriver v1.2.1
+	github.com/uptrace/bun v1.2.3
+	github.com/uptrace/bun/dialect/pgdialect v1.2.3
+	github.com/uptrace/bun/driver/pgdriver v1.2.3
 	go.uber.org/mock v0.4.0
 	google.golang.org/api v0.194.0
 )
@@ -82,6 +82,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
+	github.com/puzpuzpuz/xsync/v3 v3.4.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/shirou/gopsutil/v3 v3.23.12 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
