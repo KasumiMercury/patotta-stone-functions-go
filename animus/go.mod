@@ -1,6 +1,6 @@
 module github.com/KasumiMercury/patotta-stone-functions-go/animus
 
-go 1.21.6
+go 1.22
 
 toolchain go1.23.0
 
@@ -9,9 +9,9 @@ require (
 	github.com/Code-Hex/synchro v0.5.2
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.0
 	github.com/rivo/uniseg v0.4.7
-	github.com/uptrace/bun v1.2.1
-	github.com/uptrace/bun/dialect/pgdialect v1.2.1
-	github.com/uptrace/bun/driver/pgdriver v1.2.1
+	github.com/uptrace/bun v1.2.3
+	github.com/uptrace/bun/dialect/pgdialect v1.2.3
+	github.com/uptrace/bun/driver/pgdriver v1.2.3
 	golang.org/x/text v0.17.0
 	google.golang.org/api v0.194.0
 )
@@ -36,6 +36,7 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
+	github.com/puzpuzpuz/xsync/v3 v3.4.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
