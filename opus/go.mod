@@ -2,7 +2,7 @@ module github.com/KasumiMercury/patotta-stone-functions-go/opus
 
 go 1.22
 
-toolchain go1.23.0
+toolchain go1.23.1
 
 require (
 	github.com/Code-Hex/synchro v0.5.2
