@@ -57,7 +57,7 @@ jobs:
         cache-dependency-path: go.sum
 
     - name: Golangci-lint
-      uses: golangci/golangci-lint-action@v6.1.0
+      uses: golangci/golangci-lint-action@v6.1.1
       with:
         args: --config=../.golangci.yml
         working-directory: opus
