@@ -13,7 +13,7 @@ require (
 	github.com/uptrace/bun/dialect/pgdialect v1.2.3
 	github.com/uptrace/bun/driver/pgdriver v1.2.3
 	golang.org/x/text v0.19.0
-	google.golang.org/api v0.200.0
+	google.golang.org/api v0.201.0
 )
 
 require (
