@@ -9,9 +9,9 @@ require (
 	github.com/Code-Hex/synchro v0.5.2
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.0
 	github.com/rivo/uniseg v0.4.7
-	github.com/uptrace/bun v1.2.3
-	github.com/uptrace/bun/dialect/pgdialect v1.2.3
-	github.com/uptrace/bun/driver/pgdriver v1.2.3
+	github.com/uptrace/bun v1.2.5
+	github.com/uptrace/bun/dialect/pgdialect v1.2.5
+	github.com/uptrace/bun/driver/pgdriver v1.2.5
 	golang.org/x/text v0.19.0
 	google.golang.org/api v0.203.0
 )
@@ -59,5 +59,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241015192408-796eee8c2d53 // indirect
 	google.golang.org/grpc v1.67.1 // indirect
 	google.golang.org/protobuf v1.35.1 // indirect
-	mellium.im/sasl v0.3.1 // indirect
+	mellium.im/sasl v0.3.2 // indirect
 )
