@@ -2,7 +2,7 @@ module github.com/KasumiMercury/patotta-stone-functions-go/animus
 
 go 1.23
 
-toolchain go1.23.3
+toolchain go1.23.4
 
 require (
 	cloud.google.com/go/language v1.14.2
