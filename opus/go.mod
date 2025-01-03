@@ -1,11 +1,9 @@
 module github.com/KasumiMercury/patotta-stone-functions-go/opus
 
-go 1.23
-
-toolchain go1.23.4
+go 1.23.4
 
 require (
-	github.com/Code-Hex/synchro v0.5.2
+	github.com/Code-Hex/synchro v0.5.3
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.0
 	github.com/golang-migrate/migrate/v4 v4.18.1
 	github.com/google/go-cmp v0.6.0
@@ -14,9 +12,9 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.34.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.34.0
-	github.com/uptrace/bun v1.2.6
-	github.com/uptrace/bun/dialect/pgdialect v1.2.6
-	github.com/uptrace/bun/driver/pgdriver v1.2.6
+	github.com/uptrace/bun v1.2.7
+	github.com/uptrace/bun/dialect/pgdialect v1.2.7
+	github.com/uptrace/bun/driver/pgdriver v1.2.7
 	go.uber.org/mock v0.5.0
 	google.golang.org/api v0.214.0
 )
