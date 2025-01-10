@@ -5,11 +5,11 @@ go 1.23.4
 require (
 	cloud.google.com/go/language v1.14.3
 	github.com/Code-Hex/synchro v0.5.3
-	github.com/GoogleCloudPlatform/functions-framework-go v1.9.0
+	github.com/GoogleCloudPlatform/functions-framework-go v1.9.1
 	github.com/rivo/uniseg v0.4.7
-	github.com/uptrace/bun v1.2.7
-	github.com/uptrace/bun/dialect/pgdialect v1.2.7
-	github.com/uptrace/bun/driver/pgdriver v1.2.7
+	github.com/uptrace/bun v1.2.8
+	github.com/uptrace/bun/dialect/pgdialect v1.2.8
+	github.com/uptrace/bun/driver/pgdriver v1.2.8
 	golang.org/x/text v0.21.0
 	google.golang.org/api v0.214.0
 )
@@ -18,7 +18,7 @@ require (
 	cloud.google.com/go/auth v0.13.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.6 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
-	cloud.google.com/go/functions v1.16.6 // indirect
+	cloud.google.com/go/functions v1.19.3 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.15.2 // indirect
@@ -55,7 +55,7 @@ require (
 	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
