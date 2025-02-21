@@ -12,9 +12,9 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.35.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
-	github.com/uptrace/bun v1.2.9
-	github.com/uptrace/bun/dialect/pgdialect v1.2.9
-	github.com/uptrace/bun/driver/pgdriver v1.2.9
+	github.com/uptrace/bun v1.2.10
+	github.com/uptrace/bun/dialect/pgdialect v1.2.10
+	github.com/uptrace/bun/driver/pgdriver v1.2.10
 	go.uber.org/mock v0.5.0
 	google.golang.org/api v0.221.0
 )
@@ -84,7 +84,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
-	github.com/puzpuzpuz/xsync/v3 v3.5.0 // indirect
+	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.23.12 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
