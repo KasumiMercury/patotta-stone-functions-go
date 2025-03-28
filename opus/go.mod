@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	github.com/Code-Hex/synchro v0.5.3
-	github.com/GoogleCloudPlatform/functions-framework-go v1.9.1
+	github.com/GoogleCloudPlatform/functions-framework-go v1.9.2
 	github.com/golang-migrate/migrate/v4 v4.18.2
 	github.com/google/go-cmp v0.7.0
 	github.com/joho/godotenv v1.5.1
