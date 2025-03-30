@@ -1,11 +1,31 @@
+version: "2"
 linters:
   enable:
     - exhaustruct
     - goconst
-    - gofmt
-    - tparallel
     - paralleltest
-linters-settings:
-  exhaustruct:
-    include:
-      - '.+\.Test'
+    - tparallel
+  settings:
+    exhaustruct:
+      include:
+        - .+\.Test
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
