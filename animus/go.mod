@@ -7,9 +7,9 @@ require (
 	github.com/Code-Hex/synchro v0.5.3
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.2
 	github.com/rivo/uniseg v0.4.7
-	github.com/uptrace/bun v1.2.12
-	github.com/uptrace/bun/dialect/pgdialect v1.2.12
-	github.com/uptrace/bun/driver/pgdriver v1.2.12
+	github.com/uptrace/bun v1.2.13
+	github.com/uptrace/bun/dialect/pgdialect v1.2.13
+	github.com/uptrace/bun/driver/pgdriver v1.2.13
 	golang.org/x/text v0.26.0
 	google.golang.org/api v0.236.0
 )
@@ -52,7 +52,7 @@ require (
 	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/multierr v1.1.0 // indirect
 	go.uber.org/zap v1.10.0 // indirect
-	golang.org/x/crypto v0.38.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.15.0 // indirect
