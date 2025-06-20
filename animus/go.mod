@@ -7,9 +7,9 @@ require (
 	github.com/Code-Hex/synchro v0.5.3
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.2
 	github.com/rivo/uniseg v0.4.7
-	github.com/uptrace/bun v1.2.13
-	github.com/uptrace/bun/dialect/pgdialect v1.2.13
-	github.com/uptrace/bun/driver/pgdriver v1.2.13
+	github.com/uptrace/bun v1.2.14
+	github.com/uptrace/bun/dialect/pgdialect v1.2.14
+	github.com/uptrace/bun/driver/pgdriver v1.2.14
 	golang.org/x/text v0.26.0
 	google.golang.org/api v0.237.0
 )
