@@ -3,7 +3,7 @@ module github.com/KasumiMercury/patotta-stone-functions-go/opus
 go 1.23.4
 
 require (
-	github.com/Code-Hex/synchro v0.5.3
+	github.com/Code-Hex/synchro v0.5.4
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.2
 	github.com/golang-migrate/migrate/v4 v4.19.0
 	github.com/google/go-cmp v0.7.0
