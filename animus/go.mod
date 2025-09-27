@@ -4,7 +4,7 @@ go 1.23.4
 
 require (
 	cloud.google.com/go/language v1.14.5
-	github.com/Code-Hex/synchro v0.5.3
+	github.com/Code-Hex/synchro v0.5.4
 	github.com/GoogleCloudPlatform/functions-framework-go v1.9.2
 	github.com/rivo/uniseg v0.4.7
 	github.com/uptrace/bun v1.2.15
