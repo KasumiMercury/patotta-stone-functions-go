@@ -11,7 +11,7 @@ require (
 	github.com/uptrace/bun/dialect/pgdialect v1.2.15
 	github.com/uptrace/bun/driver/pgdriver v1.2.15
 	golang.org/x/text v0.30.0
-	google.golang.org/api v0.252.0
+	google.golang.org/api v0.253.0
 )
 
 require (
